@@ -1,7 +1,7 @@
 module.exports = {
   lintOnSave: false,
   devServer: {
-      port: 8082,
+      port: 8080,
       // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
       // proxy: {
       //   '/': {
