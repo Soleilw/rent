@@ -7,10 +7,11 @@
 </template>
 
 <script>
+	var geocoder, map, marker = null;
 	export default {
 		data() {
 			return {
-
+				center: '39.916527, 116.397128'
 			}
 		},
 		mounted() {
@@ -18,17 +19,36 @@
 		},
 		methods: {
 			init() {
-				var map = new qq.maps.Map(document.getElementById("container"), {
-					// 地图的中心地理坐标。
-					center: new qq.maps.LatLng(39.916527, 116.397128)
-				})
-				var listener = qq.maps.event.addListener(
-					map,
-					'click',
-					function() {
-						alert('您点击了地图。');
-					}
-				);
+				this.center = new qq.maps.LatLng(39.916527, 116.397128);
+				map = new qq.maps.Map(document.getElementById('container'), {
+					center: center,
+					zoom: 13
+				});
+				//地址和经纬度之间进行转换服务
+				geocoder = new qq.maps.Geocoder();
+				//设置服务请求成功的回调函数
+				geocoder.setComplete(function(result) {
+					map.setCenter(result.detail.location);
+					var marker = new qq.maps.Marker({
+						map: map,
+						position: result.detail.location
+					});
+					//点击Marker会弹出反查结果
+					var info = new qq.maps.InfoWindow({
+						map: map
+					});
+					qq.maps.event.addListener(marker, 'click', function() {
+						info.open();
+						info.setContent('<div style="width:280px;height:100px;">' +
+							result.detail.address + '</div>');
+						info.setPosition(result.detail.location);
+					});
+				});
+				//若服务请求失败，则运行以下函数
+				geocoder.setError(function() {
+					alert("出错了，请输入正确的经纬度！！！");
+				});
+
 			}
 		}
 	}
