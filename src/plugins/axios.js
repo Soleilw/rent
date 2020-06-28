@@ -55,10 +55,10 @@ const instance = axios.create({
 
 // 请求拦截
 instance.interceptors.request.use(config => {
-	var token = localStorage.getItem('token');
-	if (token) {
-		config.headers.common['token'] = `${token}`
-	}
+	// var token = localStorage.getItem('token');
+	// if (token) {
+	// 	config.headers.common['token'] = `${token}`
+	// }
 	return config
 }, err => {
 	return Promise.reject(err)

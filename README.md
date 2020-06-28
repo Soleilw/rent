@@ -1,4 +1,4 @@
-# school
+# rent
 
 ## Project setup
 ```
