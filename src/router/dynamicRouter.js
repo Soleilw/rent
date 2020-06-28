@@ -24,6 +24,14 @@ const dynamicRouter = [
 				meta: {
 				    title: '房屋列表',
 				}
+			},
+			{
+				path: '/map',
+				name: 'map',
+				component: () => import('@/views/house/map.vue'),
+				meta: {
+				    title: '腾讯地图demo',
+				}
 			}
 		]
 	},

@@ -50,7 +50,7 @@
 				localStorage.setItem('token', '12345678')
 				localStorage.setItem('role', 'super')
 				localStorage.setItem('username', 'ss')
-				var permissions = ['resident', 'desktop', 'house', 'houses']
+				var permissions = ['resident', 'desktop', 'house', 'houses', 'map']
 				localStorage.setItem('permissions', permissions)
 				self.$router.replace('/')
 
