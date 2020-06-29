@@ -1,5 +1,16 @@
 <template>
 	<div>
+		<div class="map">
+			<div class="item">
+				<el-input v-model="latlng"></el-input>
+			</div>
+			<div class="item">
+				<el-input v-model="address"></el-input>
+			</div>
+			<div class="btn">
+				<el-button size="mini" type="primary">搜索</el-button>
+			</div>
+		</div>
 		<div id="container">
 
 		</div>
@@ -11,7 +22,9 @@
 	export default {
 		data() {
 			return {
-				center: '39.916527, 116.397128'
+				center: '39.916527, 116.397128',
+				latlng: '', // 坐标
+				address: '', // 地址
 			}
 		},
 		mounted() {
@@ -54,7 +67,16 @@
 	}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+	.map {
+		margin-bottom: 10px;
+		
+		.item {
+			width: 200px;
+			margin: 10px 0;
+		}
+	}
+
 	#container {
 		width: 62.5rem;
 		height: 50rem;

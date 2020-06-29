@@ -12,13 +12,13 @@
 			<el-table-column prop="id" label="用户ID" align="center"></el-table-column>
 			<el-table-column prop="snapshot.name" label="用户名" align="center"></el-table-column>
 			<el-table-column prop="snapshot.phone" label="手机号" align="center"></el-table-column>
-			<el-table-column prop="snapshot.card_number" label="身份证" align="center"></el-table-column>
-			<el-table-column prop="address.address" label="房屋地址" align="center"></el-table-column>
+			<el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
+			<el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
 			<el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
 			<el-table-column prop="snapshot.href" label="人脸照片" align="center">
-				<!-- <template slot-scope="scope">
+				<template slot-scope="scope">
 					<img :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;" />
-				</template> -->
+				</template>
 			</el-table-column>
 			<el-table-column prop="typeString" label="用户身份" align="center"></el-table-column>
 			<el-table-column prop="state" label="审核状态" align="center"></el-table-column>
@@ -108,33 +108,33 @@
 				API.households(self.currentPage, self.pageSize).then(res => {
 					self.tableData = res.data;
 					self.totalPage = res.total;
-						self.tableData.forEach(item => {
-							switch (item.type) {
-								case 1:
-									item.type = "户主";
-									break;
-								case 2:
-									item.type = "租客";
-									break;
-								case 3:
-									item.type = "家庭成员";
-									break;
-								case 4:
-									item.type = "物业";
-							}
-					
-							switch (item.state) {
-								case 1:
-									item.state = "待审核";
-									break;
-								case 2:
-									item.state = "已通过";
-									break;
-								case 3:
-									item.state = "未通过";
-							}
-						});
-					
+					self.tableData.forEach(item => {
+						switch (item.type) {
+							case 1:
+								item.type = "户主";
+								break;
+							case 2:
+								item.type = "租客";
+								break;
+							case 3:
+								item.type = "家庭成员";
+								break;
+							case 4:
+								item.type = "物业";
+						}
+
+						switch (item.state) {
+							case 1:
+								item.state = "待审核";
+								break;
+							case 2:
+								item.state = "已通过";
+								break;
+							case 3:
+								item.state = "未通过";
+						}
+					});
+
 				})
 				// API.houser(self.currentPage, self.pageSize, 1654).then(res => {
 				// 	self.tableData = res.data;
@@ -213,12 +213,74 @@
 
 			// 分页
 			handleCurrentChange(val) {
+				var self = this;
+				self.currentPage = val;
+				API.households(val, self.pageSize).then(res => {
+					self.tableData = res.data;
+					self.totalPage = res.total;
+					self.tableData.forEach(item => {
+						switch (item.type) {
+							case 1:
+								item.type = "户主";
+								break;
+							case 2:
+								item.type = "租客";
+								break;
+							case 3:
+								item.type = "家庭成员";
+								break;
+							case 4:
+								item.type = "物业";
+						}
 
+						switch (item.state) {
+							case 1:
+								item.state = "待审核";
+								break;
+							case 2:
+								item.state = "已K通过";
+								break;
+							case 3:
+								item.state = "未通过";
+						}
+					})
+				})
 			},
 
 			// 每页几条
 			handleSizeChange(val) {
+				var self = this;
+				self.pageSize = val;
+				API.households(self.currentPage, val).then(res => {
+					self.tableData = res.data;
+					self.totalPage = res.total;
+					self.tableData.forEach(item => {
+						switch (item.type) {
+							case 1:
+								item.type = "户主";
+								break;
+							case 2:
+								item.type = "租客";
+								break;
+							case 3:
+								item.type = "家庭成员";
+								break;
+							case 4:
+								item.type = "物业";
+						}
 
+						switch (item.state) {
+							case 1:
+								item.state = "待审核";
+								break;
+							case 2:
+								item.state = "已K通过";
+								break;
+							case 3:
+								item.state = "未通过";
+						}
+					})
+				})
 			},
 
 			// 进出记录

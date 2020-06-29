@@ -20,7 +20,7 @@ API.rooms = function(data) {
 	return axios.post(url.Rooms, data)
 }
 
-API.households = function(page, limit, user_id, address_id, type,state, room_id) {
+API.households = function(page, limit, user_id, address_id, type, state, room_id) {
 	return axios.get(url.Households, {page: page,limit:limit,user_id:user_id,address_id:address_id,type:type,state:state,room_id:room_id})
 }
 
