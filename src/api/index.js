@@ -20,10 +20,19 @@ API.rooms = function(data) {
 	return axios.post(url.Rooms, data)
 }
 
-API.households = function(page, limit, user_id, address_id, type, state, room_id) {
-	return axios.get(url.Households, {page: page,limit:limit,user_id:user_id,address_id:address_id,type:type,state:state,room_id:room_id})
+API.households = function(page, limit, user_id, address_id, type, state, room_id, name) {
+	return axios.get(url.Households, {page: page,limit:limit,user_id:user_id,address_id:address_id,type:type,state:state,room_id:room_id, name: name})
 }
 
+// 搜索住户
+API.searchHousehold = function(page, limit, name) {
+	return axios.get(url.Households, {page: page,limit:limit,name: name})
+}
+
+// 删除住户
+API.delHousehold = function(id) {
+	return axios.del(url.Household, {id:id})
+}
 
 
 export default API

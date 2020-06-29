@@ -1,31 +1,38 @@
 <template>
 	<div v-loading="loading">
 		<div class="btn">
-			<el-input v-model="renter_id" placeholder="输入ID/用户名" class="search" @keyup.enter.native="search(renter_id)"></el-input>
+			<el-input v-model="renter_name" placeholder="输入用户名" class="search" @keyup.enter.native="search(renter_name)"></el-input>
 		</div>
 		<div class="btn">
-			<el-button type="primary" @click="search(renter_id)">搜索</el-button>
+			<el-button type="primary" @click="search(renter_name)">搜索</el-button>
 		</div>
 
 		<!-- 表格数据 -->
-		<el-table :data="tableData">
+		<el-table :data="tableData" empty-text="暂无数据">
 			<el-table-column prop="id" label="用户ID" align="center"></el-table-column>
 			<el-table-column prop="snapshot.name" label="用户名" align="center"></el-table-column>
 			<el-table-column prop="snapshot.phone" label="手机号" align="center"></el-table-column>
 			<el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
 			<el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
 			<el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
-			<el-table-column prop="snapshot.href" label="人脸照片" align="center">
+			<el-table-column prop="snapshot" label="人脸照片" align="center">
 				<template slot-scope="scope">
-					<img :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;" />
+					<div v-if="scope.row.snapshot">
+						<img :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;" />
+					</div>
+					<div v-else>
+						<span>--暂无图片--</span>
+						<!-- <img :src="href" style="max-width:180px;max-height:80px;" /> -->
+					</div>
 				</template>
 			</el-table-column>
 			<el-table-column prop="typeString" label="用户身份" align="center"></el-table-column>
 			<el-table-column prop="state" label="审核状态" align="center"></el-table-column>
-			<el-table-column label="操作" align="center" width="200px">
+			<el-table-column label="操作" align="center" width="300px">
 				<template slot-scope="scope">
 					<el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
-					<el-button type="primary" size="mini" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
+					<el-button type="primary" size="mini" v-if="scope.row.state == '待审核'" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
+					<el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -62,6 +69,15 @@
 			</span>
 		</el-dialog>
 
+		<!-- 删除提示框 -->
+		<el-dialog :visible.sync="dialogDel" title="删除年级" width="20%" align="center" :close-on-click-modal="false">
+			<div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
+			<span>
+				<el-button type="primary" @click="toDel">删除</el-button>
+				<el-button type="danger" @click="dialogDel = false">取消</el-button>
+			</span>
+		</el-dialog>
+
 		<!-- 分页 -->
 		<div class="block">
 			<el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40, 50]"
@@ -82,8 +98,8 @@
 					identity: ''
 				},
 
-				tableData: [{}], // 表格数据
-
+				tableData: [], // 表格数据
+				href: require('../../assets/children.png'),
 				currentPage: 1, // 分页
 				pageSize: 10,
 				totalPage: 0,
@@ -95,6 +111,9 @@
 				totalLogsPage: 0,
 				dialogAudit: false, // 审核
 				renter_id: '', // 住户id
+				renter_name: '', // 住户名字
+				id: '', // 删除id
+				dialogDel: false
 
 			}
 		},
@@ -133,49 +152,22 @@
 							case 3:
 								item.state = "未通过";
 						}
+
 					});
 
 				})
-				// API.houser(self.currentPage, self.pageSize, 1654).then(res => {
-				// 	self.tableData = res.data;
-				// 	self.totalPage = res.total;
-				// 	self.tableData.forEach(item => {
-				// 		switch (item.type) {
-				// 			case 1:
-				// 				item.type = "户主";
-				// 				break;
-				// 			case 2:
-				// 				item.type = "租客";
-				// 				break;
-				// 			case 3:
-				// 				item.type = "家庭成员";
-				// 				break;
-				// 			case 4:
-				// 				item.type = "物业";
-				// 		}
-
-				// 		switch (item.state) {
-				// 			case 1:
-				// 				item.state = "待审核";
-				// 				break;
-				// 			case 2:
-				// 				item.state = "已通过";
-				// 				break;
-				// 			case 3:
-				// 				item.state = "未通过";
-				// 		}
-				// 	});
-				// })
 			},
-
+			
+	
+			
 			// 搜索
 			search() {
 				var self = this;
-				if (self.rent_id) {
-					API.search(self.rent_id).then(res => {
+				if (self.renter_name) {
+					API.searchHousehold(self.currentPage, self.pageSize, self.renter_name).then(res => {
 						self.tableData = res.data;
 						self.totalPage = 1;
-						self.rent_id = '';
+						self.renter_name = '';
 						self.$message.success('搜索成功！');
 					})
 				} else {
@@ -211,13 +203,28 @@
 				})
 			},
 
+			handleDel(index, row) {
+				var self = this;
+				self.id = row.id;
+				self.dialogDel = true;
+			},
+
+			toDel() {
+				var self = this;
+				API.delHousehold(self.id).then(res => {
+					self.$message.success('删除成功');
+					self.dialogDel = false;
+					self.getAllRent();
+					self.currentPage = 1;
+				})
+			},
+
 			// 分页
 			handleCurrentChange(val) {
 				var self = this;
 				self.currentPage = val;
 				API.households(val, self.pageSize).then(res => {
 					self.tableData = res.data;
-					self.totalPage = res.total;
 					self.tableData.forEach(item => {
 						switch (item.type) {
 							case 1:
@@ -238,7 +245,7 @@
 								item.state = "待审核";
 								break;
 							case 2:
-								item.state = "已K通过";
+								item.state = "已通过";
 								break;
 							case 3:
 								item.state = "未通过";
@@ -254,6 +261,7 @@
 				API.households(self.currentPage, val).then(res => {
 					self.tableData = res.data;
 					self.totalPage = res.total;
+					self.currentPage = 1;
 					self.tableData.forEach(item => {
 						switch (item.type) {
 							case 1:
@@ -274,7 +282,7 @@
 								item.state = "待审核";
 								break;
 							case 2:
-								item.state = "已K通过";
+								item.state = "已通过";
 								break;
 							case 3:
 								item.state = "未通过";
