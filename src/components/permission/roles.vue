@@ -1,0 +1,309 @@
+<template>
+	<div>
+		<div class="btn">
+			<el-button type="primary" @click="addRole">添加角色</el-button>
+		</div>
+
+		<el-table :data="tableData">
+			<el-table-column prop="id" label="ID" align="center"></el-table-column>
+			<el-table-column prop="name" label="角色名" align="center"></el-table-column>
+			<el-table-column label="操作" align="center">
+				<template slot-scope="scope">
+					<el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑权限</el-button>
+					<el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+				</template>
+			</el-table-column>
+		</el-table>
+
+		<el-dialog :visible.sync="dialogDel" title="删除角色" width="20%" align="center" :close-on-click-modal="false">
+			<div style="font-size: 20px; margin-bottom: 30px;">是否删除该角色</div>
+			<span>
+				<el-button type="primary" @click="toDel">删除</el-button>
+				<el-button type="danger" @click="dialogDel = false">取消</el-button>
+			</span>
+		</el-dialog>
+
+		<div class="block">
+			<el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-sizes="[10, 20, 30, 40, 50]"
+			 :page-size="10" layout="sizes, prev, pager, next, jumper" :total="totalPage" @size-change="handleSizeChange"></el-pagination>
+		</div>
+
+		<el-dialog title="添加角色" :visible.sync="dialogRole" width="50%" :close-on-click-modal="false">
+			<div class="box">
+				<el-form :model="form" label-width="120px">
+					<el-form-item label="角色名称(英文)">
+						<el-input v-model="form.title" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
+					</el-form-item>
+					<el-form-item label="角色名称(中文)">
+						<el-input v-model="form.name" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
+					</el-form-item>
+					<el-form-item label="选择权限">
+						<el-checkbox v-model="checkAll" @change="AllChange">全选</el-checkbox>
+						<div class="permission">
+							<el-checkbox-group v-model="form.permissions" class="permission-item">
+								<el-checkbox label="resident" @change="oneChange" border>
+									<span style="font-weight: bold;">住户管理页</span>
+								</el-checkbox>
+								<el-checkbox label="residentGet" @change="oneChange">获取住户</el-checkbox>
+							</el-checkbox-group>
+						</div>
+						<div class="permission">
+							<el-checkbox-group v-model="form.permissions" class="permission-item">
+								<el-checkbox label="house" @change="oneChange" border>
+									<span style="font-weight: bold;">房屋管理页</span>
+								</el-checkbox>
+								<el-checkbox label="houses" @change="oneChange">房屋列表</el-checkbox>
+								<el-checkbox label="housesAdd" @change="oneChange">新增房屋</el-checkbox>
+								<el-checkbox label="housesGet" @change="oneChange">获取房屋</el-checkbox>
+							</el-checkbox-group>
+						</div>
+						<div class="permission">
+							<el-checkbox-group v-model="form.permissions" class="permission-item">
+								<el-checkbox label="permission" @change="oneChange" border>
+									<span style="font-weight: bold;">角色管理页</span>
+								</el-checkbox>
+								<el-checkbox label="roleAdd" @change="oneChange">新增角色</el-checkbox>
+								<el-checkbox label="roleDel" @change="oneChange">删除角色</el-checkbox>
+								<el-checkbox label="roleEdit" @change="oneChange">编辑权限</el-checkbox>
+								<el-checkbox label="roleGet" @change="oneChange">获取角色列表</el-checkbox>
+							</el-checkbox-group>
+						</div>
+						<div class="permission" style="margin-left: 140px;">
+							<el-checkbox-group v-model="form.permissions" class="permission-item">
+								<el-checkbox label="manageAdd" @change="oneChange">新增管理员</el-checkbox>
+								<el-checkbox label="manageDel" @change="oneChange">删除管理员</el-checkbox>
+								<el-checkbox label="manageEdit" @change="oneChange">编辑管理员</el-checkbox>
+								<el-checkbox label="manageGet" @change="oneChange">管理员列表</el-checkbox>
+								<el-checkbox label="manageResetPwd" @change="oneChange">重置密码</el-checkbox>
+							</el-checkbox-group>
+						</div>
+					</el-form-item>
+
+					<div class="submit">
+						<el-form-item>
+							<el-button type="primary" @click="newRole">提交</el-button>
+						</el-form-item>
+					</div>
+				</el-form>
+			</div>
+		</el-dialog>
+	</div>
+</template>
+
+<script>
+	import API from "@/api/index.js";
+
+	export default {
+		data() {
+			return {
+				dialogRole: false,
+				form: {
+					title: '',
+					name: "",
+					permissions: []
+				},
+				stateList: [{
+						label: "启用",
+						value: 1
+					},
+					{
+						label: "禁用",
+						value: 0
+					}
+				],
+				tableData: [],
+
+				checkAll: false,
+				// permissionList: [
+				// 	"resident", // 住户管理
+				// 	"residentGet", // 获取住户列表
+					
+				// 	"house", // 房屋管理
+				// 	"houses",
+				// 	"housesAdd", // 新增房屋
+				// 	"housesGet", // 房屋列表获取
+					
+				// 	"permission", // 角色管理
+				// 	"roleGet",
+				// 	"roleAdd",
+				// 	"roleEdit",
+				// 	"roleDel",
+				// 	"manageGet",
+				// 	"manageAdd",
+				// 	"manageEdit",
+				// 	"manageDel",
+				// 	"manageResetPwd" // 重置密码
+				// ],
+				permissionList: [
+					{
+						title: 'resident',
+						name: '住户管理页'
+					},
+					{
+						title: 'residentGet',
+						name: '获取住户'
+					},
+					{
+						title: 'house',
+						name: '房屋管理页'
+					},
+					{
+						title: 'houses',
+						name: '房屋列表'
+					},
+					{
+						title: 'housesAdd',
+						name: '新增房屋'
+					},
+					{
+						title: 'housesGet',
+						name: '获取房屋'
+					},
+					{
+						title: 'permission',
+						name: '角色管理页'
+					},
+					{
+						title: 'roleGet',
+						name: '获取角色列表'
+					},
+					{
+						title: 'roleAdd',
+						name: '新增角色'
+					},{
+						title: 'roleEdit',
+						name: '编辑权限'
+					},{
+						title: 'roleDel',
+						name: '删除角色'
+					},{
+						title: 'manageGet',
+						name: '管理员列表'
+					},{
+						title: 'manageAdd',
+						name: '新增管理员'
+					},
+					,{
+						title: 'manageEdit',
+						name: '编辑管理员'
+					},
+					,{
+						title: 'manageDel',
+						name: '删除管理员'
+					},
+					,{
+						title: 'manageResetPwd',
+						name: '重置密码'
+					}
+				],
+				
+
+				dialogDel: false,
+				id: "", // 删除id
+				disabledRole: false,
+				// 分页
+				currentPage: 1,
+				totalPage: 0,
+			};
+		},
+		mounted() {
+			this.getRoles();
+		},
+		methods: {
+			addRole() {
+				var self = this;
+				self.dialogRole = true;
+				self.form = {
+					title: '',
+					name: "",
+					permissions: []
+				};
+				self.disabledRole = false;
+				self.checkAll = true;
+				if (self.checkAll === true) {
+					self.form.permissions = self.checkAll ? self.permissionList : [];
+				}
+			},
+			getRoles() {
+				var self = this;
+				API.getRole(self.currentPage).then(res => {
+					self.tableData = res.data;
+					self.totalPage = res.total;
+				});
+			},
+			newRole() {
+				var self = this;
+				API.role(self.form).then(res => {
+					self.dialogRole = false;
+					self.$message.success("提交成功");
+					self.getRoles();
+					self.currentPage = 1;
+					self.form = {};
+					self.form.permissions = [];
+				});
+			},
+			// 操作
+			handleEdit(index, row) {
+				var self = this;
+				self.dialogRole = true;
+				self.disabledRole = true;
+				self.form = row;
+				self.form.permissions = row.permissions;
+				self.checkAll = row.permissions.length === self.permissionList.length;
+				row.permissions;
+			},
+			AllChange(val) {
+				var self = this;
+				self.form.permissions = val ? self.permissionList : [];
+				debugger
+			},
+			oneChange(val) {
+				var self = this;
+				console.log(self.form.permissions);
+				self.checkAll =
+					self.form.permissions.length === self.permissionList.length;
+			},
+
+			handleDel(index, row) {
+				var self = this;
+				self.dialogDel = true;
+				self.id = row.id;
+			},
+			toDel() {
+				var self = this;
+				// API.delRole(self.id).then(res => {
+				// 	self.$message.success("删除成功");
+				// 	self.dialogDel = false;
+				// 	self.getRoles();
+				// 	self.currentPage = 1;
+				// });
+			},
+
+			// 分页
+			handleCurrentChange(val) {
+				var self = this;
+				self.getRoles();
+			},
+			// 每页多少条
+			handleSizeChange(val) {
+				var self = this;
+				// API.roles(self.currentPage, val).then(res => {
+				// 	self.tableData = res.data;
+				// 	self.totalPage = res.total;
+				// });
+			}
+		}
+	};
+</script>
+
+<style scoped>
+	.permission {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.permission-item {
+		margin: 10px;
+		padding: 0 10px;
+	}
+</style>

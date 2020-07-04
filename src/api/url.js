@@ -13,6 +13,8 @@ const url = {
 	'Rooms': BaseURL + '/rooms', // 获取出租屋列表
 	'Households': BaseURL + '/households', // 获取出租屋列表
 	'Household': BaseURL + '/household', // 删除住户
+	
+	'Role': BaseURL + '/role', // 添加角色
 }
 
 module.exports = url;

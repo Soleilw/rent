@@ -25,16 +25,26 @@ const dynamicRouter = [
 				    title: '房屋列表',
 				}
 			},
-			{
-				path: '/map',
-				name: 'map',
-				component: () => import('@/views/house/map.vue'),
-				meta: {
-				    title: '腾讯地图demo',
-				}
-			}
+			// {
+			// 	path: '/map',
+			// 	name: 'map',
+			// 	component: () => import('@/views/house/map.vue'),
+			// 	meta: {
+			// 	    title: '腾讯地图demo',
+			// 	}
+			// }
 		]
 	},
+	
+	{
+	    path: '/permission',
+	    name: 'permission',
+	    component: () => import('@/views/permission/permission.vue'),
+	    meta: {
+	        title: '权限管理',
+	        icon: 'el-icon-setting'
+	    }
+	}
 ]
 
 export default dynamicRouter

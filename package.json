@@ -14,7 +14,6 @@
     "core-js": "^3.6.4",
     "crypto": "^1.0.1",
     "element-ui": "^2.13.1",
-    "jquery": "^3.5.1",
     "js-md5": "^0.7.3",
     "vue": "^2.6.11",
     "vue-quill-editor": "^3.0.6",
@@ -37,8 +36,7 @@
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true,
-	  "jquery": true
+      "node": true
     },
     "extends": [
       "plugin:vue/essential",

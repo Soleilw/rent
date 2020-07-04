@@ -11,27 +11,42 @@
 		<el-table :data="tableData" empty-text="暂无数据">
 			<el-table-column prop="id" label="用户ID" align="center"></el-table-column>
 			<el-table-column prop="snapshot.name" label="用户名" align="center"></el-table-column>
-			<el-table-column prop="snapshot.phone" label="手机号" align="center"></el-table-column>
-			<el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
-			<el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
-			<el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
+			<el-table-column prop="typeString" label="用户身份" align="center"></el-table-column>
 			<el-table-column prop="snapshot" label="人脸照片" align="center">
 				<template slot-scope="scope">
 					<div v-if="scope.row.snapshot">
-						<img :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;" />
+						<el-popover placement="top-start" title="" trigger="click">
+							<img :src="scope.row.snapshot.href" style="max-width:800px;max-height:800px;" />
+							<img slot="reference" :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;">
+						</el-popover>
 					</div>
 					<div v-else>
 						<span>--暂无图片--</span>
-						<!-- <img :src="href" style="max-width:180px;max-height:80px;" /> -->
 					</div>
 				</template>
 			</el-table-column>
-			<el-table-column prop="typeString" label="用户身份" align="center"></el-table-column>
-			<el-table-column prop="state" label="审核状态" align="center"></el-table-column>
+			<el-table-column prop="snapshot.phone" label="手机号" align="center"></el-table-column>
+			<el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
+		
+			<el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
+			<el-table-column prop="room.door_number" label="房屋编号" align="center"></el-table-column>
+			<el-table-column prop="state" label="审核状态" align="center">
+				<template slot-scope="scope">
+					<div v-if="scope.row.state == 1">
+						<span>待审核</span>
+					</div>
+					<div v-if="scope.row.state == 2">
+						<span style="color: green;">已通过</span>
+					</div>
+					<div v-if="scope.row.state == 3">
+						<span style="color: red;">未通过</span>
+					</div>
+				</template>
+			</el-table-column>
 			<el-table-column label="操作" align="center" width="300px">
 				<template slot-scope="scope">
 					<el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
-					<el-button type="primary" size="mini" v-if="scope.row.state == '待审核'" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
+					<el-button type="primary" size="mini" v-if="scope.row.state == 1" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
 					<el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -99,7 +114,6 @@
 				},
 
 				tableData: [], // 表格数据
-				href: require('../../assets/children.png'),
 				currentPage: 1, // 分页
 				pageSize: 10,
 				totalPage: 0,
@@ -127,34 +141,6 @@
 				API.households(self.currentPage, self.pageSize).then(res => {
 					self.tableData = res.data;
 					self.totalPage = res.total;
-					self.tableData.forEach(item => {
-						switch (item.type) {
-							case 1:
-								item.type = "户主";
-								break;
-							case 2:
-								item.type = "租客";
-								break;
-							case 3:
-								item.type = "家庭成员";
-								break;
-							case 4:
-								item.type = "物业";
-						}
-
-						switch (item.state) {
-							case 1:
-								item.state = "待审核";
-								break;
-							case 2:
-								item.state = "已通过";
-								break;
-							case 3:
-								item.state = "未通过";
-						}
-
-					});
-
 				})
 			},
 			
@@ -215,7 +201,6 @@
 					self.$message.success('删除成功');
 					self.dialogDel = false;
 					self.getAllRent();
-					self.currentPage = 1;
 				})
 			},
 
@@ -225,32 +210,6 @@
 				self.currentPage = val;
 				API.households(val, self.pageSize).then(res => {
 					self.tableData = res.data;
-					self.tableData.forEach(item => {
-						switch (item.type) {
-							case 1:
-								item.type = "户主";
-								break;
-							case 2:
-								item.type = "租客";
-								break;
-							case 3:
-								item.type = "家庭成员";
-								break;
-							case 4:
-								item.type = "物业";
-						}
-
-						switch (item.state) {
-							case 1:
-								item.state = "待审核";
-								break;
-							case 2:
-								item.state = "已通过";
-								break;
-							case 3:
-								item.state = "未通过";
-						}
-					})
 				})
 			},
 
@@ -262,32 +221,6 @@
 					self.tableData = res.data;
 					self.totalPage = res.total;
 					self.currentPage = 1;
-					self.tableData.forEach(item => {
-						switch (item.type) {
-							case 1:
-								item.type = "户主";
-								break;
-							case 2:
-								item.type = "租客";
-								break;
-							case 3:
-								item.type = "家庭成员";
-								break;
-							case 4:
-								item.type = "物业";
-						}
-
-						switch (item.state) {
-							case 1:
-								item.state = "待审核";
-								break;
-							case 2:
-								item.state = "已通过";
-								break;
-							case 3:
-								item.state = "未通过";
-						}
-					})
 				})
 			},
 

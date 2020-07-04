@@ -2,10 +2,13 @@
 	<div>
 		<div class="map">
 			<div class="item">
-				<el-input v-model="latlng"></el-input>
+				<el-input id="latLng" v-model="latlng" placeholder="坐标" :disabled="true"></el-input>
 			</div>
 			<div class="item">
-				<el-input v-model="address" placeholder="输入地址" class="search" @keyup.enter.native="search(address)"></el-input>
+				<el-cascader style="width: 300px;"  v-model="mapvalue" placeholder="搜索省市区" :options="mapData" filterable :props="props" @change="handleMapValue"></el-cascader>
+			</div>
+			<div class="item">
+				<el-input v-model="address" placeholder="输入地址"  @focus="handleAddress" class="search" @keyup.enter.native="search(address)"></el-input>
 			</div>
 			<div class="item btn">
 				<el-button type="primary" @click="search(address)">搜索</el-button>
@@ -18,66 +21,116 @@
 </template>
 
 <script>
-	var geocoder, map, marker = null;
+	import { map } from './map-data.js'
 	export default {
 		data() {
 			return {
-				center: '39.916527, 116.397128',
-				latlng: '39.98174, 116.30631', // 坐标
-				address: '', // 地址
+				latLng: {},
+				latlng: '22.508949,113.321297', // 显示坐标
+				address: '中山市', // 地址
+				getAddress: null,
+				getAddCode: null,
+				map: null,
+				marker: null,
+				mapvalue: '',
+				mapData: map,// 显示省市区
+				props: {
+					label: 'label',
+					value: 'label'
+				}
 			}
 		},
 		mounted() {
 			this.init();
-			this.getLating();
-		},
-		watch: {
-			latlng: 'getLating'
 		},
 		methods: {
-			getLating() {
+			handleAddress() {
 				var self = this;
-				self.address = geocoder.getAddress(self.latlng);
+				if(!self.mapvalue) {
+					self.$message.error("请先选择省市区");
+				}
 			},
-			search(val) {
+			search() {
 				var self = this;
-				geocoder.getLocation(val);
+				//通过getLocation();方法获取位置信息值
+				self.getAddress.getLocation(self.mapvalue + self.address);
+			},
+			handleMapValue() {
+				this.search();
+				this.address = '';
+			},
+			// 通过坐标获得地址
+			getAddressCode() {
+				var lat = parseFloat(this.latLng.lat);
+				var lng = parseFloat(this.latLng.lng);
+				var latLng = new qq.maps.LatLng(lat, lng);
+				//调用获取位置方法
+				this.getAddCode.getAddress(latLng);
 			},
 			init() {
 				var self = this;
-				var center = new qq.maps.LatLng(39.916527, 116.397128);
-				console.log(center)
-				map = new qq.maps.Map(document.getElementById('container'), {
+				var center = new qq.maps.LatLng(22.51595, 113.3926);
+				self.map = new qq.maps.Map(document.getElementById('container'), {
 					center: center,
 					zoom: 15,
 				});
 
+				//创建一个Marker
+				self.marker = new qq.maps.Marker({
+					//设置Marker的位置坐标
+					position: center,
+					//设置显示Marker的地图
+					map: self.map
+				});
+				
+
 				// 监听坐标
-				qq.maps.event.addListener(map, 'click', function(e) {
-					// self.latlng = `${e.latLng.lat}, ${e.latLng.lng}`;
-					self.latlng = new qq.maps.LatLng(e.latLng.lat, e.latLng.lng);
+				qq.maps.event.addListener(self.map, 'click', function(e) {
+					self.latLng.lat = e.latLng.getLat();
+					self.latLng.lng = e.latLng.getLng();
+					self.latlng = `${self.latLng.lat},${self.latLng.lng}`;
+					self.getAddressCode();
 				});
 
-				//地址和经纬度之间进行转换服务
-				geocoder = new qq.maps.Geocoder();
-				//设置服务请求成功的回调函数
-				geocoder.setComplete(function(result) {
-					map.setCenter(result.detail.location);
-					var marker = new qq.maps.Marker({
-						map: map,
-						position: result.detail.location
-					});
-					//点击Marker会弹出反查结果
-					qq.maps.event.addListener(marker, 'click', function() {
-						self.$message.success("坐标为： " + result.detail.location);
-					});
-				});
-				//若服务请求失败，则运行以下函数
-				geocoder.setError(function() {
-					self.$message.error("出错了，请输入正确的地址！！！");
+				//通过坐标来显示地图地址
+				self.getAddCode = new qq.maps.Geocoder({
+					complete: function(result) {
+						self.marker.setMap(null)
+						self.address = result.detail.address;
+						self.mapvalue = '';
+						self.marker = new qq.maps.Marker({
+							map: self.map,
+							position: result.detail.location
+						});
+						
+					}
 				});
 
+				self.getAddCode.setError(function() {
+					self.$message.error("请输入正确的坐标");
+				});
+
+				//调用地址显示地图位置并设置地址
+				self.getAddress = new qq.maps.Geocoder({
+					complete: function(result) {
+						self.marker.setMap(null)
+						self.map.setCenter(result.detail.location);
+						console.log(result.detail.location)
+						self.latLng.lng = result.detail.location.lng;
+						self.latLng.lat = result.detail.location.lat;
+						self.latlng = `${self.latLng.lat},${self.latLng.lng}`;
+						self.marker = new qq.maps.Marker({
+							map: self.map,
+							position: result.detail.location
+						});
+					}
+				});
+
+				self.getAddress.setError(function() {
+					self.$message.error("请输入正确的地址");
+				});
 			}
+
 		}
 	}
 </script>
@@ -88,14 +141,14 @@
 
 		.item {
 			display: inline-block;
-			width: 400px;
-			margin: 10px 20px;
+			width: 300px;
+			margin: 10px 5px;
 		}
 	}
 
 	#container {
 		width: 62.5rem;
-		height: 50rem;
+		height: 40rem;
 		border: solid 1px red;
 	}
 </style>
