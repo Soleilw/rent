@@ -35,6 +35,40 @@ const dynamicRouter = [
 			// }
 		]
 	},
+	{
+	    path: '/picture',
+	    name: 'picture',
+	    component: () => import('@/views/picture/index.vue'),
+	    meta: {
+	        title: '图文管理',
+	        icon: 'el-icon-picture-outline',
+	    },
+	    children: [{
+	            path: '/banner',
+	            name: 'banner',
+	            component: () => import('@/views/picture/banner.vue'),
+	            meta: {
+	                title: '轮播图管理'
+	            }
+	        },
+	        {
+	            path: '/message',
+	            name: 'message',
+	            component: () => import('@/views/picture/message.vue'),
+	            meta: {
+	                title: '资讯管理'
+	            }
+	        },
+	        {
+	            path: '/document',
+	            name: 'document',
+	            component: () => import('@/views/picture/document.vue'),
+	            meta: {
+	                title: '文档管理'
+	            }
+	        }
+	    ]
+	},
 	
 	{
 	    path: '/permission',

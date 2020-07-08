@@ -47,27 +47,27 @@
 		methods: {
 			submitForm() {
 				var self = this;
-				localStorage.setItem('token', '12345678')
-				localStorage.setItem('role', 'super')
-				localStorage.setItem('username', 'ss')
-				var permissions = ['resident', 'desktop', 'house', 'houses', 'permission']
-				localStorage.setItem('permissions', permissions)
-				self.$router.replace('/')
+				// localStorage.setItem('token', '12345678')
+				// localStorage.setItem('role', 'super')
+				// localStorage.setItem('username', 'ss')
+				// var permissions = ['resident', 'desktop', 'house', 'houses', 'permission']
+				// localStorage.setItem('permissions', permissions)
+				// self.$router.replace('/')
 
-				// if (self.loginForm.username && self.loginForm.password) {
-				// 	// self.$store.dispatch('permission/FETCH_PERMISSION', self.loginForm)
-				// 	API.login(self.loginForm).then(res => {
-				// 		localStorage.setItem('token', res);
-				// 		localStorage.setItem('username', self.loginForm.username)
-				// 		self.$router.replace('/')
-				// 	})
-				// 	window.addEventListener('storage', () => {
-				// 		localStorage.clear();
-				// 		window.location.replace('/login')
-				// 	})
-				// } else {
-				// 	self.$message.error('请输入账号/密码');
-				// }
+				if (self.loginForm.username && self.loginForm.password) {
+					// self.$store.dispatch('permission/FETCH_PERMISSION', self.loginForm)
+					API.login(self.loginForm).then(res => {
+						localStorage.setItem('token', res);
+						localStorage.setItem('username', self.loginForm.username)
+						self.$router.replace('/')
+					})
+					window.addEventListener('storage', () => {
+						localStorage.clear();
+						window.location.replace('/login')
+					})
+				} else {
+					self.$message.error('请输入账号/密码');
+				}
 			},
 		}
 	}

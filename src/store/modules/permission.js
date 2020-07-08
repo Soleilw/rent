@@ -60,11 +60,10 @@ export default {
 			commit,
 			state
 		}) {
-			// let token = localStorage.getItem('token');
-			// var res = await API.userInfo(token)
-			// commit('SET_PERMISSIONS', res.permissions)
-			let arr = localStorage.getItem('permissions')
-			let routes = recursionRouter(arr, dynamicRouter)
+			let token = localStorage.getItem('token');
+			var res = await API.userInfo(token)
+			commit('SET_PERMISSIONS', res.permissions)
+			let routes = recursionRouter(res.permissions, dynamicRouter)
 			let MainContainer = DynamicRoutes.find(v => v.path === '')
 			let children = MainContainer.children
 			commit('SET_CONTROL_LIST', [...children, ...dynamicRouter])

@@ -5,7 +5,7 @@
 		</div>
 		<el-table :data="tableData">
 			<el-table-column prop="id" label="ID" align="center"></el-table-column>
-			<el-table-column prop="username" label="账号" align="center"></el-table-column>
+			<el-table-column prop="name" label="账号" align="center"></el-table-column>
 			<el-table-column prop="role" label="角色名" align="center"></el-table-column>
 			<el-table-column prop="enable" label="状态" align="center">
 				<template slot-scope="scope">
@@ -35,7 +35,7 @@
 			</el-pagination>
 		</div>
 
-		<el-dialog title="添加用户" :visible.sync="dialogUser" width="500px" :close-on-click-modal="false">
+		<el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false">
 			<div class="box">
 				<el-form :model="form" label-width="80px">
 					<el-form-item label="账号">
@@ -49,13 +49,12 @@
 							<el-option v-for="item in rolesList" :key="item.title" :label="item.name" :value="item.title"></el-option>
 						</el-select>
 					</el-form-item>
-					<!-- <el-form-item label="选择学校">
-						<el-select v-model="form.school_id" placeholder="请选择学校">
-							<el-option v-for="item in schoolList" :key="item.id" :label="item.name" :value="item.id">
+					<el-form-item label="选择社区">
+						<el-select v-model="form.areas_id" placeholder="请选择社区">
+							<el-option v-for="item in areaList" :key="item.id" :label="item.title" :value="item.id">
 							</el-option>
 						</el-select>
-					</el-form-item> -->
-
+					</el-form-item>
 					<el-form-item label="选择状态">
 						<el-select v-model="form.enable" placeholder="请选择状态">
 							<el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value"></el-option>
@@ -96,7 +95,7 @@
 </template>
 
 <script>
-	// import API from '@/api//index.js'
+	import API from '@/api//index.js'
 
 	export default {
 		data() {
@@ -107,7 +106,7 @@
 					password: '',
 					enable: '',
 					role: '',
-					// school_id: ''
+					areas_id: ''
 				},
 				stateList: [{
 						label: '启用',
@@ -118,8 +117,10 @@
 						value: 2
 					}
 				],
+				areaList: [], //  社区列表
+				
 				rolesList: [],
-				schoolList: [],
+
 				tableData: [],
 
 				dialogResetPassWord: false, // 修改密码
@@ -137,29 +138,24 @@
 				currentPage: 1,
 				totalPage: 0,
 
-
-				permissions: localStorage.getItem('permissions'),
-				role: localStorage.getItem('role'),
 			}
 		},
 		mounted() {
-			this.getSchool();
+			this.getArea();
 			this.getRoles();
 			this.getUsers();
 		},
 		methods: {
-			// 获取学校列表
-			getSchool() {
+			// 获取社区列表（省市区选中）
+			getArea() {
 				var self = this;
-				if (self.role === 'super') {
-					API.schools(self.currentPage, 100).then(res => {
-						self.schoolList = res.data;
-					})
-				}
+				API.areas(self.currentPage, 100).then(res => {
+					self.areaList = res.data;
+				})
 			},
 			getRoles() {
 				var self = this;
-				API.roles(self.currentPage).then(res => {
+				API.getRole(self.currentPage).then(res => {
 					self.rolesList = res.data;
 				})
 			},
@@ -178,7 +174,7 @@
 					password: '',
 					enable: '',
 					title: '',
-					school_id: ''
+					areas_id: ''
 				}
 
 			},
@@ -197,14 +193,14 @@
 			// 操作
 			handleEdit(index, row) {
 				var self = this
-					self.dialogUser = true;
-					self.form = row;
+				self.dialogUser = true;
+				self.form = row;
 			},
 			// 重置密码
 			handleReset(index, row) {
 				var self = this
-					self.dialogResetPassWord = true;
-					self.pwdForm.id = row.id;
+				self.dialogResetPassWord = true;
+				self.pwdForm.id = row.id;
 
 			},
 			ChangePassword() {

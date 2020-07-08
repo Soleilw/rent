@@ -61,15 +61,122 @@ API.delHousehold = function(id) {
 	})
 }
 
+// 图文管理
+// 获取轮播图
+API.banners = function (page, limit) {
+	return axios.get(url.Banners, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 新增轮播图
+API.banner = function (data) {
+	return axios.post(url.Banner, data)
+}
+
+// 新增资讯管理
+API.message = function (data) {
+	return axios.post(url.Message, data)
+}
+
+// 获取资讯类型
+API.messages = function (page, limit) {
+	return axios.get(url.Messages, {
+		page: page,
+		limit: limit
+	})
+}
+
+
+// 新增资讯类型
+API.messageType = function (data) {
+	return axios.post(url.MessageType, data)
+}
+
+// 获取资讯类型
+API.messageTypes = function (page, limit) {
+	return axios.get(url.MessageTypes, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 删除资讯类型
+API.delDocumentType = function (id) {
+	return axios.del(url.DelDocumentType, {
+		id: id
+	})
+}
+
+// 获取文档
+API.documents = function (page, limit) {
+	return axios.get(url.Documents, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 删除文档
+API.delDocument = function (id) {
+	return axios.del(url.DelDocument, {
+		id: id
+	})
+}
+
+// 新增文档
+API.document = function (data) {
+	return axios.post(url.Document, data)
+}
+
+API.documentDel = function (id) {
+	return axios.del(url.DocumentDel, {
+		id: id
+	})
+}
+API.delBanner = function (id) {
+	return axios.del(url.DelBanner, {
+		id: id
+	})
+},
+
 // 权限管理
 // 创建角色
 API.role = function(data) {
 	return axios.post(url.Role, data)
 }
 
-// 创建角色
+// 获取角色
 API.getRole = function(page, limit) {
 	return axios.get(url.Role, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 删除角色
+API.delRole = function(id) {
+	return axios.del(url.Role, {
+		id: id
+	})
+}
+
+// 创建用户
+API.user = function(data) {
+	return axios.post(url.User, data)
+}
+
+// 获取用户
+API.users = function(page, limit) {
+	return axios.get(url.Users, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 获取社区列表（省市区选中）
+API.areas = function(page, limit) {
+	return axios.get(url.Areas, {
 		page: page,
 		limit: limit
 	})

@@ -31,12 +31,12 @@
 		<el-dialog title="添加角色" :visible.sync="dialogRole" width="50%" :close-on-click-modal="false">
 			<div class="box">
 				<el-form :model="form" label-width="120px">
-					<el-form-item label="角色名称(英文)">
+					<el-form-item label="角色名称">
 						<el-input v-model="form.title" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
 					</el-form-item>
-					<el-form-item label="角色名称(中文)">
+<!-- 					<el-form-item label="角色名称(中文)">
 						<el-input v-model="form.name" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
-					</el-form-item>
+					</el-form-item> -->
 					<el-form-item label="选择权限">
 						<el-checkbox v-model="checkAll" @change="AllChange">全选</el-checkbox>
 						<div class="permission">
@@ -56,6 +56,37 @@
 								<el-checkbox label="housesAdd" @change="oneChange">新增房屋</el-checkbox>
 								<el-checkbox label="housesGet" @change="oneChange">获取房屋</el-checkbox>
 							</el-checkbox-group>
+						</div>
+						<div class="permission">
+						  <el-checkbox-group v-model="form.permissions" class="permission-item">
+						    <el-checkbox label="picture" @change="oneChange" border>
+						      <span style="font-weight: bold;">图文管理</span>
+						    </el-checkbox>
+						    <el-checkbox label="banner" @change="oneChange">轮播图</el-checkbox>
+						    <el-checkbox label="bannerAdd" @change="oneChange">添加轮播图</el-checkbox>
+						    <el-checkbox label="bannerGet" @change="oneChange">获取轮播图</el-checkbox>
+						    <el-checkbox label="bannerDel" @change="oneChange">删除轮播图</el-checkbox>
+						    <el-checkbox label="document" @change="oneChange">文档管理</el-checkbox>
+						    <el-checkbox label="documentAdd" @change="oneChange">添加文档</el-checkbox>
+						    <el-checkbox label="documentGet" @change="oneChange">获取文档</el-checkbox>
+						    <el-checkbox label="documentDel" @change="oneChange">删除文档</el-checkbox>
+						    <el-checkbox label="documentEdit" @change="oneChange">编辑文档</el-checkbox>
+						  </el-checkbox-group>
+						</div>
+						<div class="permission">
+						  <el-checkbox-group v-model="form.permissions" class="permission-item">
+						    <el-checkbox label="message" @change="oneChange" border>
+						      <span style="font-weight: bold;">资讯管理</span>
+						    </el-checkbox>
+						    <el-checkbox label="message" @change="oneChange">资讯管理</el-checkbox>
+						    <el-checkbox label="messageAdd" @change="oneChange">添加资讯</el-checkbox>
+						    <el-checkbox label="messageGet" @change="oneChange">获取资讯</el-checkbox>
+						    <el-checkbox label="messageDel" @change="oneChange">删除资讯</el-checkbox>
+						    <el-checkbox label="messageEdit" @change="oneChange">编辑</el-checkbox>
+						    <el-checkbox label="typeAdd" @change="oneChange">添加资讯类型</el-checkbox>
+						    <el-checkbox label="typeGet" @change="oneChange">获取资讯类型</el-checkbox>
+						    <el-checkbox label="typeDel" @change="oneChange">删除</el-checkbox>
+						  </el-checkbox-group>
 						</div>
 						<div class="permission">
 							<el-checkbox-group v-model="form.permissions" class="permission-item">
@@ -87,6 +118,7 @@
 				</el-form>
 			</div>
 		</el-dialog>
+		
 	</div>
 </template>
 
@@ -99,7 +131,7 @@
 				dialogRole: false,
 				form: {
 					title: '',
-					name: "",
+					name: '',
 					permissions: []
 				},
 				stateList: [{
@@ -114,88 +146,107 @@
 				tableData: [],
 
 				checkAll: false,
-				// permissionList: [
-				// 	"resident", // 住户管理
-				// 	"residentGet", // 获取住户列表
-					
-				// 	"house", // 房屋管理
-				// 	"houses",
-				// 	"housesAdd", // 新增房屋
-				// 	"housesGet", // 房屋列表获取
-					
-				// 	"permission", // 角色管理
-				// 	"roleGet",
-				// 	"roleAdd",
-				// 	"roleEdit",
-				// 	"roleDel",
-				// 	"manageGet",
-				// 	"manageAdd",
-				// 	"manageEdit",
-				// 	"manageDel",
-				// 	"manageResetPwd" // 重置密码
-				// ],
 				permissionList: [
-					{
-						title: 'resident',
-						name: '住户管理页'
-					},
-					{
-						title: 'residentGet',
-						name: '获取住户'
-					},
-					{
-						title: 'house',
-						name: '房屋管理页'
-					},
-					{
-						title: 'houses',
-						name: '房屋列表'
-					},
-					{
-						title: 'housesAdd',
-						name: '新增房屋'
-					},
-					{
-						title: 'housesGet',
-						name: '获取房屋'
-					},
-					{
-						title: 'permission',
-						name: '角色管理页'
-					},
-					{
-						title: 'roleGet',
-						name: '获取角色列表'
-					},
-					{
-						title: 'roleAdd',
-						name: '新增角色'
-					},{
-						title: 'roleEdit',
-						name: '编辑权限'
-					},{
-						title: 'roleDel',
-						name: '删除角色'
-					},{
-						title: 'manageGet',
-						name: '管理员列表'
-					},{
-						title: 'manageAdd',
-						name: '新增管理员'
-					},
-					,{
-						title: 'manageEdit',
-						name: '编辑管理员'
-					},
-					,{
-						title: 'manageDel',
-						name: '删除管理员'
-					},
-					,{
-						title: 'manageResetPwd',
-						name: '重置密码'
-					}
+					"resident", // 住户管理
+					"residentGet", // 获取住户列表
+					
+					"house", // 房屋管理
+					"houses",
+					"housesAdd", // 新增房屋
+					"housesGet", // 房屋列表获取
+					
+					"picture", // 图文管理
+					"banner", // 轮播图
+					"bannerAdd",
+					"bannerGet",
+					"bannerDel",
+					"message", // 资讯管理
+					"messageAdd",
+					"messageGet",
+					"messageDel",
+					"messageEdit",
+					"typeAdd",
+					"typeGet",
+					"typeDel",
+					"document", // 文档管理
+					"documentAdd",
+					"documentGet",
+					"documentDel",
+					"documentEdit",
+					
+					"permission", // 角色管理
+					"roleGet",
+					"roleAdd",
+					"roleEdit",
+					"roleDel",
+					"manageGet",
+					"manageAdd",
+					"manageEdit",
+					"manageDel",
+					"manageResetPwd" // 重置密码
 				],
+				// permissionList: [
+				// 	{
+				// 		title: 'resident',
+				// 		name: '住户管理页'
+				// 	},
+				// 	{
+				// 		title: 'residentGet',
+				// 		name: '获取住户'
+				// 	},
+				// 	{
+				// 		title: 'house',
+				// 		name: '房屋管理页'
+				// 	},
+				// 	{
+				// 		title: 'houses',
+				// 		name: '房屋列表'
+				// 	},
+				// 	{
+				// 		title: 'housesAdd',
+				// 		name: '新增房屋'
+				// 	},
+				// 	{
+				// 		title: 'housesGet',
+				// 		name: '获取房屋'
+				// 	},
+				// 	{
+				// 		title: 'permission',
+				// 		name: '角色管理页'
+				// 	},
+				// 	{
+				// 		title: 'roleGet',
+				// 		name: '获取角色列表'
+				// 	},
+				// 	{
+				// 		title: 'roleAdd',
+				// 		name: '新增角色'
+				// 	},{
+				// 		title: 'roleEdit',
+				// 		name: '编辑权限'
+				// 	},{
+				// 		title: 'roleDel',
+				// 		name: '删除角色'
+				// 	},{
+				// 		title: 'manageGet',
+				// 		name: '管理员列表'
+				// 	},{
+				// 		title: 'manageAdd',
+				// 		name: '新增管理员'
+				// 	},
+				// 	,{
+				// 		title: 'manageEdit',
+				// 		name: '编辑管理员'
+				// 	},
+				// 	,{
+				// 		title: 'manageDel',
+				// 		name: '删除管理员'
+				// 	},
+				// 	,{
+				// 		title: 'manageResetPwd',
+				// 		name: '重置密码'
+				// 	}
+				// ],
 				
 
 				dialogDel: false,
@@ -233,6 +284,7 @@
 			},
 			newRole() {
 				var self = this;
+				self.form.name = self.form.title;
 				API.role(self.form).then(res => {
 					self.dialogRole = false;
 					self.$message.success("提交成功");
@@ -249,19 +301,16 @@
 				self.disabledRole = true;
 				self.form = row;
 				self.form.permissions = row.permissions;
-				self.checkAll = row.permissions.length === self.permissionList.length;
-				row.permissions;
+				self.checkAll = row.permissions.length >= self.permissionList.length;
 			},
 			AllChange(val) {
 				var self = this;
 				self.form.permissions = val ? self.permissionList : [];
-				debugger
 			},
 			oneChange(val) {
 				var self = this;
 				console.log(self.form.permissions);
-				self.checkAll =
-					self.form.permissions.length === self.permissionList.length;
+				self.checkAll = self.form.permissions.length >= self.permissionList.length;
 			},
 
 			handleDel(index, row) {
@@ -271,12 +320,12 @@
 			},
 			toDel() {
 				var self = this;
-				// API.delRole(self.id).then(res => {
-				// 	self.$message.success("删除成功");
-				// 	self.dialogDel = false;
-				// 	self.getRoles();
-				// 	self.currentPage = 1;
-				// });
+				API.delRole(self.id).then(res => {
+					self.$message.success("删除成功");
+					self.dialogDel = false;
+					self.getRoles();
+					self.currentPage = 1;
+				});
 			},
 
 			// 分页
