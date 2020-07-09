@@ -24,10 +24,10 @@ const url = {
 	'Message': BaseURL+ '/document', // 新增资讯管理
 	'Messages': BaseURL + '/documents', // 获取资讯管理
 	'MessageType': BaseURL + '/document/type', // 新增资讯类型
-	'MessageTypes': BaseURL + '/document/types', // 获取资讯类型
+	'MessageTypes': BaseURL + '/document/type', // 获取资讯类型
 	"DocumentDel": 	BaseURL + '/document',  // 删除文档
 	"DelBanner": BaseURL + '/banner', // 删除轮播
-	"DelDocumentType": BaseURL + '/document/types', // 资讯类型--删除
+	"DelDocumentType": BaseURL + '/document/type', // 资讯类型--删除
 	
 	'Role': BaseURL + '/role', // 添加角色
 	

@@ -235,7 +235,9 @@ export default {
     getMessages() {
       var self = this;
       API.messages(self.currentPage).then(res => {
-        // console.log("res.data", res.data); // []
+        console.log("res.data", res.data); 
+        console.log(111);
+        
         self.tableDate = res.data;
         self.totalPage = res.total;
       });
