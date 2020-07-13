@@ -108,6 +108,7 @@
 								<el-checkbox label="manageResetPwd" @change="oneChange">重置密码</el-checkbox>
 							</el-checkbox-group>
 						</div>
+						
 					</el-form-item>
 
 					<div class="submit">
@@ -173,6 +174,8 @@
 					"documentGet",
 					"documentDel",
 					"documentEdit",
+
+					'buy', // 购买服务管理
 					
 					"permission", // 角色管理
 					"roleGet",

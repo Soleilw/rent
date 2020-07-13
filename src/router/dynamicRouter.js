@@ -69,6 +69,16 @@ const dynamicRouter = [
 	        }
 	    ]
 	},
+
+	{
+		path: '/buy',
+		name: 'buy',
+		component: () => import('@/views/buy/buy.vue'),
+		meta: {
+	        title: '购买服务管理',
+            icon: 'el-icon-bank-card'
+	    }
+	},
 	
 	{
 	    path: '/permission',

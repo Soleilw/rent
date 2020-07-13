@@ -190,4 +190,26 @@ API.areas = function(page, limit, parent_id) {
 	})
 }
 
+// 获取服务
+API.buys = function (page, limit) {
+	return axios.get(url.Buys, {
+		page: page,
+		limit: limit
+	})
+}
+
+// 新增购买服务
+API.buy = function (data) {
+	return axios.post(url.Buy, data)
+}
+
+// 获取服务订单
+API.server = function (page, limit, product_id) {
+	return axios.get(url.Server, {
+		page: page,
+		limit: limit,
+		product_id: product_id
+	})
+}
+ 
 export default API

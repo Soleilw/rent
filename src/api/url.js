@@ -35,6 +35,10 @@ const url = {
 	'Users': BaseURL + '/users', //  获取用户
 	
 	'Areas': BaseURL + '/areas', // 获取社区
+
+	"Buys": BaseURL + '/products', // 获取服务
+	"Buy": BaseURL + '/product', // 新增购买服务
+	'Server':BaseURL  + '/orders',  // 服务订单
 }
 
 module.exports = url;
