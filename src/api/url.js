@@ -17,7 +17,7 @@ const url = {
 	
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图
-	'Banners': BaseURL + '/api/banners', // 获取轮播图
+	'Banners': BaseURL + '/banners', // 获取轮播图
 	'Document': BaseURL + '/help/doc', // 文档管理
 	'Documents': BaseURL + '/help/docs', // 获取文档
 	'DelDocument': BaseURL + '/help/doc', // 获取文档

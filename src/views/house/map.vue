@@ -46,6 +46,7 @@
 		methods: {
 			handleAddress() {
 				var self = this;
+				self.address = '';
 				if(!self.mapvalue) {
 					self.$message.error("请先选择省市区");
 				}
@@ -149,6 +150,6 @@
 	#container {
 		width: 62.5rem;
 		height: 40rem;
-		border: solid 1px red;
+		border: solid 1px #ccc;
 	}
 </style>

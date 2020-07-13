@@ -14,42 +14,6 @@ const instance = axios.create({
 	timeout: 5000,
 	headers: {
 		'Content-Type': 'application/x-www-form-urlencoded'
-	},
-	validateStatus(status) {
-		switch (status) {
-			case 400:
-				Message.error('请求出错')
-				break
-			case 401:
-				Message.warning({
-					message: '授权失败，请重新登录'
-				})
-				setTimeout(() => {
-					localStorage.removeItem('username')
-					localStorage.removeItem('token')
-					localStorage.removeItem('role')
-					localStorage.removeItem('permissions')
-					window.location.reload()
-					this.$router.replace('/login')
-				}, 1000)
-				return
-			case 403:
-				// Message.warning({
-				// 	message: '拒绝访问'
-				// })
-				break
-			case 404:
-				Message.warning({
-					message: '请求错误,未找到该资源'
-				})
-				break
-				// case 500:
-				// 	Message.warning({
-				// 		message: ''
-				// 	})
-				// 	break
-		}
-		return status >= 200 && status < 300
 	}
 })
 
@@ -67,7 +31,43 @@ instance.interceptors.request.use(config => {
 // 响应拦截
 instance.interceptors.response.use(res => {
 	if (res.status === 200) {
-		return res.data
+		switch(res.data.code) {
+			case 10001: 
+			Message.warning({
+				message: '请重新登录'
+			})
+			setTimeout(() => {
+				localStorage.removeItem('username')
+				localStorage.removeItem('token')
+				localStorage.removeItem('role')
+				localStorage.removeItem('permissions')
+				window.location.reload()
+				this.$router.replace('/login')
+			}, 1000)
+			break;
+			case 10002:
+			Message.warning({
+				message: res.data.toast
+			})
+			break;
+			case 10003:
+			Message.warning({
+				message: res.data.toast
+			})
+			break;
+			case 10004:
+			Message.warning({
+				message: res.data.toast
+			})
+			break;
+			case 10005:
+			Message.warning({
+				message: res.data.toast
+			})
+			break;
+			default: 
+			return res.data
+		}
 	}
 }, err => {
 	if (err.response.status) {

@@ -29,8 +29,11 @@
 		methods: {
 			changeActive() {
 				if(this.activeName === 'role') {
+					
 				}
 				if(this.activeName === 'user') {
+					API.getRole(1).then(res => {
+					})
 					API.users(1).then(res => {
 					})
 				}

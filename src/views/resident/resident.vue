@@ -149,16 +149,12 @@
 			// 搜索
 			search() {
 				var self = this;
-				if (self.renter_name) {
 					API.searchHousehold(self.currentPage, self.pageSize, self.renter_name).then(res => {
 						self.tableData = res.data;
 						self.totalPage = 1;
 						self.renter_name = '';
 						self.$message.success('搜索成功！');
 					})
-				} else {
-					self.$message.warning('请输入ID/用户名');
-				}
 			},
 
 			handleLogs() {

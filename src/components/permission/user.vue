@@ -50,7 +50,19 @@
 						</el-select>
 					</el-form-item>
 					<el-form-item label="选择社区">
-						<el-select v-model="form.areas_id" placeholder="请选择社区">
+						<el-select v-model="pro_id" placeholder="请选择省份" @change="proChange" style="margin-right: 10px;">
+							<el-option v-for="item in proList" :key="item.id" :label="item.title" :value="item.id">
+							</el-option>
+						</el-select>
+						<el-select v-model="city_id" placeholder="请选择市级" @change="cityChange" style="margin-right: 10px;">
+							<el-option v-for="item in cityList" :key="item.id" :label="item.title" :value="item.id">
+							</el-option>
+						</el-select>
+						<el-select v-model="areas_id" placeholder="请选择区级" @change="areasChange" style="margin-right: 10px;">
+							<el-option v-for="item in communityList" :key="item.id" :label="item.title" :value="item.id">
+							</el-option>
+						</el-select>
+						<el-select v-model="community_id" placeholder="请选择社区" @change="communityChange" style="margin-right: 10px;">
 							<el-option v-for="item in areaList" :key="item.id" :label="item.title" :value="item.id">
 							</el-option>
 						</el-select>
@@ -102,6 +114,7 @@
 			return {
 				dialogUser: false,
 				form: {
+					id: '',
 					username: '',
 					password: '',
 					enable: '',
@@ -117,8 +130,14 @@
 						value: 2
 					}
 				],
+				proList: [], // 省级列表
+				pro_id: '',
+				cityList: [], // 市级列表
+				city_id: '',
+				communityList: [], // 区级列表
+				community_id: '',
 				areaList: [], //  社区列表
-				
+				areas_id: '',
 				rolesList: [],
 
 				tableData: [],
@@ -141,18 +160,50 @@
 			}
 		},
 		mounted() {
-			this.getArea();
+			this.getPro();
 			this.getRoles();
 			this.getUsers();
 		},
 		methods: {
 			// 获取社区列表（省市区选中）
-			getArea() {
+			getPro() {
 				var self = this;
-				API.areas(self.currentPage, 100).then(res => {
+				API.areas(self.currentPage, 100, 0).then(res => {
+					self.proList = res.data;
+				})
+			},
+			proChange(val) {
+				this.getCity(val)
+			},
+			getCity(val) {
+				var self = this;
+				API.areas(self.currentPage, 100, val).then(res => {
+					self.cityList = res.data;
+				})
+			},
+			cityChange(val) {
+				this.getCommunity(val)
+			},
+			getCommunity(val) {
+				var self = this;
+				API.areas(self.currentPage, 100, val).then(res => {
+					self.communityList = res.data;
+				})
+			},
+			areasChange(val) {
+				this.getAreas(val)
+			},
+			communityChange(val) {
+				this.form.areas_id = val;
+			},
+			
+			getAreas(val) {
+				var self = this;
+				API.areas(self.currentPage, 100, val).then(res => {
 					self.areaList = res.data;
 				})
 			},
+
 			getRoles() {
 				var self = this;
 				API.getRole(self.currentPage).then(res => {
@@ -170,38 +221,52 @@
 				var self = this
 				self.dialogUser = true;
 				self.form = {
+					id: '',
 					username: '',
 					password: '',
 					enable: '',
-					title: '',
+					role: '',
 					areas_id: ''
 				}
-
+				self.pro_id = '';
+				self.city_id = '';
+				self.areas_id = '';
+				self.community_id= '';
 			},
 			newUser() {
 				var self = this;
-				API.user(self.form).then(res => {
-					self.dialogUser = false;
-					self.$message.success('提交成功');
-					self.getUsers();
-					self.currentPage = 1;
-					self.form = {};
-				})
-
+				if(self.form.username && self.form.password && self.form.enable && self.form.role && self.form.areas_id) {
+					API.user(self.form).then(res => {
+						self.dialogUser = false;
+						self.$message.success('提交成功');
+						self.getUsers();
+						self.currentPage = 1;
+						self.form = {};
+					})
+				} else {
+					self.$message.warning('请补充完整信息');
+				}
 			},
 
 			// 操作
 			handleEdit(index, row) {
-				var self = this
+				var self = this;
 				self.dialogUser = true;
-				self.form = row;
+				self.form.username = row.name;
+				self.form.role = row.role;
+				self.form.enable = row.enable;
+				self.pro_id = row.province;
+				self.city_id = row.city;
+				self.areas_id = row.area;
+				self.community_id= row.community;
+				self.form.areas_id = row.areas_id;
+				self.form.id = row.id;
 			},
 			// 重置密码
 			handleReset(index, row) {
 				var self = this
 				self.dialogResetPassWord = true;
 				self.pwdForm.id = row.id;
-
 			},
 			ChangePassword() {
 				var self = this;

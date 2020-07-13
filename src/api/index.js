@@ -174,11 +174,19 @@ API.users = function(page, limit) {
 	})
 }
 
+// 删除用户
+API.delUser = function(id) {
+	return axios.del(url.User, {
+		id: id
+	})
+}
+
 // 获取社区列表（省市区选中）
-API.areas = function(page, limit) {
+API.areas = function(page, limit, parent_id) {
 	return axios.get(url.Areas, {
 		page: page,
-		limit: limit
+		limit: limit,
+		parent_id: parent_id
 	})
 }
 
