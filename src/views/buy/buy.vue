@@ -1,6 +1,6 @@
 <template>
-<!-- v-loading="loading" element-loading-text="拼命加载中" -->
-  <div >
+  <!-- v-loading="loading" element-loading-text="拼命加载中" -->
+  <div>
     <div class="btn">
       <el-button type="primary" @click="addBuy">添加购买服务</el-button>
     </div>
@@ -9,12 +9,12 @@
       <el-select v-model="form.school" placeholder="请选择学校">
         <el-option v-for="item in schoolList" :key="item.id" :label="item.name" :value="item.id"></el-option>
       </el-select>
-    </div> -->
+    </div>-->
 
     <el-dialog title="添加购买服务" :visible.sync="dialogBuy">
       <div class="box">
         <el-form :model="form" label-width="100px">
-          <el-form-item label="选择学校">
+          <!-- <el-form-item label="选择学校">
             <el-select v-model="form.school" placeholder="请选择学校">
               <el-option
                 v-for="item in schoolList"
@@ -23,7 +23,7 @@
                 :value="item.id"
               ></el-option>
             </el-select>
-          </el-form-item>
+          </el-form-item>-->
           <el-form-item label="选择服务">
             <el-checkbox v-model="checkAll" @change="handleCheckAllService">全选</el-checkbox>
             <div class="service">
@@ -121,7 +121,7 @@ export default {
   name: "buy",
   data() {
     return {
-    //   loading: true,
+      //   loading: true,
       schoolList: [],
       school: "",
       dialogBuy: false,
@@ -130,8 +130,8 @@ export default {
       serviceIdList: [],
       serviceList: [
         {
-          title: "sendInfo",
-          name: "消息推送"
+          title: "InAndOut",
+          name: "进出"
         },
         {
           title: "classesNotice",
@@ -194,11 +194,11 @@ export default {
         .then(res => {
           self.tableDate = res.data;
           self.totalPage = res.total;
-        //   self.loading = false;
+          //   self.loading = false;
         })
         .catch(err => {
-        //   self.loading = false;
-            console.log(err);
+          //   self.loading = false;
+          console.log(err);
         });
     },
     newBuy() {
@@ -237,6 +237,7 @@ export default {
     //     self.schoolList = res.data;
     //   });
     // },
+
     // 全选服务
     handleCheckAllService(val) {
       var self = this;
@@ -267,6 +268,7 @@ export default {
       API.server(1, self.pageSize, self.product_id).then(res => {
         self.orderData = res.data;
         self.orderTotalPage = res.total;
+        self.currentOrderPage = 1;
         self.orderData.forEach(item => {
           switch (item.status) {
             case 1:
@@ -300,17 +302,41 @@ export default {
     handleOrderChange(val) {
       var self = this;
       self.currentOrderPage = val;
-      API.server(val, self.orderPageSize, self.id).then(res => {
+      API.server(val, self.orderPageSize, self.product_id).then(res => {
         self.orderData = res.data;
         self.orderTotalPage = res.total;
+        self.orderData.forEach(item => {
+          switch (item.status) {
+            case 1:
+              item.status = "提交";
+              break;
+            case 2:
+              item.status = "已付款";
+              break;
+            case 3:
+              item.status = "无效";
+          }
+        });
       });
     },
     // 当前分页
     handleOrderSizeChange(val) {
       var self = this;
-      API.server(val, self.currentOrderPage, self.id).then(res => {
+      API.server(self.currentOrderPage, val, self.product_id).then(res => {
         self.orderData = res.data;
         self.orderTotalPage = res.total;
+        self.orderData.forEach(item => {
+          switch (item.status) {
+            case 1:
+              item.status = "提交";
+              break;
+            case 2:
+              item.status = "已付款";
+              break;
+            case 3:
+              item.status = "无效";
+          }
+        });
       });
     }
   }
