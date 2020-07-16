@@ -211,5 +211,12 @@ API.server = function (page, limit, product_id) {
 		product_id: product_id
 	})
 }
+
+// 删除服务
+API.delServer = function (id) {
+	return axios.del(url.DelServer, {
+		id: id
+	})
+}
  
 export default API

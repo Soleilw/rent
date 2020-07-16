@@ -96,9 +96,25 @@
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="handleEdit(scope.$index,scope.row)">编辑服务</el-button>
           <el-button size="mini" type="success" @click="handleOrder(scope.$index,scope.row)">服务订单</el-button>
+          <el-button size="mini" type="danger" @click="delservice(scope.$index,scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 删除提示框 -->
+    <el-dialog
+      :visible.sync="dialogDel"
+      title="删除年级"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
+      <span>
+        <el-button type="primary" @click="toDel">删除</el-button>
+        <el-button type="danger" @click="dialogDel = false">取消</el-button>
+      </span>
+    </el-dialog>
 
     <div class="block">
       <el-pagination
@@ -116,6 +132,7 @@
 
 <script>
 import API from "@/api//index.js";
+import { log } from "util";
 
 export default {
   name: "buy",
@@ -180,7 +197,10 @@ export default {
       tableDate: [],
       currentPage: 1,
       totalPage: 0,
-      pageSize: 10
+      pageSize: 10,
+      product_id: "",
+      id: "",
+      dialogDel: false
     };
   },
   mounted() {
@@ -257,7 +277,7 @@ export default {
       self.dialogBuy = true;
       self.form = row;
       console.log(row);
-      row.service.length === 6
+      self.form.service === 6
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
@@ -282,6 +302,22 @@ export default {
           }
         });
         self.$message.success("获取数据成功");
+      });
+    },
+
+   
+    delservice(index, row) {
+      var self = this;
+      self.id = row.id;
+      self.dialogDel = true;
+    },
+    // 删除服务
+    toDel() {
+      var self = this;
+      API.delServer(self.id).then(res => {
+        self.$message.success("删除成功");
+        self.dialogDel = false;
+        self.getBuys();
       });
     },
 
