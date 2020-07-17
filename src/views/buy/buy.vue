@@ -1,29 +1,11 @@
 <template>
-  <!-- v-loading="loading" element-loading-text="拼命加载中" -->
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="btn">
       <el-button type="primary" @click="addBuy">添加购买服务</el-button>
     </div>
-    <!-- <div class="btn">
-      <span>学校：</span>
-      <el-select v-model="form.school" placeholder="请选择学校">
-        <el-option v-for="item in schoolList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-      </el-select>
-    </div>-->
-
     <el-dialog title="添加购买服务" :visible.sync="dialogBuy">
       <div class="box">
         <el-form :model="form" label-width="100px">
-          <!-- <el-form-item label="选择学校">
-            <el-select v-model="form.school" placeholder="请选择学校">
-              <el-option
-                v-for="item in schoolList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>-->
           <el-form-item label="选择服务">
             <el-checkbox v-model="checkAll" @change="handleCheckAllService">全选</el-checkbox>
             <div class="service">
@@ -138,38 +120,17 @@ export default {
   name: "buy",
   data() {
     return {
-      //   loading: true,
-      schoolList: [],
-      school: "",
+      loading: true,
       dialogBuy: false,
       showServiceOrder: false,
       checkAll: false, // 全选
+      dialogDel: false,
       serviceIdList: [],
       serviceList: [
         {
           title: "InAndOut",
           name: "进出"
         },
-        {
-          title: "classesNotice",
-          name: "班级公告"
-        },
-        {
-          title: "studentLocal",
-          name: "学生定位"
-        },
-        {
-          title: "out-inRecord",
-          name: "学生进出记录"
-        },
-        {
-          title: "markInquire",
-          name: "成绩查询"
-        },
-        {
-          title: "buyLocator",
-          name: "购买定位器"
-        }
       ],
       form: {
         title: "",
@@ -190,42 +151,43 @@ export default {
           label: "财务统计"
         }
       ],
-      orderData: [],
-      orderPageSize: 10, // 订单列表
+      orderData: [], // 订单列表
+      orderPageSize: 10,
       orderTotalPage: 0,
       currentOrderPage: 1,
+
       tableDate: [],
       currentPage: 1,
       totalPage: 0,
       pageSize: 10,
+
       product_id: "",
-      id: "",
-      dialogDel: false
+      id: ""
     };
   },
   mounted() {
     this.getBuys();
-    // this.getSchool();
   },
   methods: {
+    // 获取服务列表
     getBuys() {
       var self = this;
       API.buys(self.currentPage, self.pageSize)
         .then(res => {
           self.tableDate = res.data;
           self.totalPage = res.total;
-          //   self.loading = false;
+          self.loading = false;
         })
         .catch(err => {
-          //   self.loading = false;
+          self.loading = false;
           console.log(err);
         });
     },
+
+    // 编辑服务
     newBuy() {
       var self = this;
-      // if (self.form.price) {
-      //   self.form.price = self.form.price * 100;
-      // }
+      console.log('newBuy', self.form);
       API.buy(self.form).then(res => {
         self.dialogBuy = false;
         self.$message.success("提交成功");
@@ -234,8 +196,9 @@ export default {
         self.form = {};
         self.form.service = [];
       });
-      console.log("new", self.form);
     },
+
+    // 添加购买服务
     addBuy() {
       var self = this;
       self.dialogBuy = true;
@@ -250,34 +213,28 @@ export default {
         time: ""
       };
     },
-    // 获取学校列表
-    // getSchool() {
-    //   var self = this;
-    //   API.schools(self.currentPage, 100, 2).then(res => {
-    //     self.schoolList = res.data;
-    //   });
-    // },
 
     // 全选服务
     handleCheckAllService(val) {
       var self = this;
-      console.log("handleCheckAllService", val);
-
       self.form.service = val ? self.serviceList : [];
     },
     oneChange() {
       var self = this;
+      console.log('oneChange', self.form);
       self.form.service.length === 6
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
+
     // 操作
     handleEdit(index, row) {
       var self = this;
       self.dialogBuy = true;
+      console.log('handleEdit', row);
       self.form = row;
-      console.log(row);
-      self.form.service === 6
+      // console.log(row);
+      self.form.service.length === 6
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
@@ -304,13 +261,12 @@ export default {
         self.$message.success("获取数据成功");
       });
     },
-
-   
     delservice(index, row) {
       var self = this;
       self.id = row.id;
       self.dialogDel = true;
     },
+
     // 删除服务
     toDel() {
       var self = this;
