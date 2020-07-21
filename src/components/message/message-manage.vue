@@ -13,7 +13,7 @@
 					<img :src="scope.row.cover" style="max-width:180px;max-height:80px;" />
 				</template>
 			</el-table-column>
-			<el-table-column prop="type_id" label="资讯浏览量" align="center"></el-table-column>
+			<el-table-column prop="page_view" label="资讯浏览量" align="center"></el-table-column>
 			<el-table-column prop="updated_at" label="更新时间" align="center"></el-table-column>
 			<el-table-column label="操作" align="center">
 				<template slot-scope="scope">

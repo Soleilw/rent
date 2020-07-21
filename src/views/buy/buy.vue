@@ -183,7 +183,6 @@ export default {
           console.log(err);
         });
     },
-
     // 编辑服务
     newBuy() {
       var self = this;
