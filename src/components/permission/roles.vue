@@ -176,6 +176,7 @@
 					"documentEdit",
 
 					'buy', // 购买服务管理
+					'suspected', // 可疑人物
 					
 					"permission", // 角色管理
 					"roleGet",

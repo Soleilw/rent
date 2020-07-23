@@ -129,7 +129,7 @@ export default {
       serviceList: [
         {
           title: "InAndOut",
-          name: "进出"
+          name: "进出服务"
         },
       ],
       form: {
@@ -137,7 +137,6 @@ export default {
         price: "",
         detail: "",
         service: [],
-        school: "",
         time: ""
       },
       financial: "订单列表",
@@ -208,7 +207,6 @@ export default {
         price: "",
         detail: "",
         service: [],
-        school: "",
         time: ""
       };
     },

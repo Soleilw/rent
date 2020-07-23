@@ -81,6 +81,16 @@ const dynamicRouter = [
 	},
 	
 	{
+		path: '/suspected',
+		name: 'suspected',
+		component: () => import('@/views/suspected/suspected.vue'),
+		meta: {
+	        title: '可疑人物信息',
+            icon: 'el-icon-picture'
+	    }
+	},
+	
+	{
 	    path: '/permission',
 	    name: 'permission',
 	    component: () => import('@/views/permission/permission.vue'),
