@@ -218,5 +218,14 @@ API.delServer = function (id) {
 		id: id
 	})
 }
+
+// 获取可以人物
+API.dangerFace = function (page, limit, address_id) {
+	return axios.get(url.DangerFace, {
+		page: page,
+		limit: limit,
+		address_id: address_id
+	})
+}
  
 export default API
