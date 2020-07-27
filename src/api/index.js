@@ -212,6 +212,19 @@ API.server = function (page, limit, product_id) {
 	})
 }
 
+// 后台设置用户商品 
+API.setProduct = function (data) {
+	return axios.post(url.SetProduct, data)
+}
+
+// 获取开通的服务 
+API.userServes = function (user_id, addresses_id) {
+	return axios.get(url.UserServes, {
+		user_id: user_id,
+		addresses_id: addresses_id
+	})
+}
+
 // 删除服务
 API.delServer = function (id) {
 	return axios.del(url.DelServer, {

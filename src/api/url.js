@@ -40,6 +40,8 @@ const url = {
 	"Buy": BaseURL + '/product', // 新增购买服务
 	'Server': BaseURL + '/orders', // 服务订单
 	"DelServer": BaseURL + '/product', // 删除服务
+	"SetProduct": BaseURL + '/set/Product', // 后台设置用户商品
+	"UserServes": BaseURL + '/user/serves', // 获取开通的服务
 
 	"DangerFace": BaseURL + '/danger/face', // 可疑人物
 	"addDangerFace": BaseURL + '/danger/face', // 添加可疑人物
