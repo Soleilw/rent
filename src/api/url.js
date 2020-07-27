@@ -43,8 +43,8 @@ const url = {
 	"SetProduct": BaseURL + '/set/Product', // 后台设置用户商品
 	"UserServes": BaseURL + '/user/serves', // 获取开通的服务
 
-	"DangerFace": BaseURL + '/danger/face', // 可疑人物
-	"addDangerFace": BaseURL + '/danger/face', // 添加可疑人物
+	"DangerFace": BaseURL + '/danger/face', // 获取可疑人物 & 添加可疑人物
+	// "addDangerFace": BaseURL + '/danger/face', // 添加可疑人物
 	
 }
 

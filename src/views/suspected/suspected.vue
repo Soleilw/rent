@@ -4,14 +4,56 @@
     <div class="btn">
       <el-button type="primary" @click="addDangerFace">添加可疑人物</el-button>
     </div>
-      <el-dialog title="添加可疑人物" :visible.sync="dialogDangerFace">
+    <el-dialog title="添加可疑人物" :visible.sync="dialogDangerFace" :close-on-click-modal="false">
       <div class="box">
-       
+        <el-form :model="form" label-width="100px">
+          <el-form-item label="姓名">
+            <el-input v-model="form.name" style="width: 200px"></el-input>
+          </el-form-item>
+          <el-form-item label="证件号">
+            <el-input v-model="form.number" style="width: 200px"></el-input>
+          </el-form-item>
+          <el-form-item label="相似度">
+            <el-input v-model="form.notify_score" style="width: 200px"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号">
+            <el-input v-model="form.notify_user" style="width: 200px"></el-input>
+          </el-form-item>
+           <el-form-item label="地址">
+            <el-input v-model="form.address_id" style="width: 200px"></el-input>
+          </el-form-item>
+          <el-form-item label="人脸图片">
+            <el-upload
+              action="https://api.fengniaotuangou.cn/api/upload"
+              ref="upload"
+              :limit="1"
+              :before-upload="beforeAvatarUpload"
+              :on-change="handleChange"
+              :on-success="handleAvatarSuccess"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :auto-upload="false"
+            >
+              <el-button size="small" type="primary">选择图片</el-button>
+            </el-upload>
+            <div v-if="hasNewImage" style="color: red; font-size: 12px;">* 点击文件名可删除所选图片</div>
+
+            <div class="up-img">
+              <img class="pic-box" :src="form.href" />
+            </div>
+          </el-form-item>
+          <div class="submit">
+            <el-form-item>
+              <el-button type="primary" @click="upload">提交</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
       </div>
     </el-dialog>
+
     <el-table :data="tableData" empty-text="暂无数据">
       <el-table-column prop="id" label="ID" align="center"></el-table-column>
-      <el-table-column prop="" label="设备ID" align="center"></el-table-column>
+      <el-table-column prop label="设备ID" align="center"></el-table-column>
       <el-table-column prop="name" label="名称" align="center"></el-table-column>
       <el-table-column prop="created_at" label="时间" align="center"></el-table-column>
       <el-table-column prop="number" label="人脸证件号" align="center"></el-table-column>
@@ -56,7 +98,22 @@ export default {
       currentPage: 1, // 分页
       pageSize: 10,
       totalPage: 0,
-      dialogDangerFace: false
+      dialogDangerFace: false,
+      // dialogPicture: false,
+      form: {
+        href: "",
+      },
+      qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
+
+      hasNewImage: false,
+      form: {
+        name: "",
+        number: "",
+        href: "",
+        notify_score: '', // 相似度
+        notify_user: '', // 通知的手机号
+        address_id: ''
+      },
     };
   },
 
@@ -76,10 +133,64 @@ export default {
     // 添加可以人物
     addDangerFace() {
       var self = this;
-      self.dialogDangerFace = true
+      self.dialogDangerFace = true;
     },
 
-    
+    handleRemove(file, fileList) {
+      //移除图片
+      var self = this;
+      self.form.href = "";
+      self.hasNewImage = false;
+    },
+    beforeAvatarUpload(file) {
+      //文件上传之前调用做一些拦截限制
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        this.$message.error("上传图片大小不能超过 2MB!");
+      }
+      return isLt2M;
+    },
+    handleChange(file) {
+      var self = this;
+      self.form.href = URL.createObjectURL(file.raw);
+      self.hasNewImage = true;
+    },
+    handleAvatarSuccess(res, file) {
+      //图片上传成功
+      var self = this;
+      file.url = res.data;
+      // self.href = file.url;
+      self.form.href = file.url;
+      API.addDangerFace(self.form).then((res) => {
+        self.$message.success("上传成功");
+        self.currentPage = 1;
+        self.getDangerFace();
+        self.$refs.upload.clearFiles();
+        self.form.href = "";
+        self.dialogDangerFace = false;
+      });
+    },
+    handleExceed(files, fileList) {
+      //图片上传超过数量限制
+      var self = this;
+      self.$message.error("上传图片不能超过1张!");
+      self.$refs.upload.clearFiles();
+      self.form.href = "";
+      self.form.id = "";
+    },
+    // 上传图片
+    upload() {
+      this.$refs.upload.submit();
+    },
+    getQiniuToken() {
+      var self = this;
+      axios
+        .get("https://api.fengniaotuangou.cn/api/upload/token")
+        .then((res) => {
+          self.imgData.token = res.data.uptoken;
+        });
+    },
+
     // 分页
     handleCurrentChange(val) {
       var self = this;
@@ -105,4 +216,11 @@ export default {
 </script>
 
 <style scoped>
+.upload-btn {
+  margin-top: 10px;
+}
+.pic-box {
+  max-width: 100%;
+  height: 200px;
+}
 </style>

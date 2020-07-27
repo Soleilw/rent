@@ -232,13 +232,17 @@ API.delServer = function (id) {
 	})
 }
 
-// 获取可以人物
+// 获取可疑人物
 API.dangerFace = function (page, limit, address_id) {
 	return axios.get(url.DangerFace, {
 		page: page,
 		limit: limit,
 		address_id: address_id
 	})
+}
+// 创建可疑人物
+API.addDangerFace = function (data) {
+	return axios.post(url.DangerFace, data)
 }
  
 export default API
