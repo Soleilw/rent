@@ -8,19 +8,30 @@
       <div class="box">
         <el-form :model="form" label-width="100px">
           <el-form-item label="姓名">
-            <el-input v-model="form.name" style="width: 200px"></el-input>
+            <el-input v-model="form.name" style="width: 220px"></el-input>
           </el-form-item>
           <el-form-item label="证件号">
-            <el-input v-model="form.number" style="width: 200px"></el-input>
+            <el-input v-model="form.number" style="width: 220px"></el-input>
           </el-form-item>
           <el-form-item label="相似度">
-            <el-input v-model="form.notify_score" style="width: 200px"></el-input>
+            <el-input v-model="form.notify_score" style="width: 220px"></el-input>
           </el-form-item>
           <el-form-item label="手机号">
-            <el-input v-model="form.notify_user" style="width: 200px"></el-input>
+            <el-input v-model="form.notify_user" style="width: 220px"></el-input>
           </el-form-item>
-           <el-form-item label="地址">
-            <el-input v-model="form.address_id" style="width: 200px"></el-input>
+          <el-form-item label="地址">
+            <div style="font-size: 20px; margin-bottom: 30px;">
+              <el-select v-model="form.address" placeholder="请选择地址" @change="addressChange">
+                <el-option
+                  v-for="item in addressList"
+                  :key="item.id"
+                  :label="item.address"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </div>
+
+            <!-- <el-input v-model="form.address_id" style="width: 220px"></el-input> -->
           </el-form-item>
           <el-form-item label="人脸图片">
             <el-upload
@@ -70,7 +81,27 @@
           </div>
         </template>
       </el-table-column>
+      <!-- <el-table-column label="操作" align="center" width="300px">
+        <template slot-scope="scope">
+          <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column> -->
     </el-table>
+
+    <!-- 删除提示框 -->
+    <el-dialog
+      :visible.sync="dialogDel"
+      title="删除住户"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
+      <span>
+        <el-button type="primary" @click="toDel">删除</el-button>
+        <el-button type="danger" @click="dialogDel = false">取消</el-button>
+      </span>
+    </el-dialog>
     <!-- 分页 -->
     <div class="block">
       <el-pagination
@@ -110,10 +141,12 @@ export default {
         name: "",
         number: "",
         href: "",
-        notify_score: '', // 相似度
-        notify_user: '', // 通知的手机号
-        address_id: ''
+        notify_score: "", // 相似度
+        notify_user: "", // 通知的手机号
+        address_id: "",
       },
+      addressList: [],
+      dialogDel: false,
     };
   },
 
@@ -130,12 +163,31 @@ export default {
         self.totalPage = res.data.total;
       });
     },
+    // 获取地址列表
+    getAddress() {
+      var self = this;
+      API.address(self.currentPage, self.pageSize).then((res) => {
+        console.log("getAddress", res);
+        self.addressList = res.data;
+      });
+    },
+    // 选择地址
+    addressChange(val) {
+      var self = this;
+      self.form.address_id = val;
+      console.log(self.form.address_id);
+    },
     // 添加可以人物
     addDangerFace() {
       var self = this;
       self.dialogDangerFace = true;
+      self.getAddress();
     },
-
+    handleDel(index, row) {
+      var self = this;
+      self.dialogDel = true;
+    },
+    toDel() {},
     handleRemove(file, fileList) {
       //移除图片
       var self = this;
@@ -166,7 +218,15 @@ export default {
         self.currentPage = 1;
         self.getDangerFace();
         self.$refs.upload.clearFiles();
-        self.form.href = "";
+        self.form = {
+          name: "",
+          number: "",
+          href: "",
+          notify_score: "", 
+          notify_user: "", 
+          address_id: "",
+        };
+        // self.form.href = "";
         self.dialogDangerFace = false;
       });
     },
@@ -180,7 +240,8 @@ export default {
     },
     // 上传图片
     upload() {
-      this.$refs.upload.submit();
+      var self = this;
+      self.$refs.upload.submit();
     },
     getQiniuToken() {
       var self = this;

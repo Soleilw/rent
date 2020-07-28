@@ -44,6 +44,24 @@ API.households = function(page, limit, user_id, address_id, type, state, room_id
 		name: name
 	})
 }
+// 获取住户信息
+API.addressResidents = function(page, limit, address_id, type) {
+	return axios.get(url.AddressResidents, {
+		page: page,
+		limit: limit,
+		address_id: address_id,
+		type: type
+	})
+}
+// 获取进出记录
+API.faceLogs = function(page, limit, face_id) {
+	return axios.get(url.FaceLogs, {
+		page: page,
+		limit: limit,
+		face_id: face_id
+	})
+}
+
 
 // 搜索住户
 API.searchHousehold = function(page, limit, name) {
@@ -243,6 +261,14 @@ API.dangerFace = function (page, limit, address_id) {
 // 创建可疑人物
 API.addDangerFace = function (data) {
 	return axios.post(url.DangerFace, data)
+}
+// 获取地址
+API.address = function (page, limit, area_id) {
+	return axios.get(url.Address, {
+		page: page,
+		limit: limit,
+		area_id: area_id
+	})
 }
  
 export default API
