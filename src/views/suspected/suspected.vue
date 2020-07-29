@@ -81,26 +81,67 @@
           </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center" width="300px">
+      <el-table-column label="操作" align="center" width="300px">
         <template slot-scope="scope">
-          <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+          <el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
 
     <!-- 删除提示框 -->
-    <el-dialog
+    <!-- <el-dialog
       :visible.sync="dialogDel"
       title="删除住户"
       width="20%"
       align="center"
       :close-on-click-modal="false"
-    >
+     >
       <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
       <span>
         <el-button type="primary" @click="toDel">删除</el-button>
         <el-button type="danger" @click="dialogDel = false">取消</el-button>
       </span>
+    </el-dialog> -->
+
+    <!-- 进出记录 -->
+    <el-dialog title="进出记录" :visible.sync="dialogLogs">
+      <div class="box">
+        <el-table :data="logsData">
+          <el-table-column prop="danger.name" label="姓名" align="center"></el-table-column>
+          <el-table-column prop="address" label="地址" align="center"></el-table-column>
+          <el-table-column prop="danger.number" label="证件号" align="center"></el-table-column>
+          <el-table-column prop="time" label="时间" align="center"></el-table-column>
+          <el-table-column prop="direction" label="进出状态" align="center"></el-table-column>
+          <el-table-column prop="danger.href" label="人脸照片" align="center">
+            <template slot-scope="scope">
+              <div v-if="scope.row.danger.href">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.danger.href" style="max-width:800px;max-height:800px;" />
+                  <img
+                    slot="reference"
+                    :src="scope.row.danger.href"
+                    style="max-width:180px;max-height:80px;"
+                  />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="block">
+        <el-pagination
+          @current-change="handleCurrentLogs"
+          :current-page.sync="currentLogsPage"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="pageSizeLogs"
+          layout="sizes, prev, pager, next, jumper"
+          :total="totalLogsPage"
+          @size-change="handleSizeLogs"
+        ></el-pagination>
+      </div>
     </el-dialog>
     <!-- 分页 -->
     <div class="block">
@@ -146,7 +187,13 @@ export default {
         address_id: "",
       },
       addressList: [],
-      dialogDel: false,
+      // dialogDel: false,
+      dialogLogs: false,
+      logsData: [],
+      area: "",
+      currentLogsPage: 1,
+      pageSizeLogs: 10,
+      totalLogsPage: 0,
     };
   },
 
@@ -183,11 +230,40 @@ export default {
       self.dialogDangerFace = true;
       self.getAddress();
     },
-    handleDel(index, row) {
+    // 进出记录
+    handleLogs(index, row) {
       var self = this;
-      self.dialogDel = true;
+      self.dialogLogs = true;
+      self.area = row.danger_id;
+      console.log(row);
+      self.getFaceLogs();
     },
-    toDel() {},
+    getFaceLogs() {
+      var self = this;
+      API.dangerLog(self.currentLogsPage, self.pageSizeLogs, self.area).then(
+        (res) => {
+          console.log("getFaceLogs", res.data.data);
+          self.logsData = res.data.data;
+          self.totalLogsPage = res.total;
+          res.data.data.forEach((item) => {
+            switch (item.direction) {
+              case 1:
+                item.direction = "进入";
+                break;
+              case 2:
+                item.direction = "外出";
+                break;
+            }
+          });
+        }
+      );
+    },
+
+    // handleDel(index, row) {
+    //   var self = this;
+    //   self.dialogDel = true;
+    // },
+    // toDel() {},
     handleRemove(file, fileList) {
       //移除图片
       var self = this;
@@ -222,8 +298,8 @@ export default {
           name: "",
           number: "",
           href: "",
-          notify_score: "", 
-          notify_user: "", 
+          notify_score: "",
+          notify_user: "",
           address_id: "",
         };
         // self.form.href = "";
@@ -272,7 +348,24 @@ export default {
         self.currentPage = 1;
       });
     },
+
+    // 进出记录分页
+    handleCurrentLogs(val) {
+      var self = this;
+      self.currentLogsPage = val;
+      API.dangerLog(val, self.pageSizeLogs, self.area).then((res) => {
+        self.logsData = res.data.data;
+      });
+    },
+    handleSizeLogs(val) {
+      var self = this;
+      self.pageSizeLogs = val;
+      API.dangerLog(self.currentLogsPage, val, self.area).then((res) => {
+        self.logsData = res.data.data;
+      });
+    },
   },
+
 };
 </script>
 

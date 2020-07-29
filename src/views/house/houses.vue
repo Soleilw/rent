@@ -14,6 +14,7 @@
     <div class="btn">
       <el-button type="primary" @click="search(house_id)">搜索</el-button>
     </div>
+
     <el-dialog title="添加房屋" :visible.sync="dialogHouses" width="80%">
       <div class="box">
         <el-form :model="form" label-width="130px">
@@ -46,8 +47,8 @@
     <el-table :data="tableData">
       <el-table-column prop="id" label="ID" align="center"></el-table-column>
       <el-table-column prop="address" label="房屋地址" align="center"></el-table-column>
-      <el-table-column prop="id" label="访客功能状态" align="center"></el-table-column>
-      <el-table-column prop="id" label="负责人姓名" align="center"></el-table-column>
+      <el-table-column prop="room_count" label="单元总数" align="center"></el-table-column>
+      <el-table-column prop="room_resident" label="租客总数" align="center"></el-table-column>
       <el-table-column label="操作" align="center" width="400px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
@@ -62,6 +63,7 @@
       </el-table-column>
     </el-table>
 
+    <!-- 查看所有住户信息 -->
     <el-dialog title="查看所有住户信息" :visible.sync="dialogResident" width="80%" @close="closeShowUser">
       <div class="box">
         <div class="btn">
@@ -269,7 +271,55 @@
       </div>
     </el-dialog>
 
+    <!-- 楼栋管理 -->
     <el-dialog title="楼栋管理" :visible.sync="dialogBuild">
+      <div class="box">
+        <div class="btn">
+          <el-button type="primary" @click="HandleAddBuild">添加房屋编号</el-button>
+        </div>
+        <el-table :data="buildingList">
+          <el-table-column prop="door_number" label="房屋编号" align="center"></el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-button
+                type="danger"
+                size="mini"
+                @click="HandledelBuilding(scope.$index, scope.row)"
+              >删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <!-- 分页 -->
+      <div class="block">
+        <el-pagination
+          @current-change="handleCurrenBuildingt"
+          :current-page.sync="currentBuildingPage"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="pageSizeBuilding"
+          layout="sizes, prev, pager, next, jumper"
+          :total="totalBuildingPage"
+          @size-change="handleSizeBuilding"
+        ></el-pagination>
+      </div>
+    </el-dialog>
+    <!-- 楼栋管理删除提示框 -->
+    <el-dialog
+      :visible.sync="dialogDelBuild"
+      title="删除房屋编号"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否删除该房屋编号</div>
+      <span>
+        <el-button type="primary" @click="toDelBuild">删除</el-button>
+        <el-button type="danger" @click="dialogDelBuild = false">取消</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 添加房屋编号 -->
+    <el-dialog title="添加房屋编号" :visible.sync="dialogAddBuild">
       <div class="box">
         <el-form :model="buildForm" label-width="100px">
           <div v-for="(item,index) in buildForm.rooms" :key="index">
@@ -436,12 +486,20 @@ export default {
       managementPageSize: 10,
       managementTotalPage: 0,
 
-      dialogLogs: false,
+      dialogLogs: false, // 进出记录
       logsData: [],
       currentLogsPage: 1,
       pageSizeLogs: 10,
       totalLogsPage: 0,
       dialogDel: false,
+      buildingList: [], // 楼栋列表
+      address_id: "",
+      dialogAddBuild: false,
+      currentBuildingPage: 1, // 分页
+      pageSizeBuilding: 10,
+      totalBuildingPage: 0,
+      dialogDelBuild: false,
+      building_id: "",
     };
   },
   mounted() {
@@ -452,7 +510,7 @@ export default {
     getnewHouses() {
       var self = this;
       API.addresses(self.currentPage, self.pageSize).then((res) => {
-        console.log("获取房屋列表", res.data);
+        // console.log("获取房屋列表", res.data);
         self.tableData = res.data;
         self.totalPage = res.total;
       });
@@ -489,6 +547,25 @@ export default {
       var self = this;
       self.dialogBuild = true;
       self.buildForm.address_id = row.id;
+      self.address_id = row.id;
+      self.getBuilding();
+    },
+    HandleAddBuild(index, row) {
+      var self = this;
+      self.dialogAddBuild = true;
+    },
+    // 获取楼栋信息
+    getBuilding() {
+      var self = this;
+      API.gainRooms(
+        self.currentBuildingPage,
+        self.pageSizeBuilding,
+        self.address_id
+      ).then((res) => {
+        // console.log("获取楼栋信息", res);
+        self.buildingList = res.data;
+        self.totalBuildingPage = res.total;
+      });
     },
 
     // 房屋编号操作
@@ -505,9 +582,10 @@ export default {
       var self = this;
       API.rooms(self.buildForm).then((res) => {
         self.$message.success("提交成功");
-        self.dialogBuild = false;
+        self.dialogAddBuild = false;
         self.buildForm.rooms = [];
         self.rooms = "";
+        self.getBuilding();
       });
     },
 
@@ -663,6 +741,7 @@ export default {
       self.managementList = [];
     },
 
+    // 进出记录
     handleLogs(index, row) {
       var self = this;
       self.dialogLogs = true;
@@ -670,8 +749,6 @@ export default {
       console.log(row);
       self.getFaceLogs();
     },
-
-    // 进出记录
     getFaceLogs() {
       var self = this;
       API.faceLogs(self.currentLogsPage, self.pageSizeLogs, self.face_id).then(
@@ -695,26 +772,25 @@ export default {
 
     // 编辑
     handleEdit() {},
-
-    // 删除
+    // 删除--查看住户信息
     handleDel(index, row) {
       var self = this;
       self.id = row.id;
       self.dialogDel = true;
     },
-
-    toDel(user) {
+    toDel() {
       var self = this;
       API.delHousehold(self.id).then((res) => {
-        self.$message.success("删除成功");
-        self.dialogDel = false;
-        switch (user) {
+        switch (self.user) {
           case "全部":
+            self.$message.success("删除成功");
+            self.dialogDel = false;
             API.addressResidents(
               self.currentResidentPage,
               self.pageSizeResident,
               self.house_id
             ).then((res) => {
+              console.log("所有", res);
               self.residentData = res.data;
               self.totalResidentPage = res.total;
               res.data.forEach((item) => {
@@ -733,6 +809,8 @@ export default {
             });
             break;
           case "户主":
+            self.$message.success("删除成功");
+            self.dialogDel = false;
             API.addressResidents(
               self.houseOwnerCurrentPage,
               self.houseOwnerPageSize,
@@ -758,6 +836,8 @@ export default {
             });
             break;
           case "租客":
+            self.$message.success("删除成功");
+            self.dialogDel = false;
             API.addressResidents(
               self.renterCurrentPage,
               self.renterPageSize,
@@ -782,6 +862,8 @@ export default {
             });
             break;
           case "物业":
+            self.$message.success("删除成功");
+            self.dialogDel = false;
             API.addressResidents(
               self.managementCurrentPage,
               self.managementPageSize,
@@ -809,6 +891,21 @@ export default {
       });
     },
 
+    // 删除--楼栋管理
+    HandledelBuilding(index, row) {
+      var self = this;
+      self.dialogDelBuild = true;
+      self.building_id = row.id;
+    },
+    toDelBuild() {
+      var self = this;
+      API.delBuilding(self.building_id).then((res) => {
+        self.dialogDelBuild = false;
+        self.$message.success("删除成功");
+        self.getBuilding();
+      });
+    },
+
     // 分页
     handleCurrentChange(val) {
       var self = this;
@@ -818,7 +915,6 @@ export default {
         self.totalPage = res.total;
       });
     },
-
     // 每页几条
     handleSizeChange(val) {
       var self = this;
@@ -829,7 +925,7 @@ export default {
       });
     },
 
-    // 全部分页
+    // 全部住户分页
     handleCurrentResident(val) {
       var self = this;
       self.currentResidentPage = val;
@@ -901,7 +997,7 @@ export default {
         }
       );
     },
-    // 每页几条
+    //
     handleSizeHouseOwner(val) {
       var self = this;
       self.houseOwnerPageSize = val;
@@ -929,7 +1025,7 @@ export default {
       });
     },
 
-    // 租客
+    // 租客分页
     handleCurrentRenter(val) {
       var self = this;
       self.renterCurrentPage = val;
@@ -977,7 +1073,7 @@ export default {
       );
     },
 
-    // 物业
+    // 物业分页
     handleManagement(val) {
       var self = this;
       self.managementCurrentPage = val;
@@ -1028,21 +1124,40 @@ export default {
       });
     },
 
-    // 进出记录
+    // 进出记录分页
     handleCurrentLogs(val) {
       var self = this;
       self.currentLogsPage = val;
-      API.faceLogs(val, self.pageSizeLogs).then((res) => {
+      API.faceLogs(val, self.pageSizeLogs, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
+    handleSizeLogs(val) {
+      var self = this;
+      self.pageSizeLogs = val;
+      API.faceLogs(self.currentLogsPage, val, self.face_id).then((res) => {
         self.logsData = res.data;
       });
     },
 
-    handleSizeLogs(val) {
+    // 楼栋管理分页
+    handleCurrenBuildingt(val) {
       var self = this;
-      self.pageSizeLogs = val;
-      API.faceLogs(self.currentLogsPage, val).then((res) => {
-        self.logsData = res.data;
+      self.currentBuildingPage = val;
+      API.gainRooms(val, self.pageSizeBuilding, self.address_id).then((res) => {
+        // console.log("获取楼栋信息", res);
+        self.buildingList = res.data;
       });
+    },
+    handleSizeBuilding(val) {
+      var self = this;
+      self.pageSizeBuilding = val;
+      API.gainRooms(self.currentBuildingPage, val, self.address_id).then(
+        (res) => {
+          // console.log("获取楼栋信息", res);
+          self.buildingList = res.data;
+        }
+      );
     },
   },
 };

@@ -11,11 +11,12 @@ const url = {
 	'HouseManagers': BaseURL + '/house/managers', // 住户列表
 	'CheckManagers': BaseURL + '/check/managers', // 住户列表
 	'Addresses': BaseURL + '/addresses', // 获取出租屋列表
-	'Rooms': BaseURL + '/rooms', // 获取出租屋列表
+	'Rooms': BaseURL + '/rooms', // 新增房间门牌, 获取门牌
 	'Households': BaseURL + '/households', // 获取出租屋列表
 	'Household': BaseURL + '/household', // 删除住户
 	'AddressResidents': BaseURL + '/address/residents', // 获取住户信息
 	'FaceLogs': BaseURL + '/face/logs', // 获取住户进出记录
+	'DelBuilding': BaseURL + '/role', // 删除楼栋
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图
@@ -47,6 +48,7 @@ const url = {
 
 	"DangerFace": BaseURL + '/danger/face', // 获取可疑人物 & 添加可疑人物
 	"Address": BaseURL + '/addresses', // 可疑人物获取地址列表
+	"DangerLog": BaseURL + '/danger/log', // 进出记录
 	
 }
 

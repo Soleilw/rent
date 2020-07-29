@@ -74,17 +74,26 @@
       <div class="box">
         <el-table :data="logsData">
           <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
-          <el-table-column prop="id" label="用户名" align="center"></el-table-column>
-          <el-table-column prop="id" label="手机号" align="center"></el-table-column>
-          <el-table-column prop="id" label="房屋名称" align="center"></el-table-column>
-          <el-table-column prop="id" label="房屋单元" align="center"></el-table-column>
-          <el-table-column prop="id" label="人脸照片" align="center">
+          <el-table-column prop="number" label="证件号" align="center"></el-table-column>
+          <el-table-column prop="time" label="时间" align="center"></el-table-column>
+          <el-table-column prop="direction" label="进出状态" align="center"></el-table-column>
+          <el-table-column prop="image" label="人脸照片" align="center">
             <template slot-scope="scope">
-              <img :src="scope" alt style="min-width: 80px; min-height: 80px;" />
+              <div v-if="scope.row.image">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.image" style="max-width:800px;max-height:800px;" />
+                  <img
+                    slot="reference"
+                    :src="scope.row.image"
+                    style="max-width:180px;max-height:80px;"
+                  />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column prop="id" label="真实姓名" align="center"></el-table-column>
-          <el-table-column prop="id" label="用户身份" align="center"></el-table-column>
         </el-table>
       </div>
       <div class="block">
@@ -226,6 +235,7 @@ export default {
       },
       user_id: "",
       addresses_id: "",
+      face_id: ''
     };
   },
   mounted() {
@@ -254,11 +264,6 @@ export default {
         self.renter_name = "";
         self.$message.success("搜索成功！");
       });
-    },
-
-    handleLogs() {
-      var self = this;
-      self.dialogLogs = true;
     },
 
     // 审核
@@ -325,15 +330,44 @@ export default {
         console.log("toConfirm", res);
         self.$message.success("开通成功！");
         self.dialogOpenServe = false;
-        self.title = ''
+        self.title = "";
       });
     },
+    handleLogs(index, row) {
+      var self = this;
+      self.dialogLogs = true;
+      self.face_id = row.face_id;
+      console.log(row);
+      self.getFaceLogs();
+    },
+
+    // 进出记录
+    getFaceLogs() {
+      var self = this;
+      API.faceLogs(self.currentLogsPage, self.pageSizeLogs, self.face_id).then(
+        (res) => {
+          console.log("getFaceLogs", res);
+          self.logsData = res.data;
+          self.totalLogsPage = res.total;
+          res.data.forEach((item) => {
+            switch (item.direction) {
+              case 1:
+                item.direction = "进入";
+                break;
+              case 2:
+                item.direction = "外出";
+                break;
+            }
+          });
+        }
+      );
+    },
+
     handleDel(index, row) {
       var self = this;
       self.id = row.id;
       self.dialogDel = true;
     },
-
     toDel() {
       var self = this;
       API.delHousehold(self.id).then((res) => {
@@ -364,9 +398,21 @@ export default {
     },
 
     // 进出记录
-    handleCurrentLogs(val) {},
+    handleCurrentLogs(val) {
+      var self = this;
+      self.currentLogsPage = val;
+      API.faceLogs(val, self.pageSizeLogs, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
 
-    handleSizeLogs(val) {},
+    handleSizeLogs(val) {
+      var self = this;
+      self.pageSizeLogs = val;
+      API.faceLogs(self.currentLogsPage, val, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
   },
 };
 </script>
