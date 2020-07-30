@@ -101,7 +101,7 @@
         <el-button type="primary" @click="toDel">删除</el-button>
         <el-button type="danger" @click="dialogDel = false">取消</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>-->
 
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
@@ -110,8 +110,8 @@
           <el-table-column prop="danger.name" label="姓名" align="center"></el-table-column>
           <el-table-column prop="address" label="地址" align="center"></el-table-column>
           <el-table-column prop="danger.number" label="证件号" align="center"></el-table-column>
-          <el-table-column prop="time" label="时间" align="center"></el-table-column>
-          <el-table-column prop="direction" label="进出状态" align="center"></el-table-column>
+          <!-- <el-table-column prop="score" label="相似度" align="center"></el-table-column> -->
+          <el-table-column prop="log.timestamp" label="时间" align="center"></el-table-column>
           <el-table-column prop="danger.href" label="人脸照片" align="center">
             <template slot-scope="scope">
               <div v-if="scope.row.danger.href">
@@ -161,6 +161,7 @@
 <script>
 import API from "@/api//index.js";
 import { log } from "util";
+import date from "../../utils/date";
 
 export default {
   data() {
@@ -190,7 +191,7 @@ export default {
       // dialogDel: false,
       dialogLogs: false,
       logsData: [],
-      area: "",
+      danger_id: "",
       currentLogsPage: 1,
       pageSizeLogs: 10,
       totalLogsPage: 0,
@@ -234,26 +235,19 @@ export default {
     handleLogs(index, row) {
       var self = this;
       self.dialogLogs = true;
-      self.area = row.danger_id;
+      self.danger_id = row.danger_id;
       console.log(row);
       self.getFaceLogs();
     },
     getFaceLogs() {
       var self = this;
-      API.dangerLog(self.currentLogsPage, self.pageSizeLogs, self.area).then(
+      API.dangerLog(self.currentLogsPage, self.pageSizeLogs, self.danger_id).then(
         (res) => {
           console.log("getFaceLogs", res.data.data);
           self.logsData = res.data.data;
-          self.totalLogsPage = res.total;
-          res.data.data.forEach((item) => {
-            switch (item.direction) {
-              case 1:
-                item.direction = "进入";
-                break;
-              case 2:
-                item.direction = "外出";
-                break;
-            }
+          self.totalLogsPage = res.data.total;
+          self.logsData.forEach((item) => {
+            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
           });
         }
       );
@@ -353,19 +347,24 @@ export default {
     handleCurrentLogs(val) {
       var self = this;
       self.currentLogsPage = val;
-      API.dangerLog(val, self.pageSizeLogs, self.area).then((res) => {
+      API.dangerLog(val, self.pageSizeLogs, self.danger_id).then((res) => {
         self.logsData = res.data.data;
+        self.logsData.forEach((item) => {
+            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
+          });
       });
     },
     handleSizeLogs(val) {
       var self = this;
       self.pageSizeLogs = val;
-      API.dangerLog(self.currentLogsPage, val, self.area).then((res) => {
+      API.dangerLog(self.currentLogsPage, val, self.danger_id).then((res) => {
         self.logsData = res.data.data;
+        self.logsData.forEach((item) => {
+            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
+          });
       });
     },
   },
-
 };
 </script>
 

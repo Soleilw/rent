@@ -237,11 +237,13 @@ API.buy = function (data) {
 }
 
 // 获取服务订单
-API.server = function (page, limit, product_id) {
+API.server = function (page, limit, product_id, keyword, areas_id) {
 	return axios.get(url.Server, {
 		page: page,
 		limit: limit,
-		product_id: product_id
+		product_id: product_id,
+		keyword: keyword,
+		areas_id: areas_id
 	})
 }
 
@@ -286,11 +288,11 @@ API.address = function (page, limit, area_id) {
 	})
 }
 // 进出记录 
-API.dangerLog = function (page, limit, area) {
+API.dangerLog = function (page, limit, danger_id) {
 	return axios.get(url.DangerLog, {
 		page: page,
 		limit: limit,
-		area: area
+		danger_id: danger_id
 	})
 }
 

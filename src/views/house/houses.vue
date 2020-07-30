@@ -524,7 +524,7 @@ export default {
         (res) => {
           self.tableData = res.data;
           self.totalPage = res.total;
-          self.house_id = "";
+          // self.house_id = "";
           self.$message.success("搜索成功！");
         }
       );
@@ -910,19 +910,33 @@ export default {
     handleCurrentChange(val) {
       var self = this;
       self.currentPage = val;
-      API.addresses(val, self.pageSize).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-      });
+      if (self.house_id == "") {
+        API.addresses(val, self.pageSize).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+        });
+      } else {
+        API.addresses(val, self.pageSize, 0, self.house_id).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+        });
+      }
     },
     // 每页几条
     handleSizeChange(val) {
       var self = this;
       self.pageSize = val;
-      API.addresses(self.currentPage, val).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-      });
+      if (self.house_id == "") {
+        API.addresses(self.currentPage, val).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+        });
+      } else {
+        API.addresses(self.currentPage, val, 0, self.house_id).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+        });
+      }
     },
 
     // 全部住户分页

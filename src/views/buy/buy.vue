@@ -38,6 +38,17 @@
     </el-dialog>
     <el-dialog title="订单列表" :visible.sync="showServiceOrder" width="80%">
       <div class="box">
+        <div class="btn">
+          <el-input
+            v-model="keyword"
+            placeholder="输入房屋地址"
+            class="search"
+            @keyup.enter.native="search(keyword)"
+          ></el-input>
+        </div>
+        <div class="btn">
+          <el-button type="primary" @click="search(keyword)">搜索</el-button>
+        </div>
         <div>
           <el-table :data="orderData">
             <el-table-column prop="no" label="订单ID" align="center"></el-table-column>
@@ -45,9 +56,9 @@
             <el-table-column prop="user_name" label="用户名" align="center"></el-table-column>
             <el-table-column prop="name" label="商品名称" align="center"></el-table-column>
             <el-table-column prop="price" label="商品价格" align="center"></el-table-column>
-            <el-table-column prop="time" label="商品时长" align="center"></el-table-column>
+            <el-table-column prop="addresses_text" label="地址" align="center"></el-table-column>
             <el-table-column prop="status" label="订单状态" align="center"></el-table-column>
-            <el-table-column prop="create_id" label="创建时间" align="center"></el-table-column>
+            <el-table-column prop="created_at" label="创建时间" align="center"></el-table-column>
           </el-table>
           <div class="block">
             <el-pagination
@@ -129,7 +140,7 @@ export default {
       serviceList: [
         {
           title: "InAndOut",
-          name: "进出服务"
+          name: "进出服务",
         },
       ],
       form: {
@@ -137,18 +148,18 @@ export default {
         price: "",
         detail: "",
         service: [],
-        time: ""
+        time: "",
       },
       financial: "订单列表",
       financialList: [
         {
           value: 1,
-          label: "订单列表"
+          label: "订单列表",
         },
         {
           value: 2,
-          label: "财务统计"
-        }
+          label: "财务统计",
+        },
       ],
       orderData: [], // 订单列表
       orderPageSize: 10,
@@ -161,7 +172,8 @@ export default {
       pageSize: 10,
 
       product_id: "",
-      id: ""
+      id: "",
+      keyword: "",
     };
   },
   mounted() {
@@ -172,21 +184,52 @@ export default {
     getBuys() {
       var self = this;
       API.buys(self.currentPage, self.pageSize)
-        .then(res => {
+        .then((res) => {
           self.tableDate = res.data;
           self.totalPage = res.total;
           self.loading = false;
         })
-        .catch(err => {
+        .catch((err) => {
           self.loading = false;
           console.log(err);
         });
     },
+    // 搜索
+    search() {
+      var self = this;
+      // if (self.house_id) {
+      API.server(
+        self.currentPage,
+        self.pageSize,
+        self.product_id,
+        self.keyword
+      ).then((res) => {
+        self.orderData = res.data;
+        self.orderTotalPage = res.total;
+        // self.keyword = "";
+        self.orderData.forEach((item) => {
+          switch (item.status) {
+            case 1:
+              item.status = "提交";
+              break;
+            case 2:
+              item.status = "已付款";
+              break;
+            case 3:
+              item.status = "未付款";
+          }
+        });
+        self.$message.success("搜索成功！");
+      });
+      // } else {
+      // 	self.$message.warning('请输入ID');
+      // }
+    },
     // 编辑服务
     newBuy() {
       var self = this;
-      console.log('newBuy', self.form);
-      API.buy(self.form).then(res => {
+      console.log("newBuy", self.form);
+      API.buy(self.form).then((res) => {
         self.dialogBuy = false;
         self.$message.success("提交成功");
         self.getBuys();
@@ -207,7 +250,7 @@ export default {
         price: "",
         detail: "",
         service: [],
-        time: ""
+        time: "",
       };
     },
 
@@ -218,7 +261,7 @@ export default {
     },
     oneChange() {
       var self = this;
-      console.log('oneChange', self.form);
+      console.log("oneChange", self.form);
       self.form.service.length === 6
         ? (self.checkAll = true)
         : (self.checkAll = false);
@@ -228,7 +271,7 @@ export default {
     handleEdit(index, row) {
       var self = this;
       self.dialogBuy = true;
-      console.log('handleEdit', row);
+      console.log("handleEdit", row);
       self.form = row;
       // console.log(row);
       self.form.service.length === 6
@@ -239,24 +282,26 @@ export default {
       var self = this;
       self.showServiceOrder = true;
       self.product_id = row.id;
-      API.server(1, self.pageSize, self.product_id).then(res => {
-        self.orderData = res.data;
-        self.orderTotalPage = res.total;
-        self.currentOrderPage = 1;
-        self.orderData.forEach(item => {
-          switch (item.status) {
-            case 1:
-              item.status = "提交";
-              break;
-            case 2:
-              item.status = "已付款";
-              break;
-            case 3:
-              item.status = "无效";
-          }
-        });
-        self.$message.success("获取数据成功");
-      });
+      API.server(self.currentPage, self.pageSize, self.product_id).then(
+        (res) => {
+          self.orderData = res.data;
+          self.orderTotalPage = res.total;
+          self.currentOrderPage = 1;
+          self.orderData.forEach((item) => {
+            switch (item.status) {
+              case 1:
+                item.status = "提交";
+                break;
+              case 2:
+                item.status = "已付款";
+                break;
+              case 3:
+                item.status = "未付款";
+            }
+          });
+          self.$message.success("获取数据成功");
+        }
+      );
     },
     delservice(index, row) {
       var self = this;
@@ -267,7 +312,7 @@ export default {
     // 删除服务
     toDel() {
       var self = this;
-      API.delServer(self.id).then(res => {
+      API.delServer(self.id).then((res) => {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getBuys();
@@ -282,7 +327,7 @@ export default {
     // 每页多少条
     handleSizeChange(val) {
       var self = this;
-      API.buys(self.currentPage, val).then(res => {
+      API.buys(self.currentPage, val).then((res) => {
         self.tableDate = res.data;
         self.totalPage = res.total;
       });
@@ -291,44 +336,89 @@ export default {
     handleOrderChange(val) {
       var self = this;
       self.currentOrderPage = val;
-      API.server(val, self.orderPageSize, self.product_id).then(res => {
-        self.orderData = res.data;
-        self.orderTotalPage = res.total;
-        self.orderData.forEach(item => {
-          switch (item.status) {
-            case 1:
-              item.status = "提交";
-              break;
-            case 2:
-              item.status = "已付款";
-              break;
-            case 3:
-              item.status = "无效";
-          }
+      if (self.keyword == "") {
+        API.server(val, self.orderPageSize, self.product_id).then((res) => {
+          self.orderData = res.data;
+          self.orderTotalPage = res.total;
+          self.orderData.forEach((item) => {
+            switch (item.status) {
+              case 1:
+                item.status = "提交";
+                break;
+              case 2:
+                item.status = "已付款";
+                break;
+              case 3:
+                item.status = "无效";
+            }
+          });
         });
-      });
+      } else {
+        API.server(val, self.orderPageSize, self.product_id, self.keyword).then(
+          (res) => {
+            self.orderData = res.data;
+            self.orderTotalPage = res.total;
+            self.orderData.forEach((item) => {
+              switch (item.status) {
+                case 1:
+                  item.status = "提交";
+                  break;
+                case 2:
+                  item.status = "已付款";
+                  break;
+                case 3:
+                  item.status = "无效";
+              }
+            });
+          }
+        );
+      }
     },
     // 当前分页
     handleOrderSizeChange(val) {
       var self = this;
-      API.server(self.currentOrderPage, val, self.product_id).then(res => {
-        self.orderData = res.data;
-        self.orderTotalPage = res.total;
-        self.orderData.forEach(item => {
-          switch (item.status) {
-            case 1:
-              item.status = "提交";
-              break;
-            case 2:
-              item.status = "已付款";
-              break;
-            case 3:
-              item.status = "无效";
-          }
+      if (self.keyword == "") {
+        API.server(self.currentOrderPage, val, self.product_id).then((res) => {
+          self.orderData = res.data;
+          self.orderTotalPage = res.total;
+          self.orderData.forEach((item) => {
+            switch (item.status) {
+              case 1:
+                item.status = "提交";
+                break;
+              case 2:
+                item.status = "已付款";
+                break;
+              case 3:
+                item.status = "无效";
+            }
+          });
         });
-      });
-    }
-  }
+      } else {
+        API.server(
+          self.currentOrderPage,
+          val,
+          self.product_id,
+          self.keyword
+        ).then((res) => {
+          self.orderData = res.data;
+          self.orderTotalPage = res.total;
+          self.orderData.forEach((item) => {
+            switch (item.status) {
+              case 1:
+                item.status = "提交";
+                break;
+              case 2:
+                item.status = "已付款";
+                break;
+              case 3:
+                item.status = "无效";
+            }
+          });
+        });
+      }
+    },
+  },
 };
 </script>
 
@@ -337,7 +427,6 @@ export default {
   display: flex;
   flex-wrap: wrap;
 }
-
 .service-item {
   margin: 10px;
   padding: 0 10px;

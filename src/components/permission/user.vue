@@ -7,6 +7,7 @@
 			<el-table-column prop="id" label="ID" align="center"></el-table-column>
 			<el-table-column prop="name" label="账号" align="center"></el-table-column>
 			<el-table-column prop="role" label="角色名" align="center"></el-table-column>
+			<el-table-column prop="community" label="社区" align="center"></el-table-column>
 			<el-table-column prop="enable" label="状态" align="center">
 				<template slot-scope="scope">
 					<span v-text="scope.row.enable == '1' ? '启用' : '禁用'"></span>
