@@ -16,7 +16,7 @@ const url = {
 	'Household': BaseURL + '/household', // 删除住户
 	'AddressResidents': BaseURL + '/address/residents', // 获取住户信息
 	'FaceLogs': BaseURL + '/face/logs', // 获取住户进出记录
-	'DelBuilding': BaseURL + '/role', // 删除楼栋
+	'DelBuilding': BaseURL + '/room', // 删除楼栋
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图
