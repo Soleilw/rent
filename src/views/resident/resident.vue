@@ -38,8 +38,9 @@
       <el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
 
       <el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
+      <el-table-column prop="expireTime" label="进出服务到期时间" align="center" width="300px"></el-table-column>
       <!-- <el-table-column prop label="是否开通服务" align="center" width="300px"></el-table-column> -->
-      <el-table-column prop="room.door_number" label="房屋编号" align="center"></el-table-column>
+      <el-table-column prop="room" label="房屋编号" align="center"></el-table-column>
       <el-table-column prop="state" label="审核状态" align="center">
         <template slot-scope="scope">
           <div v-if="scope.row.state == 1">
@@ -53,7 +54,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300px">
+      <el-table-column label="操作" align="center" width="500px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
           <el-button

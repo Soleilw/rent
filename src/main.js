@@ -8,6 +8,11 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
+// 引入图表
+import echarts from 'echarts'
+Vue.prototype.$echarts = echarts    
+Vue.use(echarts)
+
 import '@/assets/style/reset.css'
 import '@/assets/style/commom.scss'
 

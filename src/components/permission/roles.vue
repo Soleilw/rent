@@ -200,12 +200,14 @@ export default {
 
         "buy", // 购买服务管理
         "buyAdd", // 添加购买服务
-        'compileBuy', // 编辑服务
-        'orderServe', // 服务订单
-        'delBuy', // 删除
-        'checkBuy', // 查询服务
+        "compileBuy", // 编辑服务
+        "orderServe", // 服务订单
+        "delBuy", // 删除
+        "checkBuy", // 查询服务
         "suspected", // 可疑人物
 
+        "total", // 统计
+        "rentersTotal",
         "permission", // 角色管理
         "roleGet",
         "roleAdd",
@@ -217,7 +219,6 @@ export default {
         "manageDel",
         "manageResetPwd", // 重置密码
       ],
-      
 
       dialogDel: false,
       id: "", // 删除id
