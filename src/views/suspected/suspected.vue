@@ -8,17 +8,22 @@
       <div class="box">
         <el-form :model="form" label-width="100px">
           <el-form-item label="姓名">
-            <el-input v-model="form.name" style="width: 220px"></el-input>
+            <el-input v-model="form.name" placeholder="请输入姓名"></el-input>
           </el-form-item>
-          <el-form-item label="证件号">
-            <el-input v-model="form.number" style="width: 220px"></el-input>
+          <el-form-item label="身份证号">
+            <el-input v-model="form.number" placeholder="请输入身份证号"></el-input>
           </el-form-item>
-          <el-form-item label="相似度">
-            <el-input v-model="form.notify_score" style="width: 220px"></el-input>
+          <el-form-item label="通知相似度">
+            <el-input v-model="form.notify_score" placeholder="请输入通知相似度(保留一位小数, 例如78.9)"></el-input>
           </el-form-item>
-          <el-form-item label="手机号">
-            <el-input v-model="form.notify_user" style="width: 220px"></el-input>
+          <el-form-item label="通知手机号">
+            <el-input
+              type="textarea"
+              v-model="notify_user"
+              placeholder="请输入手机号, 多个手机号用逗号分隔(例如: 13212312312,13212312312)"
+            ></el-input>
           </el-form-item>
+
           <el-form-item label="地址">
             <div style="font-size: 20px; margin-bottom: 30px;">
               <el-select v-model="form.address" placeholder="请选择地址" @change="addressChange">
@@ -173,9 +178,9 @@ export default {
       totalPage: 0,
       dialogDangerFace: false,
       // dialogPicture: false,
-      form: {
-        href: "",
-      },
+      // form: {
+      //   href: "",
+      // },
       qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
 
       hasNewImage: false,
@@ -195,6 +200,7 @@ export default {
       currentLogsPage: 1,
       pageSizeLogs: 10,
       totalLogsPage: 0,
+      notify_user: "",
     };
   },
 
@@ -241,23 +247,23 @@ export default {
     },
     getFaceLogs() {
       var self = this;
-      API.dangerLog(self.currentLogsPage, self.pageSizeLogs, self.danger_id).then(
-        (res) => {
-          console.log("getFaceLogs", res.data.data);
-          self.logsData = res.data.data;
-          self.totalLogsPage = res.data.total;
-          self.logsData.forEach((item) => {
-            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
-          });
-        }
-      );
+      API.dangerLog(
+        self.currentLogsPage,
+        self.pageSizeLogs,
+        self.danger_id
+      ).then((res) => {
+        console.log("getFaceLogs", res.data.data);
+        self.logsData = res.data.data;
+        self.totalLogsPage = res.data.total;
+        self.logsData.forEach((item) => {
+          item.log.timestamp = date.formatTime(
+            item.log.timestamp,
+            "Y-M-D h:m:s"
+          );
+        });
+      });
     },
 
-    // handleDel(index, row) {
-    //   var self = this;
-    //   self.dialogDel = true;
-    // },
-    // toDel() {},
     handleRemove(file, fileList) {
       //移除图片
       var self = this;
@@ -283,6 +289,14 @@ export default {
       file.url = res.data;
       // self.href = file.url;
       self.form.href = file.url;
+      // 手机加 '+86'
+      var phones = self.notify_user.split(",");
+      var arr = [];
+      phones.forEach((item) => {
+        item = "+86" + item;
+        arr.push(item);
+      });
+      self.form.notify_user = arr.toString();
       API.addDangerFace(self.form).then((res) => {
         self.$message.success("上传成功");
         self.currentPage = 1;
@@ -296,6 +310,7 @@ export default {
           notify_user: "",
           address_id: "",
         };
+        self.notify_user = ''
         // self.form.href = "";
         self.dialogDangerFace = false;
       });
@@ -350,8 +365,11 @@ export default {
       API.dangerLog(val, self.pageSizeLogs, self.danger_id).then((res) => {
         self.logsData = res.data.data;
         self.logsData.forEach((item) => {
-            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
-          });
+          item.log.timestamp = date.formatTime(
+            item.log.timestamp,
+            "Y-M-D h:m:s"
+          );
+        });
       });
     },
     handleSizeLogs(val) {
@@ -360,8 +378,11 @@ export default {
       API.dangerLog(self.currentLogsPage, val, self.danger_id).then((res) => {
         self.logsData = res.data.data;
         self.logsData.forEach((item) => {
-            item.log.timestamp = date.formatTime(item.log.timestamp, 'Y-M-D h:m:s')
-          });
+          item.log.timestamp = date.formatTime(
+            item.log.timestamp,
+            "Y-M-D h:m:s"
+          );
+        });
       });
     },
   },

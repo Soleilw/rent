@@ -34,11 +34,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="snapshot.phone" label="手机号" align="center"></el-table-column>
-      <el-table-column prop="snapshot.card_number" label="身份证" align="center" width="200px"></el-table-column>
+      <el-table-column prop="snapshot.phone" label="手机号" align="center" width="110px"></el-table-column>
+      <el-table-column prop="snapshot.card_number" label="身份证" align="center" width="180px"></el-table-column>
 
-      <el-table-column prop="address.address" label="房屋地址" align="center" width="300px"></el-table-column>
-      <el-table-column prop="expireTime" label="进出服务到期时间" align="center" width="300px"></el-table-column>
+      <el-table-column prop="address.address" label="房屋地址" align="center" width="200px"></el-table-column>
+      <el-table-column prop="expireTime" label="进出服务到期时间" align="center" width="150px"></el-table-column>
       <!-- <el-table-column prop label="是否开通服务" align="center" width="300px"></el-table-column> -->
       <el-table-column prop="room" label="房屋编号" align="center"></el-table-column>
       <el-table-column prop="state" label="审核状态" align="center">
@@ -54,7 +54,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="500px">
+      <el-table-column label="操作" align="center" width="450px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
           <el-button
