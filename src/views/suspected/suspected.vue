@@ -310,7 +310,7 @@ export default {
           notify_user: "",
           address_id: "",
         };
-        self.notify_user = ''
+        self.notify_user = "";
         // self.form.href = "";
         self.dialogDangerFace = false;
       });

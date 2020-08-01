@@ -134,6 +134,16 @@
               </el-checkbox-group>
             </div>
           </el-form-item>
+          <el-form-item>
+            <div class="permission">
+              <el-checkbox-group v-model="form.permissions" class="permission-item">
+                <el-checkbox label="total" @change="oneChange" border>
+                  <span style="font-weight: bold;">统计</span>
+                </el-checkbox>
+                <el-checkbox label="rentersTotal" @change="oneChange">出租屋人数统计</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </el-form-item>
           <div class="submit">
             <el-form-item>
               <el-button type="primary" @click="newRole">提交</el-button>

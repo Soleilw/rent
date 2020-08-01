@@ -63,7 +63,7 @@
             v-if="scope.row.state == 1"
             @click="handleAudit(scope.$index, scope.row)"
           >审核</el-button>
-          <el-button type="primary" size="mini" @click="openServe(scope.$index, scope.row)">开通服务</el-button>
+          <el-button v-if="isShow" type="primary" size="mini" @click="openServe(scope.$index, scope.row)">开通服务</el-button>
           <el-button type="primary" size="mini" @click="openedServe(scope.$index, scope.row)">已开通的服务</el-button>
           <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -236,11 +236,16 @@ export default {
       },
       user_id: "",
       addresses_id: "",
-      face_id: ''
+      face_id: '',
+      username: localStorage.getItem("username"),
+      isShow: false
     };
   },
   mounted() {
     this.getAllRent();
+    if (this.username == 'admin') {
+      this.isShow = true
+    }
   },
   methods: {
     // 获取身份列表
@@ -306,7 +311,7 @@ export default {
         product_id: self.product_id,
         addresses_id: row.address_id,
       };
-      API.buys(self.currentPage, self.pageSize).then((res) => {
+      API.buys().then((res) => {
         console.log(res);
         self.serviceLists = res.data;
       });
