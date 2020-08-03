@@ -133,8 +133,6 @@
                 <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox>
               </el-checkbox-group>
             </div>
-          </el-form-item>
-          <el-form-item>
             <div class="permission">
               <el-checkbox-group v-model="form.permissions" class="permission-item">
                 <el-checkbox label="total" @change="oneChange" border>

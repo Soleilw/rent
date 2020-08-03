@@ -49,6 +49,8 @@ const url = {
 	"DangerFace": BaseURL + '/danger/face', // 获取可疑人物 & 添加可疑人物
 	"Address": BaseURL + '/addresses', // 可疑人物获取地址列表
 	"DangerLog": BaseURL + '/danger/log', // 进出记录
+
+	'Statistics': BaseURL + '/statistics', // 统计
 	
 }
 

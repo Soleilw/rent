@@ -296,4 +296,14 @@ API.dangerLog = function (page, limit, danger_id) {
 	})
 }
 
+// 统计
+API.statistics = function (page, limit, area_id, address_id) {
+	return axios.get(url.Statistics, {
+		page: page,
+		limit: limit,
+		area_id: area_id,
+		address_id: address_id
+	})
+}
+
 export default API
