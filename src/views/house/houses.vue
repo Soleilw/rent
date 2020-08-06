@@ -593,13 +593,13 @@ export default {
     handleResident(index, row) {
       var self = this;
       self.dialogResident = true;
-      self.house_id = row.id;
+      self.address_id = row.id;
       console.log(self.house_id);
       console.log(self.user);
       API.addressResidents(
         self.currentResidentPage,
         self.pageSizeResident,
-        self.house_id
+        self.address_id
       ).then((res) => {
         console.log("所有", res);
         self.residentData = res.data;
@@ -628,7 +628,7 @@ export default {
             API.addressResidents(
               self.currentResidentPage,
               self.pageSizeResident,
-              self.house_id
+              self.address_id
             ).then((res) => {
               self.residentData = res.data;
               self.totalResidentPage = res.total;
@@ -654,7 +654,7 @@ export default {
             API.addressResidents(
               self.houseOwnerCurrentPage,
               self.houseOwnerPageSize,
-              self.house_id,
+              self.address_id,
               1
             ).then((res) => {
               console.log("户主", res);
@@ -682,7 +682,7 @@ export default {
             API.addressResidents(
               self.renterCurrentPage,
               self.renterPageSize,
-              self.house_id,
+              self.address_id,
               2
             ).then((res) => {
               self.renterList = res.data;
@@ -709,7 +709,7 @@ export default {
             API.addressResidents(
               self.managementCurrentPage,
               self.managementPageSize,
-              self.house_id,
+              self.address_id,
               4
             ).then((res) => {
               self.managementList = res.data;
@@ -788,7 +788,7 @@ export default {
             API.addressResidents(
               self.currentResidentPage,
               self.pageSizeResident,
-              self.house_id
+              self.address_id
             ).then((res) => {
               console.log("所有", res);
               self.residentData = res.data;
@@ -814,7 +814,7 @@ export default {
             API.addressResidents(
               self.houseOwnerCurrentPage,
               self.houseOwnerPageSize,
-              self.house_id,
+              self.address_id,
               1
             ).then((res) => {
               console.log("户主", res);
@@ -841,7 +841,7 @@ export default {
             API.addressResidents(
               self.renterCurrentPage,
               self.renterPageSize,
-              self.house_id,
+              self.address_id,
               2
             ).then((res) => {
               self.renterList = res.data;
@@ -867,7 +867,7 @@ export default {
             API.addressResidents(
               self.managementCurrentPage,
               self.managementPageSize,
-              self.house_id,
+              self.address_id,
               4
             ).then((res) => {
               self.managementList = res.data;
@@ -943,7 +943,7 @@ export default {
     handleCurrentResident(val) {
       var self = this;
       self.currentResidentPage = val;
-      API.addressResidents(val, self.pageSizeResident, self.house_id).then(
+      API.addressResidents(val, self.pageSizeResident, self.address_id).then(
         (res) => {
           self.residentData = res.data;
           //   self.totalResidentPage = res.total;
@@ -966,7 +966,7 @@ export default {
     handleSizeResident(val) {
       var self = this;
       self.pageSizeResident = val;
-      API.addressResidents(self.currentResidentPage, val, self.house_id).then(
+      API.addressResidents(self.currentResidentPage, val, self.address_id).then(
         (res) => {
           self.residentData = res.data;
           //   self.totalResidentPage = res.total;
@@ -991,7 +991,7 @@ export default {
     handleCurrentHouseOwner(val) {
       var self = this;
       self.houseOwnerCurrentPage = val;
-      API.addressResidents(val, self.houseOwnerPageSize, self.house_id, 1).then(
+      API.addressResidents(val, self.houseOwnerPageSize, self.address_id, 1).then(
         (res) => {
           self.houseOwnerList = res.data;
           //   self.houseOwnerTotalPage = res.total;
@@ -1018,7 +1018,7 @@ export default {
       API.addressResidents(
         self.houseOwnerCurrentPage,
         val,
-        self.house_id,
+        self.address_id,
         1
       ).then((res) => {
         self.houseOwnerList = res.data;
@@ -1043,7 +1043,7 @@ export default {
     handleCurrentRenter(val) {
       var self = this;
       self.renterCurrentPage = val;
-      API.addressResidents(val, self.renterPageSize, self.house_id, 2).then(
+      API.addressResidents(val, self.renterPageSize, self.address_id, 2).then(
         (res) => {
           self.renterList = res.data;
           //   self.renterTotalPage = res.total;
@@ -1066,7 +1066,7 @@ export default {
     handleRenterSize(val) {
       var self = this;
       self.renterPageSize = val;
-      API.addressResidents(self.renterCurrentPage, val, self.house_id, 2).then(
+      API.addressResidents(self.renterCurrentPage, val, self.address_id, 2).then(
         (res) => {
           self.renterList = res.data;
           //   self.renterTotalPage = res.total;
@@ -1091,7 +1091,7 @@ export default {
     handleManagement(val) {
       var self = this;
       self.managementCurrentPage = val;
-      API.addressResidents(val, self.managementPageSize, self.house_id, 4).then(
+      API.addressResidents(val, self.managementPageSize, self.address_id, 4).then(
         (res) => {
           self.managementList = res.data;
           //   self.managementTotalPage = res.total;
@@ -1117,7 +1117,7 @@ export default {
       API.addressResidents(
         self.managementCurrentPage,
         val,
-        self.house_id,
+        self.address_id,
         4
       ).then((res) => {
         self.managementList = res.data;
