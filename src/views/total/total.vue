@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading">
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="btn">
       <el-button type="primary" @click="getSstatistics">全部</el-button>
     </div>
@@ -99,7 +99,7 @@ require("echarts");
 export default {
   data() {
     return {
-      loading: false,
+      loading: true,
       tableData: [],
       currentPage: 1, // 全部 分页
       pageSize: 10,
@@ -196,11 +196,16 @@ export default {
       if (self.username == "admin") {
         self.letList = [];
       }
-      API.statistics(1, self.pageSize).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-        self.currentPage = 1;
-      });
+      API.statistics(1, self.pageSize)
+        .then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+          self.currentPage = 1;
+          self.loading = false;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
     },
     // 获取社区
     getArea() {
