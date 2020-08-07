@@ -1,9 +1,19 @@
 <template>
   <div v-loading="loading">
     <div class="btn">
+      <el-select v-model="type" placeholder="请选择搜索方式" @change="changeType">
+        <el-option
+          v-for="item in typeList"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+    </div>
+    <div class="btn">
       <el-input
         v-model="renter_name"
-        placeholder="输入用户名"
+        placeholder="输入地址/用户名"
         class="search"
         @keyup.enter.native="search(renter_name)"
       ></el-input>
@@ -63,7 +73,12 @@
             v-if="scope.row.state == 1"
             @click="handleAudit(scope.$index, scope.row)"
           >审核</el-button>
-          <el-button v-if="isShow" type="primary" size="mini" @click="openServe(scope.$index, scope.row)">开通服务</el-button>
+          <el-button
+            v-if="isShow"
+            type="primary"
+            size="mini"
+            @click="openServe(scope.$index, scope.row)"
+          >开通服务</el-button>
           <el-button type="primary" size="mini" @click="openedServe(scope.$index, scope.row)">已开通的服务</el-button>
           <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -236,15 +251,29 @@ export default {
       },
       user_id: "",
       addresses_id: "",
-      face_id: '',
+      face_id: "",
       username: localStorage.getItem("username"),
-      isShow: false
+      isShow: false,
+      type: "", // 选中的搜索方式
+      typeList: [
+        {
+          // 搜索方式
+          value: 1,
+          label: "按地址搜索",
+        },
+        {
+          value: 2,
+          label: "按用户名搜索",
+        },
+      ],
+      typeDisabled: false,
+      house_id: "",
     };
   },
   mounted() {
     this.getAllRent();
-    if (this.username == 'admin') {
-      this.isShow = true
+    if (this.username == "admin") {
+      this.isShow = true;
     }
   },
   methods: {
@@ -256,20 +285,41 @@ export default {
         self.totalPage = res.total;
       });
     },
+    changeType(val) {
+      var self = this;
+      self.typeDisabled = true;
+      self.renter_name = "";
+    },
 
     // 搜索
     search() {
       var self = this;
-      API.searchHousehold(
-        self.currentPage,
-        self.pageSize,
-        self.renter_name
-      ).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = 1;
-        self.renter_name = "";
-        self.$message.success("搜索成功！");
-      });
+      if (!self.type) {
+        self.$message.error("请先选择搜索方式");
+      } else {
+        if (self.type == 1) {
+          var address_id = self.renter_name;
+          API.searchAddress(self.currentPage, self.pageSize, address_id).then(
+            (res) => {
+              self.tableData = res.data;
+              self.totalPage = res.total;
+              // self.house_id = "";
+              self.$message.success("搜索成功！");
+            }
+          );
+        }
+        if (self.type == 2) {
+          var name = self.renter_name;
+          API.searchHousehold(self.currentPage, self.pageSize, name).then(
+            (res) => {
+              self.tableData = res.data;
+              self.totalPage = 1;
+              // self.renter_name = "";
+              self.$message.success("搜索成功！");
+            }
+          );
+        }
+      }
     },
 
     // 审核

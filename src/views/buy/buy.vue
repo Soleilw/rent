@@ -57,7 +57,13 @@
             <el-table-column prop="name" label="商品名称" align="center"></el-table-column>
             <el-table-column prop="price" label="商品价格" align="center"></el-table-column>
             <el-table-column prop="addresses_text" label="地址" align="center"></el-table-column>
-            <el-table-column prop="status" label="订单状态" align="center"></el-table-column>
+            <el-table-column prop="status" label="订单状态" align="center">
+              <template slot-scope="scope">
+                <span v-if="scope.row.status == 1">提交</span>
+                <span v-else-if="scope.row.status == 2">已付款</span>
+                <span v-else-if="scope.row.status == 3">未付款</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="created_at" label="创建时间" align="center"></el-table-column>
           </el-table>
           <div class="block">
@@ -206,24 +212,9 @@ export default {
       ).then((res) => {
         self.orderData = res.data;
         self.orderTotalPage = res.total;
-        // self.keyword = "";
-        self.orderData.forEach((item) => {
-          switch (item.status) {
-            case 1:
-              item.status = "提交";
-              break;
-            case 2:
-              item.status = "已付款";
-              break;
-            case 3:
-              item.status = "未付款";
-          }
-        });
+
         self.$message.success("搜索成功！");
       });
-      // } else {
-      // 	self.$message.warning('请输入ID');
-      // }
     },
     // 编辑服务
     newBuy() {
@@ -287,18 +278,7 @@ export default {
           self.orderData = res.data;
           self.orderTotalPage = res.total;
           self.currentOrderPage = 1;
-          self.orderData.forEach((item) => {
-            switch (item.status) {
-              case 1:
-                item.status = "提交";
-                break;
-              case 2:
-                item.status = "已付款";
-                break;
-              case 3:
-                item.status = "未付款";
-            }
-          });
+
           self.$message.success("获取数据成功");
         }
       );
@@ -340,41 +320,17 @@ export default {
         API.server(val, self.orderPageSize, self.product_id).then((res) => {
           self.orderData = res.data;
           self.orderTotalPage = res.total;
-          self.orderData.forEach((item) => {
-            switch (item.status) {
-              case 1:
-                item.status = "提交";
-                break;
-              case 2:
-                item.status = "已付款";
-                break;
-              case 3:
-                item.status = "无效";
-            }
-          });
         });
       } else {
         API.server(val, self.orderPageSize, self.product_id, self.keyword).then(
           (res) => {
             self.orderData = res.data;
             self.orderTotalPage = res.total;
-            self.orderData.forEach((item) => {
-              switch (item.status) {
-                case 1:
-                  item.status = "提交";
-                  break;
-                case 2:
-                  item.status = "已付款";
-                  break;
-                case 3:
-                  item.status = "无效";
-              }
-            });
           }
         );
       }
     },
-    
+
     // 当前分页
     handleOrderSizeChange(val) {
       var self = this;
@@ -382,18 +338,6 @@ export default {
         API.server(self.currentOrderPage, val, self.product_id).then((res) => {
           self.orderData = res.data;
           self.orderTotalPage = res.total;
-          self.orderData.forEach((item) => {
-            switch (item.status) {
-              case 1:
-                item.status = "提交";
-                break;
-              case 2:
-                item.status = "已付款";
-                break;
-              case 3:
-                item.status = "无效";
-            }
-          });
         });
       } else {
         API.server(
@@ -404,18 +348,6 @@ export default {
         ).then((res) => {
           self.orderData = res.data;
           self.orderTotalPage = res.total;
-          self.orderData.forEach((item) => {
-            switch (item.status) {
-              case 1:
-                item.status = "提交";
-                break;
-              case 2:
-                item.status = "已付款";
-                break;
-              case 3:
-                item.status = "无效";
-            }
-          });
         });
       }
     },

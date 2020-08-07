@@ -78,12 +78,21 @@ API.faceLogs = function (page, limit, face_id) {
 }
 
 
-// 搜索住户
+// 搜索住户--用户名
 API.searchHousehold = function (page, limit, name) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
 		name: name
+	})
+}
+
+// 搜索住户--地址
+API.searchAddress = function (page, limit, address_id) {
+	return axios.get(url.Households, {
+		page: page,
+		limit: limit,
+		address_id: address_id
 	})
 }
 

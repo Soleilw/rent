@@ -64,7 +64,13 @@
     </el-table>
 
     <!-- 查看所有住户信息 -->
-    <el-dialog title="查看所有住户信息" :visible.sync="dialogResident" width="80%" @close="closeShowUser">
+    <el-dialog
+      title="查看所有住户信息"
+      :visible.sync="dialogResident"
+      width="80%"
+      @close="closeShowUser"
+      :close-on-click-modal="false"
+    >
       <div class="box">
         <div class="btn">
           <el-select v-model="user" @change="handleUser" placeholder="请选择">
@@ -81,7 +87,13 @@
             <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
             <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center"></el-table-column>
+            <el-table-column prop="type" label="用户身份" align="center">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type == 1">户主</span>
+                <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 4">物业</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
             <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
             <el-table-column prop="href" label="人脸照片" align="center">
@@ -129,7 +141,13 @@
             <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
             <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center"></el-table-column>
+            <el-table-column prop="type" label="用户身份" align="center">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type == 1">户主</span>
+                <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 4">物业</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
             <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
             <el-table-column prop="href" label="人脸照片" align="center">
@@ -177,7 +195,13 @@
             <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
             <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center"></el-table-column>
+            <el-table-column prop="type" label="用户身份" align="center">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type == 1">户主</span>
+                <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 4">物业</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
             <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
             <el-table-column prop="href" label="人脸照片" align="center">
@@ -225,7 +249,13 @@
             <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
             <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center"></el-table-column>
+            <el-table-column prop="type" label="用户身份" align="center">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type == 1">户主</span>
+                <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 4">物业</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
             <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
             <el-table-column prop="href" label="人脸图片" align="center">
@@ -347,7 +377,12 @@
           <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
           <el-table-column prop="number" label="证件号" align="center"></el-table-column>
           <el-table-column prop="time" label="时间" align="center"></el-table-column>
-          <el-table-column prop="direction" label="进出状态" align="center"></el-table-column>
+          <el-table-column prop="direction" label="进出状态" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.direction == 1">进入</span>
+              <span v-else-if="scope.row.direction == 2">外出</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="image" label="人脸照片" align="center">
             <template slot-scope="scope">
               <div v-if="scope.row.image">
@@ -519,7 +554,6 @@ export default {
     // 搜索
     search() {
       var self = this;
-      // if (self.house_id) {
       API.addresses(self.currentPage, self.pageSize, 0, self.house_id).then(
         (res) => {
           self.tableData = res.data;
@@ -528,9 +562,6 @@ export default {
           self.$message.success("搜索成功！");
         }
       );
-      // } else {
-      // 	self.$message.warning('请输入ID');
-      // }
     },
 
     addHouses() {
@@ -604,19 +635,6 @@ export default {
         console.log("所有", res);
         self.residentData = res.data;
         self.totalResidentPage = res.total;
-        res.data.forEach((item) => {
-          switch (item.type) {
-            case 1:
-              item.type = "户主";
-              break;
-            case 2:
-              item.type = "租客";
-              break;
-            case 4:
-              item.type = "物业";
-              break;
-          }
-        });
       });
     },
     handleUser(value) {
@@ -632,19 +650,6 @@ export default {
             ).then((res) => {
               self.residentData = res.data;
               self.totalResidentPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
           });
           break;
@@ -660,19 +665,6 @@ export default {
               console.log("户主", res);
               self.houseOwnerList = res.data;
               self.houseOwnerTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
           });
           break;
@@ -687,19 +679,6 @@ export default {
             ).then((res) => {
               self.renterList = res.data;
               self.renterTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
           });
           break;
@@ -714,19 +693,6 @@ export default {
             ).then((res) => {
               self.managementList = res.data;
               self.managementTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
           });
           break;
@@ -739,6 +705,7 @@ export default {
       self.houseOwnerList = [];
       self.renterList = [];
       self.managementList = [];
+      self.currentResidentPage = 1;
     },
 
     // 进出记录
@@ -756,16 +723,6 @@ export default {
           console.log("getFaceLogs", res);
           self.logsData = res.data;
           self.totalLogsPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.direction) {
-              case 1:
-                item.direction = "进入";
-                break;
-              case 2:
-                item.direction = "外出";
-                break;
-            }
-          });
         }
       );
     },
@@ -793,19 +750,6 @@ export default {
               console.log("所有", res);
               self.residentData = res.data;
               self.totalResidentPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
             break;
           case "户主":
@@ -820,19 +764,6 @@ export default {
               console.log("户主", res);
               self.houseOwnerList = res.data;
               self.houseOwnerTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
             break;
           case "租客":
@@ -846,19 +777,6 @@ export default {
             ).then((res) => {
               self.renterList = res.data;
               self.renterTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
             break;
           case "物业":
@@ -872,19 +790,6 @@ export default {
             ).then((res) => {
               self.managementList = res.data;
               self.managementTotalPage = res.total;
-              res.data.forEach((item) => {
-                switch (item.type) {
-                  case 1:
-                    item.type = "户主";
-                    break;
-                  case 2:
-                    item.type = "租客";
-                    break;
-                  case 4:
-                    item.type = "物业";
-                    break;
-                }
-              });
             });
             break;
         }
@@ -946,20 +851,6 @@ export default {
       API.addressResidents(val, self.pageSizeResident, self.address_id).then(
         (res) => {
           self.residentData = res.data;
-          //   self.totalResidentPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
         }
       );
     },
@@ -969,20 +860,6 @@ export default {
       API.addressResidents(self.currentResidentPage, val, self.address_id).then(
         (res) => {
           self.residentData = res.data;
-          //   self.totalResidentPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
         }
       );
     },
@@ -991,25 +868,14 @@ export default {
     handleCurrentHouseOwner(val) {
       var self = this;
       self.houseOwnerCurrentPage = val;
-      API.addressResidents(val, self.houseOwnerPageSize, self.address_id, 1).then(
-        (res) => {
-          self.houseOwnerList = res.data;
-          //   self.houseOwnerTotalPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
-        }
-      );
+      API.addressResidents(
+        val,
+        self.houseOwnerPageSize,
+        self.address_id,
+        1
+      ).then((res) => {
+        self.houseOwnerList = res.data;
+      });
     },
     //
     handleSizeHouseOwner(val) {
@@ -1022,20 +888,6 @@ export default {
         1
       ).then((res) => {
         self.houseOwnerList = res.data;
-        // self.houseOwnerTotalPage = res.total;
-        res.data.forEach((item) => {
-          switch (item.type) {
-            case 1:
-              item.type = "户主";
-              break;
-            case 2:
-              item.type = "租客";
-              break;
-            case 4:
-              item.type = "物业";
-              break;
-          }
-        });
       });
     },
 
@@ -1046,70 +898,34 @@ export default {
       API.addressResidents(val, self.renterPageSize, self.address_id, 2).then(
         (res) => {
           self.renterList = res.data;
-          //   self.renterTotalPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
         }
       );
     },
     handleRenterSize(val) {
       var self = this;
       self.renterPageSize = val;
-      API.addressResidents(self.renterCurrentPage, val, self.address_id, 2).then(
-        (res) => {
-          self.renterList = res.data;
-          //   self.renterTotalPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
-        }
-      );
+      API.addressResidents(
+        self.renterCurrentPage,
+        val,
+        self.address_id,
+        2
+      ).then((res) => {
+        self.renterList = res.data;
+      });
     },
 
     // 物业分页
     handleManagement(val) {
       var self = this;
       self.managementCurrentPage = val;
-      API.addressResidents(val, self.managementPageSize, self.address_id, 4).then(
-        (res) => {
-          self.managementList = res.data;
-          //   self.managementTotalPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.type) {
-              case 1:
-                item.type = "户主";
-                break;
-              case 2:
-                item.type = "租客";
-                break;
-              case 4:
-                item.type = "物业";
-                break;
-            }
-          });
-        }
-      );
+      API.addressResidents(
+        val,
+        self.managementPageSize,
+        self.address_id,
+        4
+      ).then((res) => {
+        self.managementList = res.data;
+      });
     },
     handlemanagementSize(val) {
       var self = this;
@@ -1121,20 +937,6 @@ export default {
         4
       ).then((res) => {
         self.managementList = res.data;
-        // self.managementTotalPage = res.total;
-        res.data.forEach((item) => {
-          switch (item.type) {
-            case 1:
-              item.type = "户主";
-              break;
-            case 2:
-              item.type = "租客";
-              break;
-            case 4:
-              item.type = "物业";
-              break;
-          }
-        });
       });
     },
 
