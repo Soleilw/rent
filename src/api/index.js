@@ -88,11 +88,11 @@ API.searchHousehold = function (page, limit, name) {
 }
 
 // 搜索住户--地址
-API.searchAddress = function (page, limit, address_id) {
+API.searchAddress = function (page, limit, keyword) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
-		address_id: address_id
+		keyword: keyword
 	})
 }
 

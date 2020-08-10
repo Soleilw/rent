@@ -298,8 +298,8 @@ export default {
         self.$message.error("请先选择搜索方式");
       } else {
         if (self.type == 1) {
-          var address_id = self.renter_name;
-          API.searchAddress(self.currentPage, self.pageSize, address_id).then(
+          var keyword = self.renter_name;
+          API.searchAddress(self.currentPage, self.pageSize, keyword).then(
             (res) => {
               self.tableData = res.data;
               self.totalPage = res.total;
@@ -313,7 +313,7 @@ export default {
           API.searchHousehold(self.currentPage, self.pageSize, name).then(
             (res) => {
               self.tableData = res.data;
-              self.totalPage = 1;
+              self.totalPage = res.total;
               // self.renter_name = "";
               self.$message.success("搜索成功！");
             }
