@@ -203,7 +203,6 @@ export default {
     // 搜索
     search() {
       var self = this;
-      // if (self.house_id) {
       API.server(
         self.currentPage,
         self.pageSize,
@@ -212,7 +211,6 @@ export default {
       ).then((res) => {
         self.orderData = res.data;
         self.orderTotalPage = res.total;
-
         self.$message.success("搜索成功！");
       });
     },
@@ -235,7 +233,6 @@ export default {
       var self = this;
       self.dialogBuy = true;
       self.checkAll = false;
-
       self.form = {
         title: "",
         price: "",

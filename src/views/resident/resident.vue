@@ -46,10 +46,8 @@
       </el-table-column>
       <el-table-column prop="snapshot.phone" label="手机号" align="center" width="110px"></el-table-column>
       <el-table-column prop="snapshot.card_number" label="身份证" align="center" width="180px"></el-table-column>
-
       <el-table-column prop="address.address" label="房屋地址" align="center" width="200px"></el-table-column>
       <el-table-column prop="expireTime" label="进出服务到期时间" align="center" width="150px"></el-table-column>
-      <!-- <el-table-column prop label="是否开通服务" align="center" width="300px"></el-table-column> -->
       <el-table-column prop="room" label="房屋编号" align="center"></el-table-column>
       <el-table-column prop="state" label="审核状态" align="center">
         <template slot-scope="scope">
@@ -85,6 +83,19 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
+    <div class="block">
+      <el-pagination
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage"
+        :page-sizes="[10, 20, 30, 40, 50]"
+        :page-size="pageSize"
+        layout="sizes, prev, pager, next, jumper"
+        :total="totalPage"
+        @size-change="handleSizeChange"
+      ></el-pagination>
+    </div>
+
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
@@ -92,7 +103,12 @@
           <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
           <el-table-column prop="number" label="证件号" align="center"></el-table-column>
           <el-table-column prop="time" label="时间" align="center"></el-table-column>
-          <el-table-column prop="direction" label="进出状态" align="center"></el-table-column>
+          <el-table-column prop="direction" label="进出状态" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.direction == 1">进入</span>
+              <span v-else-if="scope.row.direction == 2">外出</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="image" label="人脸照片" align="center">
             <template slot-scope="scope">
               <div v-if="scope.row.image">
@@ -183,31 +199,7 @@
           <el-table-column prop="expireTime" label="到期时间" align="center"></el-table-column>
         </el-table>
       </div>
-      <div class="block">
-        <el-pagination
-          @current-change="handleCurrentLogs"
-          :current-page.sync="currentLogsPage"
-          :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeLogs"
-          layout="sizes, prev, pager, next, jumper"
-          :total="totalLogsPage"
-          @size-change="handleSizeLogs"
-        ></el-pagination>
-      </div>
     </el-dialog>
-
-    <!-- 分页 -->
-    <div class="block">
-      <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
-        :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="pageSize"
-        layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
-      ></el-pagination>
-    </div>
   </div>
 </template>
 
@@ -229,12 +221,12 @@ export default {
 
       dialogLogs: false, // 进出记录
       logsData: [],
-      currentLogsPage: 1,
+      currentLogsPage: 1, // 分页--进出记录
       pageSizeLogs: 10,
       totalLogsPage: 0,
       dialogAudit: false, // 审核
       renter_id: "", // 住户id
-      renter_name: "", // 住户名字
+      renter_name: "", // 搜索
       id: "", // 删除id
       dialogDel: false,
       dialogOpenServe: false,
@@ -267,7 +259,6 @@ export default {
         },
       ],
       typeDisabled: false,
-      house_id: "",
     };
   },
   mounted() {
@@ -289,6 +280,7 @@ export default {
       var self = this;
       self.typeDisabled = true;
       self.renter_name = "";
+      self.currentPage = 1;
     },
 
     // 搜索
@@ -303,7 +295,6 @@ export default {
             (res) => {
               self.tableData = res.data;
               self.totalPage = res.total;
-              // self.house_id = "";
               self.$message.success("搜索成功！");
             }
           );
@@ -314,7 +305,6 @@ export default {
             (res) => {
               self.tableData = res.data;
               self.totalPage = res.total;
-              // self.renter_name = "";
               self.$message.success("搜索成功！");
             }
           );
@@ -405,16 +395,6 @@ export default {
           console.log("getFaceLogs", res);
           self.logsData = res.data;
           self.totalLogsPage = res.total;
-          res.data.forEach((item) => {
-            switch (item.direction) {
-              case 1:
-                item.direction = "进入";
-                break;
-              case 2:
-                item.direction = "外出";
-                break;
-            }
-          });
         }
       );
     },
@@ -437,20 +417,57 @@ export default {
     handleCurrentChange(val) {
       var self = this;
       self.currentPage = val;
-      API.households(val, self.pageSize).then((res) => {
-        self.tableData = res.data;
-      });
+      if (self.renter_name) {
+        switch (self.type) {
+          case 1:
+            var keyword = self.renter_name;
+            API.searchAddress(val, self.pageSize, keyword).then((res) => {
+              self.tableData = res.data;
+              self.totalPage = res.total;
+            });
+            break;
+          case 2:
+            var name = self.renter_name;
+            API.searchHousehold(val, self.pageSize, name).then((res) => {
+              self.tableData = res.data;
+              self.totalPage = res.total;
+            });
+        }
+      } else {
+        API.households(val, self.pageSize).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+        });
+      }
     },
 
     // 每页几条
     handleSizeChange(val) {
       var self = this;
       self.pageSize = val;
-      API.households(self.currentPage, val).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-        self.currentPage = 1;
-      });
+      if (self.renter_name) {
+        switch (self.type) {
+          case 1:
+            var keyword = self.renter_name;
+            API.searchAddress(1, val, keyword).then((res) => {
+              self.tableData = res.data;
+              self.totalPage = res.total;
+            });
+            break;
+          case 2:
+            var name = self.renter_name;
+            API.searchHousehold(1, val, name).then((res) => {
+              self.tableData = res.data;
+              self.totalPage = res.total;
+            });
+        }
+      } else {
+        API.households(self.currentPage, val).then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+          self.currentPage = 1;
+        });
+      }
     },
 
     // 进出记录
@@ -476,52 +493,6 @@ export default {
 <style>
 </style>
 
-
-<!-- <template>
-	<div>
-		<el-tabs v-model="activeName" @tab-click="changeActive">
-			<el-tab-pane label="用户身份管理" name="identity">
-				<resident-identity></resident-identity>
-			</el-tab-pane>
-			<el-tab-pane label="住户列表" name="list">
-				<resident-list></resident-list>
-			</el-tab-pane>
-		</el-tabs>
-	</div>
-</template>
-
-<script>
-	import residentIdentity from '@/components/resident/resident-identity.vue'
-	import residentList from '@/components/resident/resident-list.vue'
-	import API from '@/api/index.js'
-
-	export default {
-		name: 'student',
-		components: {
-			residentIdentity,
-			residentList
-		},
-		data() {
-			return {
-				activeName: 'identity'
-			}
-		},
-		methods: {
-			changeActive() {
-				if(this.activeName === 'identity') {
-				}
-				
-				if(this.activeName === 'list') {
-					API.houser(1).then(res => {
-					})
-				}
-			}
-		}
-	}
-</script>
-
-<style>
-</style> -->
 <style scoped>
 .service {
   display: flex;
