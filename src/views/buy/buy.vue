@@ -1,7 +1,9 @@
 <template>
   <div v-loading="loading" element-loading-text="拼命加载中">
-    <div class="btn">
-      <el-button type="primary" @click="addBuy">添加购买服务</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addBuy">添加购买服务</el-button>
+      </div>
     </div>
     <el-dialog title="添加购买服务" :visible.sync="dialogBuy">
       <div class="box">
@@ -38,33 +40,34 @@
     </el-dialog>
     <el-dialog title="订单列表" :visible.sync="showServiceOrder" width="80%">
       <div class="box">
-        <div class="btn">
-          <el-input
-            v-model="keyword"
-            placeholder="输入房屋地址"
-            class="search"
-            @keyup.enter.native="search(keyword)"
-          ></el-input>
-        </div>
-        <div class="btn">
-          <el-button type="primary" @click="search(keyword)">搜索</el-button>
+        <div class="handle-box">
+          <div class="btn">
+            <el-input
+              v-model="keyword"
+              placeholder="输入房屋地址"
+              class="input-with-select"
+              @keyup.enter.native="search(keyword)"
+            >
+              <el-button slot="append" icon="el-icon-search" @click="search(keyword)"></el-button>
+            </el-input>
+          </div>
         </div>
         <div>
-          <el-table :data="orderData">
-            <el-table-column prop="no" label="订单ID" align="center"></el-table-column>
-            <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
-            <el-table-column prop="user_name" label="用户名" align="center"></el-table-column>
-            <el-table-column prop="name" label="商品名称" align="center"></el-table-column>
-            <el-table-column prop="price" label="商品价格" align="center"></el-table-column>
-            <el-table-column prop="addresses_text" label="地址" align="center"></el-table-column>
-            <el-table-column prop="status" label="订单状态" align="center">
+          <el-table :data="orderData" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="no" label="订单ID"></el-table-column>
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="user_name" label="用户名"></el-table-column>
+            <el-table-column prop="name" label="商品名称"></el-table-column>
+            <el-table-column prop="price" label="商品价格"></el-table-column>
+            <el-table-column prop="addresses_text" label="地址"></el-table-column>
+            <el-table-column prop="status" label="订单状态">
               <template slot-scope="scope">
                 <span v-if="scope.row.status == 1">提交</span>
                 <span v-else-if="scope.row.status == 2">已付款</span>
                 <span v-else-if="scope.row.status == 3">未付款</span>
               </template>
             </el-table-column>
-            <el-table-column prop="created_at" label="创建时间" align="center"></el-table-column>
+            <el-table-column prop="created_at" label="创建时间"></el-table-column>
           </el-table>
           <div class="block">
             <el-pagination
@@ -81,17 +84,17 @@
       </div>
     </el-dialog>
 
-    <el-table :data="tableDate">
-      <el-table-column label="名称" type="selection" align="center"></el-table-column>
-      <el-table-column prop="id" label="商品ID" align="center" width="100px"></el-table-column>
-      <el-table-column prop="title" label="商品名称" align="center"></el-table-column>
-      <el-table-column prop="price" label="商品价格" align="center"></el-table-column>
-      <el-table-column prop="time" label="商品时长(天)" align="center"></el-table-column>
-      <el-table-column prop="detail" label="商品描述" align="center"></el-table-column>
-      <el-table-column prop="service[0].name" label="服务权限" align="center"></el-table-column>
-      <el-table-column prop="created_at" label="创建时间" align="center"></el-table-column>
-      <el-table-column prop="updated_at" label="更新时间" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="300px">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column label="名称" type="selection"></el-table-column>
+      <el-table-column prop="id" label="商品ID" width="100px"></el-table-column>
+      <el-table-column prop="title" label="商品名称"></el-table-column>
+      <el-table-column prop="price" label="商品价格"></el-table-column>
+      <el-table-column prop="time" label="商品时长(天)"></el-table-column>
+      <el-table-column prop="detail" label="商品描述"></el-table-column>
+      <el-table-column prop="service[0].name" label="服务权限"></el-table-column>
+      <el-table-column prop="created_at" label="创建时间"></el-table-column>
+      <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+      <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
           <el-button size="mini" type="success" @click="handleEdit(scope.$index,scope.row)">编辑服务</el-button>
           <el-button size="mini" type="success" @click="handleOrder(scope.$index,scope.row)">服务订单</el-button>

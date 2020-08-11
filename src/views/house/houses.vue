@@ -1,18 +1,20 @@
 <template>
   <div v-loading="loading">
-    <div class="btn">
-      <el-button type="primary" @click="addHouses" v-if="isShow">添加房屋</el-button>
-    </div>
-    <div class="btn">
-      <el-input
-        v-model="house_id"
-        placeholder="输入房屋地址"
-        class="search"
-        @keyup.enter.native="search(house_id)"
-      ></el-input>
-    </div>
-    <div class="btn">
-      <el-button type="primary" @click="search(house_id)">搜索</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addHouses" v-if="isShow">添加房屋</el-button>
+      </div>
+
+      <div class="btn">
+        <el-input
+          v-model="house_id"
+          placeholder="输入房屋地址"
+          class="input-with-select"
+          @keyup.enter.native="search(house_id)"
+        >
+          <el-button slot="append" icon="el-icon-search" @click="search(house_id)"></el-button>
+        </el-input>
+      </div>
     </div>
 
     <el-dialog title="添加房屋" :visible.sync="dialogHouses" width="80%">
@@ -44,12 +46,12 @@
     </el-dialog>
 
     <!-- 表格数据 -->
-    <el-table :data="tableData">
-      <el-table-column prop="id" label="ID" align="center"></el-table-column>
-      <el-table-column prop="address" label="房屋地址" align="center"></el-table-column>
-      <el-table-column prop="room_count" label="单元总数" align="center"></el-table-column>
-      <el-table-column prop="room_resident" label="租客总数" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="400px">
+    <el-table :data="tableData" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column prop="id" label="ID"></el-table-column>
+      <el-table-column prop="address" label="房屋地址"></el-table-column>
+      <el-table-column prop="room_count" label="单元总数"></el-table-column>
+      <el-table-column prop="room_resident" label="租客总数"></el-table-column>
+      <el-table-column label="操作" width="400px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
           <el-button
@@ -57,7 +59,7 @@
             size="mini"
             @click="handleResident(scope.$index, scope.row)"
           >查看住户信息</el-button>
-          <el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <!-- <el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
           <!-- <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -72,31 +74,33 @@
       :close-on-click-modal="false"
     >
       <div class="box">
-        <div class="btn">
-          <el-select v-model="user" @change="handleUser" placeholder="请选择">
-            <el-option
-              v-for="item in userList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
+        <div class="handle-box">
+          <div class="btn">
+            <el-select v-model="user" @change="handleUser" placeholder="请选择">
+              <el-option
+                v-for="item in userList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </div>
         </div>
         <template v-if="user == '全部'">
-          <el-table :data="residentData">
-            <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
-            <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center">
+          <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <el-table-column prop="name" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
-            <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
-            <el-table-column prop="href" label="人脸照片" align="center">
+            <el-table-column prop="card_number" label="身份证号"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="href" label="人脸照片">
               <template slot-scope="scope">
                 <div v-if="scope.row.href">
                   <el-popover placement="top-start" title trigger="click">
@@ -137,20 +141,20 @@
           </div>
         </template>
         <template v-if="user == '户主'">
-          <el-table :data="houseOwnerList">
-            <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
-            <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center">
+          <el-table :data="houseOwnerList" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <el-table-column prop="name" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
-            <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
-            <el-table-column prop="href" label="人脸照片" align="center">
+            <el-table-column prop="card_number" label="身份证号"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="href" label="人脸照片">
               <template slot-scope="scope">
                 <div v-if="scope.row.href">
                   <el-popover placement="top-start" title trigger="click">
@@ -191,20 +195,20 @@
           </div>
         </template>
         <template v-if="user == '租客'">
-          <el-table :data="renterList">
-            <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
-            <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center">
+          <el-table :data="renterList" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <el-table-column prop="name" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
-            <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
-            <el-table-column prop="href" label="人脸照片" align="center">
+            <el-table-column prop="card_number" label="身份证号"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="href" label="人脸照片">
               <template slot-scope="scope">
                 <div v-if="scope.row.href">
                   <el-popover placement="top-start" title trigger="click">
@@ -245,20 +249,20 @@
           </div>
         </template>
         <template v-if="user == '物业'">
-          <el-table :data="managementList">
-            <el-table-column prop="user_id" label="用户ID" align="center"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号" align="center"></el-table-column>
-            <el-table-column prop="name" label="真实姓名" align="center"></el-table-column>
-            <el-table-column prop="type" label="用户身份" align="center">
+          <el-table :data="managementList" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <el-table-column prop="name" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <el-table-column prop="card_number" label="身份证号" align="center"></el-table-column>
-            <el-table-column prop="phone" label="手机号" align="center"></el-table-column>
-            <el-table-column prop="href" label="人脸图片" align="center">
+            <el-table-column prop="card_number" label="身份证号"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="href" label="人脸图片">
               <template slot-scope="scope">
                 <div v-if="scope.row.href">
                   <el-popover placement="top-start" title trigger="click">
@@ -304,12 +308,14 @@
     <!-- 楼栋管理 -->
     <el-dialog title="楼栋管理" :visible.sync="dialogBuild">
       <div class="box">
-        <div class="btn">
-          <el-button type="primary" @click="HandleAddBuild">添加房屋编号</el-button>
+        <div class="handle-box">
+          <div class="btn">
+            <el-button type="primary" @click="HandleAddBuild">添加房屋编号</el-button>
+          </div>
         </div>
-        <el-table :data="buildingList">
-          <el-table-column prop="door_number" label="房屋编号" align="center"></el-table-column>
-          <el-table-column label="操作" align="center">
+        <el-table :data="buildingList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="door_number" label="房屋编号"></el-table-column>
+          <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
                 type="danger"
@@ -373,17 +379,17 @@
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
-        <el-table :data="logsData">
-          <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
-          <el-table-column prop="number" label="证件号" align="center"></el-table-column>
-          <el-table-column prop="time" label="时间" align="center"></el-table-column>
-          <el-table-column prop="direction" label="进出状态" align="center">
+        <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="id" label="用户ID"></el-table-column>
+          <el-table-column prop="number" label="证件号"></el-table-column>
+          <el-table-column prop="time" label="时间"></el-table-column>
+          <el-table-column prop="direction" label="进出状态">
             <template slot-scope="scope">
               <span v-if="scope.row.direction == 1">进入</span>
               <span v-else-if="scope.row.direction == 2">外出</span>
             </template>
           </el-table-column>
-          <el-table-column prop="image" label="人脸照片" align="center">
+          <el-table-column prop="image" label="人脸照片">
             <template slot-scope="scope">
               <div v-if="scope.row.image">
                 <el-popover placement="top-start" title trigger="click">
@@ -536,15 +542,15 @@ export default {
       dialogDelBuild: false,
       building_id: "",
       permission: localStorage.getItem("permissions"),
-      isShow: false
+      isShow: false,
     };
   },
   mounted() {
     this.getnewHouses();
     var permissionList = this.permission.split(",");
     // console.log(permissionList.includes('housesAdd'));
-    if (permissionList.includes('housesAdd')) {
-      this.isShow = true
+    if (permissionList.includes("housesAdd")) {
+      this.isShow = true;
     }
   },
   methods: {
@@ -735,7 +741,7 @@ export default {
     },
 
     // 编辑
-    handleEdit() {},
+    // handleEdit() {},
     // 删除--查看住户信息
     handleDel(index, row) {
       var self = this;

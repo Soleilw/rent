@@ -1,13 +1,15 @@
 <template>
   <div>
-    <div class="btn">
-      <el-button type="primary" @click="addRole">添加角色</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addRole">添加角色</el-button>
+      </div>
     </div>
 
-    <el-table :data="tableData">
-      <el-table-column prop="id" label="ID" align="center"></el-table-column>
-      <el-table-column prop="name" label="角色名" align="center"></el-table-column>
-      <el-table-column label="操作" align="center">
+    <el-table :data="tableData" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column prop="id" label="ID"></el-table-column>
+      <el-table-column prop="name" label="角色名"></el-table-column>
+      <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑权限</el-button>
           <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -133,14 +135,14 @@
                 <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox>
               </el-checkbox-group>
             </div>
-            <div class="permission">
+            <!-- <div class="permission">
               <el-checkbox-group v-model="form.permissions" class="permission-item">
                 <el-checkbox label="total" @change="oneChange" border>
                   <span style="font-weight: bold;">统计</span>
                 </el-checkbox>
                 <el-checkbox label="rentersTotal" @change="oneChange">出租屋人数统计</el-checkbox>
               </el-checkbox-group>
-            </div>
+            </div>-->
           </el-form-item>
           <div class="submit">
             <el-form-item>

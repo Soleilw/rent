@@ -87,23 +87,23 @@ const dynamicRouter = [{
 			icon: 'el-icon-picture'
 		}
 	},
-	{
-		path: '/total',
-		name: 'total',
-		component: () => import('@/views/total/index.vue'),
-		meta: {
-			title: '统计',
-			icon: 'el-icon-pie-chart'
-		},
-		children: [{
-			path: '/rentersTotal',
-			name: 'rentersTotal',
-			component: () => import('@/views/total/total.vue'),
-			meta: {
-				title: '出租屋人数总统计'
-			}
-		}, ]
-	},
+	// {
+	// 	path: '/total',
+	// 	name: 'total',
+	// 	component: () => import('@/views/total/index.vue'),
+	// 	meta: {
+	// 		title: '统计',
+	// 		icon: 'el-icon-pie-chart'
+	// 	},
+	// 	children: [{
+	// 		path: '/rentersTotal',
+	// 		name: 'rentersTotal',
+	// 		component: () => import('@/views/total/total.vue'),
+	// 		meta: {
+	// 			title: '出租屋人数总统计'
+	// 		}
+	// 	}, ]
+	// },
 
 	{
 		path: '/permission',

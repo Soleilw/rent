@@ -1,7 +1,9 @@
 <template>
   <div>
-    <div class="btn">
-      <el-button type="primary" @click="addMessageType">添加资讯类型</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addMessageType">添加资讯类型</el-button>
+      </div>
     </div>
 
     <el-dialog title="新增资讯类型" :visible.sync="dialogMessageType" width="40%">
@@ -35,18 +37,18 @@
       </div>
     </el-dialog>
 
-    <el-table :data="tableDate">
-      <el-table-column label="名称" type="selection" align="center"></el-table-column>
-      <el-table-column prop="id" label="分类ID" align="center"></el-table-column>
-      <el-table-column prop="title" label="分类标题" align="center"></el-table-column>
-      <el-table-column prop="href" label="分类图标" align="center">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column label="名称" type="selection"></el-table-column>
+      <el-table-column prop="id" label="分类ID"></el-table-column>
+      <el-table-column prop="title" label="分类标题"></el-table-column>
+      <el-table-column prop="href" label="分类图标">
         <template slot-scope="scope">
           <img :src="scope.row.href" style="max-width:180px;max-height:80px;" />
         </template>
       </el-table-column>
 
-      <el-table-column prop="updated_at" label="更新时间" align="center"></el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+      <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -92,14 +94,14 @@ export default {
       dialogDel: false,
       form: {
         title: "",
-        href: ""
+        href: "",
       },
       disabled: false,
 
       tableDate: [],
 
       currentPage: 1,
-      totalPage: 0
+      totalPage: 0,
     };
   },
   mounted() {
@@ -108,14 +110,14 @@ export default {
   methods: {
     getMessageType() {
       var self = this;
-      API.messageTypes(self.currentPage).then(res => {
+      API.messageTypes(self.currentPage).then((res) => {
         self.tableDate = res.data;
         self.totalPage = res.total;
       });
     },
     newMessageType() {
       var self = this;
-      API.messageType(self.form).then(res => {
+      API.messageType(self.form).then((res) => {
         self.$message.success("提交成功");
         self.dialogMessageType = false;
         self.getMessageType();
@@ -131,7 +133,7 @@ export default {
     toDel() {
       var self = this;
       self.dialogDel = false;
-      API.delDocumentType(self.id).then(res => {
+      API.delDocumentType(self.id).then((res) => {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getMessageType();
@@ -186,12 +188,12 @@ export default {
     // 每页多少条
     handleSizeChange(val) {
       var self = this;
-      API.messageTypes(self.currentPage, val).then(res => {
+      API.messageTypes(self.currentPage, val).then((res) => {
         self.tableDate = res.data;
         self.totalPage = res.total;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

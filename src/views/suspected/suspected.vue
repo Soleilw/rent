@@ -1,8 +1,10 @@
 <template>
   <div v-loading="loading" element-loading-text="拼命加载中">
     <!-- 表格数据 -->
-    <div class="btn">
-      <el-button type="primary" @click="addDangerFace">添加可疑人物</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addDangerFace">添加可疑人物</el-button>
+      </div>
     </div>
     <el-dialog title="添加可疑人物" :visible.sync="dialogDangerFace" :close-on-click-modal="false">
       <div class="box">
@@ -37,7 +39,7 @@
             </div>
 
             <el-input v-model="form.address_id" style="width: 220px"></el-input>
-          </el-form-item> -->
+          </el-form-item>-->
           <el-form-item label="人脸图片">
             <el-upload
               action="https://api.fengniaotuangou.cn/api/upload"
@@ -67,13 +69,13 @@
       </div>
     </el-dialog>
 
-    <el-table :data="tableData" empty-text="暂无数据">
-      <el-table-column prop="id" label="ID" align="center"></el-table-column>
-      <el-table-column prop label="设备ID" align="center"></el-table-column>
-      <el-table-column prop="name" label="名称" align="center"></el-table-column>
-      <el-table-column prop="created_at" label="时间" align="center"></el-table-column>
-      <el-table-column prop="number" label="人脸证件号" align="center"></el-table-column>
-      <el-table-column prop="href" label="人脸图片" align="center">
+    <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column prop="id" label="ID"></el-table-column>
+      <el-table-column prop label="设备ID"></el-table-column>
+      <el-table-column prop="name" label="名称"></el-table-column>
+      <el-table-column prop="created_at" label="时间"></el-table-column>
+      <el-table-column prop="number" label="人脸证件号"></el-table-column>
+      <el-table-column prop="href" label="人脸图片">
         <template slot-scope="scope">
           <div v-if="scope.row.href">
             <el-popover placement="top-start" title trigger="click">
@@ -86,7 +88,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="300px">
+      <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
         </template>
@@ -111,13 +113,13 @@
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
-        <el-table :data="logsData">
-          <el-table-column prop="danger.name" label="姓名" align="center"></el-table-column>
-          <el-table-column prop="address" label="地址" align="center"></el-table-column>
-          <el-table-column prop="danger.number" label="证件号" align="center"></el-table-column>
-          <!-- <el-table-column prop="score" label="相似度" align="center"></el-table-column> -->
-          <el-table-column prop="log.timestamp" label="时间" align="center"></el-table-column>
-          <el-table-column prop="danger.href" label="人脸照片" align="center">
+        <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="danger.name" label="姓名"></el-table-column>
+          <el-table-column prop="address" label="地址"></el-table-column>
+          <el-table-column prop="danger.number" label="证件号"></el-table-column>
+          <!-- <el-table-column prop="score" label="相似度"></el-table-column> -->
+          <el-table-column prop="log.timestamp" label="时间"></el-table-column>
+          <el-table-column prop="danger.href" label="人脸照片">
             <template slot-scope="scope">
               <div v-if="scope.row.danger.href">
                 <el-popover placement="top-start" title trigger="click">

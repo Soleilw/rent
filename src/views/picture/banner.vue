@@ -1,7 +1,9 @@
 <template>
   <div v-loading="loading" element-loading-text="拼命加载中">
-    <div class="btn">
-      <el-button type="primary" @click="addBanner">添加轮播图</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-button type="primary" @click="addBanner">添加轮播图</el-button>
+      </div>
     </div>
 
     <el-dialog
@@ -41,15 +43,15 @@
       </div>
     </el-dialog>
 
-    <el-table :data="tableDate">
-      <el-table-column prop="id" label="轮播图ID" align="center"></el-table-column>
-      <el-table-column prop="href" label="缩略图" align="center">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column prop="id" label="轮播图ID"></el-table-column>
+      <el-table-column prop="href" label="缩略图">
         <template slot-scope="scope">
           <img :src="scope.row.href" style="max-width:180px;max-height:80px;" />
         </template>
       </el-table-column>
-      <el-table-column prop="updated_at" label="更新时间" align="center"></el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column prop="updated_at" label="更新时间"></el-table-column>
+      <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
@@ -107,8 +109,8 @@ export default {
       hasNewImage: false,
       form: {
         href: "",
-        id: ""
-      }
+        id: "",
+      },
     };
   },
   mounted() {
@@ -119,12 +121,12 @@ export default {
     getBanner() {
       var self = this;
       API.banners(self.currentPage)
-        .then(res => {
+        .then((res) => {
           self.tableDate = res.data;
           self.totalPage = res.total;
           self.loading = false;
         })
-        .catch(err => {
+        .catch((err) => {
           self.loading = false;
         });
     },
@@ -137,7 +139,7 @@ export default {
     toDel() {
       var self = this;
       self.dialogDel = false;
-      API.delBanner(self.id).then(res => {
+      API.delBanner(self.id).then((res) => {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getBanner();
@@ -182,7 +184,7 @@ export default {
       file.url = res.data;
       // self.href = file.url;
       self.form.href = file.url;
-      API.banner(self.form).then(res => {
+      API.banner(self.form).then((res) => {
         self.$message.success("上传成功");
         self.currentPage = 1;
         self.getBanner();
@@ -202,9 +204,11 @@ export default {
     },
     getQiniuToken() {
       var self = this;
-      axios.get("https://api.fengniaotuangou.cn/api/upload/token").then(res => {
-        self.imgData.token = res.data.uptoken;
-      });
+      axios
+        .get("https://api.fengniaotuangou.cn/api/upload/token")
+        .then((res) => {
+          self.imgData.token = res.data.uptoken;
+        });
     },
     // 分页
     handleCurrentChange(val) {
@@ -214,12 +218,12 @@ export default {
     // 每页多少条
     handleSizeChange(val) {
       var self = this;
-      API.banners(self.currentPage, val).then(res => {
+      API.banners(self.currentPage, val).then((res) => {
         self.tableDate = res.data;
         self.totalPage = res.total;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

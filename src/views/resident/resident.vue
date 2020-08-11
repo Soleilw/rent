@@ -1,34 +1,38 @@
 <template>
   <div v-loading="loading" element-loading-text="拼命加载中">
-    <div class="btn">
-      <!-- <span>搜索方式：</span> -->
-      <el-select v-model="type" placeholder="请选择搜索方式" @change="changeType">
-        <el-option
-          v-for="item in typeList"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        ></el-option>
-      </el-select>
-    </div>
-    <div class="btn">
-      <el-input
-        v-model="renter_name"
-        placeholder="输入用户名/地址"
-        class="search"
-        @keyup.enter.native="search(renter_name)"
-      ></el-input>
-    </div>
-    <div class="btn">
-      <el-button type="primary" @click="search(renter_name)">搜索</el-button>
+    <div class="handle-box">
+      <div class="btn">
+        <el-input
+          v-model="renter_name"
+          placeholder="输入用户名/地址"
+          class="input-with-select"
+          @keyup.enter.native="search(renter_name)"
+        >
+          <el-select
+            v-model="type"
+            placeholder="请选择搜索方式"
+            @change="changeType"
+            slot="prepend"
+            style="width: 150px;"
+          >
+            <el-option
+              v-for="item in typeList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+          <el-button slot="append" icon="el-icon-search" @click="search(renter_name)"></el-button>
+        </el-input>
+      </div>
     </div>
 
     <!-- 表格数据 -->
-    <el-table :data="tableData" empty-text="暂无数据">
-      <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
-      <el-table-column prop="snapshot.name" label="用户名" align="center"></el-table-column>
-      <el-table-column prop="typeString" label="用户身份" align="center"></el-table-column>
-      <el-table-column prop="snapshot" label="人脸照片" align="center">
+    <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}">
+      <el-table-column prop="id" label="用户ID"></el-table-column>
+      <el-table-column prop="snapshot.name" label="用户名"></el-table-column>
+      <el-table-column prop="typeString" label="用户身份"></el-table-column>
+      <el-table-column prop="snapshot" label="人脸照片">
         <template slot-scope="scope">
           <div v-if="scope.row.snapshot">
             <el-popover placement="top-start" title trigger="click">
@@ -45,12 +49,12 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="snapshot.phone" label="手机号" align="center" width="110px"></el-table-column>
-      <el-table-column prop="snapshot.card_number" label="身份证" align="center" width="180px"></el-table-column>
-      <el-table-column prop="address.address" label="房屋地址" align="center" width="200px"></el-table-column>
-      <el-table-column prop="expireTime" label="进出服务到期时间" align="center" width="150px"></el-table-column>
-      <el-table-column prop="room" label="房屋编号" align="center"></el-table-column>
-      <el-table-column prop="state" label="审核状态" align="center">
+      <el-table-column prop="snapshot.phone" label="手机号" width="150px"></el-table-column>
+      <el-table-column prop="snapshot.card_number" label="身份证" width="180px"></el-table-column>
+      <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
+      <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
+      <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
+      <el-table-column prop="state" width="120px" label="审核状态">
         <template slot-scope="scope">
           <div v-if="scope.row.state == 1">
             <span>待审核</span>
@@ -63,24 +67,32 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="450px">
+      <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
-          <el-button
-            type="primary"
-            size="mini"
-            v-if="scope.row.state == 1"
-            @click="handleAudit(scope.$index, scope.row)"
-          >审核</el-button>
-          <el-button
-            v-if="isShow"
-            type="primary"
-            size="mini"
-            @click="openServe(scope.$index, scope.row)"
-          >开通服务</el-button>
-          <el-button type="primary" size="mini" @click="openedServe(scope.$index, scope.row)">已开通的服务</el-button>
-          <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
-        </template>
+					<el-dropdown>
+						<el-button type="primary">
+							操作<i class="el-icon-arrow-down el-icon--right"></i>
+						</el-button>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item>
+								<el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
+							</el-dropdown-item>
+							<el-dropdown-item>
+								<el-button size="mini" type="primary" v-if="scope.row.state == 1" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
+							</el-dropdown-item>
+							<el-dropdown-item>
+								<el-button size="mini" type="primary" v-if="isShow" @click="openServe(scope.$index, scope.row)">开通服务</el-button>
+							</el-dropdown-item>
+							<el-dropdown-item>
+							<el-button size="mini" type="success" @click="openedServe(scope.$index, scope.row)">已开通的服务</el-button>
+							</el-dropdown-item>
+							<el-dropdown-item>
+								<el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+							</el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</template>
+
       </el-table-column>
     </el-table>
 
@@ -100,17 +112,17 @@
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
-        <el-table :data="logsData">
-          <el-table-column prop="id" label="用户ID" align="center"></el-table-column>
-          <el-table-column prop="number" label="证件号" align="center"></el-table-column>
-          <el-table-column prop="time" label="时间" align="center"></el-table-column>
-          <el-table-column prop="direction" label="进出状态" align="center">
+        <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="id" label="用户ID"></el-table-column>
+          <el-table-column prop="number" label="证件号"></el-table-column>
+          <el-table-column prop="time" label="时间"></el-table-column>
+          <el-table-column prop="direction" label="进出状态">
             <template slot-scope="scope">
               <span v-if="scope.row.direction == 1">进入</span>
               <span v-else-if="scope.row.direction == 2">外出</span>
             </template>
           </el-table-column>
-          <el-table-column prop="image" label="人脸照片" align="center">
+          <el-table-column prop="image" label="人脸照片">
             <template slot-scope="scope">
               <div v-if="scope.row.image">
                 <el-popover placement="top-start" title trigger="click">
@@ -193,11 +205,11 @@
     <!-- 已开通服务 -->
     <el-dialog title="进出记录" :visible.sync="dialogOpenedServe">
       <div class="box">
-        <el-table :data="serviceList">
-          <el-table-column prop="id" label="订单ID" align="center"></el-table-column>
-          <el-table-column prop="name" label="商品名称" align="center"></el-table-column>
-          <el-table-column prop="time" label="商品有效期(天)" align="center"></el-table-column>
-          <el-table-column prop="expireTime" label="到期时间" align="center"></el-table-column>
+        <el-table :data="serviceList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="id" label="订单ID"></el-table-column>
+          <el-table-column prop="name" label="商品名称"></el-table-column>
+          <el-table-column prop="time" label="商品有效期(天)"></el-table-column>
+          <el-table-column prop="expireTime" label="到期时间"></el-table-column>
         </el-table>
       </div>
     </el-dialog>
