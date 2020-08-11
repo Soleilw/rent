@@ -62,7 +62,8 @@ export default {
 		}) {
 			let token = localStorage.getItem('token');
 			var res = await API.userInfo(token)
-			console.log(res)
+			localStorage.setItem('permissions', res.permissions);
+			// console.log(res)
 			commit('SET_PERMISSIONS', res.permissions)
 			let routes = recursionRouter(res.permissions, dynamicRouter)
 			let MainContainer = DynamicRoutes.find(v => v.path === '')

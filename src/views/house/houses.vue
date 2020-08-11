@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading">
     <div class="btn">
-      <el-button type="primary" @click="addHouses">添加房屋</el-button>
+      <el-button type="primary" @click="addHouses" v-if="isShow">添加房屋</el-button>
     </div>
     <div class="btn">
       <el-input
@@ -535,10 +535,17 @@ export default {
       totalBuildingPage: 0,
       dialogDelBuild: false,
       building_id: "",
+      permission: localStorage.getItem("permissions"),
+      isShow: false
     };
   },
   mounted() {
     this.getnewHouses();
+    var permissionList = this.permission.split(",");
+    // console.log(permissionList.includes('housesAdd'));
+    if (permissionList.includes('housesAdd')) {
+      this.isShow = true
+    }
   },
   methods: {
     // 获取房屋列表

@@ -155,6 +155,7 @@
 
 <script>
 import API from "@/api/index.js";
+import { log } from "util";
 
 export default {
   data() {
@@ -264,6 +265,7 @@ export default {
     newRole() {
       var self = this;
       self.form.name = self.form.title;
+
       API.role(self.form).then((res) => {
         self.dialogRole = false;
         self.$message.success("提交成功");

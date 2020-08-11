@@ -18,13 +18,14 @@
     <!-- 表格数据 -->
     <el-table :data="tableData" empty-text="暂无数据">
       <el-table-column prop="id" label="ID" align="center"></el-table-column>
-      <el-table-column prop="name" label="房屋地址" align="center"></el-table-column>
+      <el-table-column v-if="lets == ''" prop="name" label="房屋地址" align="center"></el-table-column>
+      <el-table-column v-else prop="name" label="单元编号" align="center"></el-table-column>
       <el-table-column prop="count" label="人口总数" align="center"></el-table-column>
       <el-table-column prop="man" label="男性人数" align="center"></el-table-column>
       <el-table-column prop="woman" label="女性人数" align="center"></el-table-column>
-      <el-table-column prop="wait_state" label="待审核人数" align="center"></el-table-column>
-      <el-table-column prop="already_state" label="审核通过人数" align="center"></el-table-column>
-      <el-table-column prop="no_state" label="审核未通过人数" align="center"></el-table-column>
+      <el-table-column v-if="lets == ''" prop="wait_state" label="待审核人数" align="center"></el-table-column>
+      <el-table-column v-if="lets == ''" prop="already_state" label="审核通过人数" align="center"></el-table-column>
+      <el-table-column v-if="lets == ''" prop="no_state" label="审核未通过人数" align="center"></el-table-column>
       <el-table-column label="操作" align="center" width="250px" v-if="lets == ''">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="openedPie(scope.$index, scope.row)">查看男女比例</el-button>
@@ -205,6 +206,7 @@ export default {
         })
         .catch((err) => {
           self.loading = false;
+          console.log(err);
         });
     },
     // 获取社区

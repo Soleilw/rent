@@ -1,6 +1,7 @@
 <template>
-  <div v-loading="loading">
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="btn">
+      <!-- <span>搜索方式：</span> -->
       <el-select v-model="type" placeholder="请选择搜索方式" @change="changeType">
         <el-option
           v-for="item in typeList"
@@ -13,7 +14,7 @@
     <div class="btn">
       <el-input
         v-model="renter_name"
-        placeholder="输入地址/用户名"
+        placeholder="输入用户名/地址"
         class="search"
         @keyup.enter.native="search(renter_name)"
       ></el-input>
@@ -209,7 +210,7 @@ import API from "@/api/index.js";
 export default {
   data() {
     return {
-      loading: false,
+      loading: true,
       form: {
         identity: "",
       },
@@ -246,7 +247,7 @@ export default {
       face_id: "",
       username: localStorage.getItem("username"),
       isShow: false,
-      type: "", // 选中的搜索方式
+      type: 2, // 选中的搜索方式
       typeList: [
         {
           // 搜索方式
@@ -268,47 +269,49 @@ export default {
     }
   },
   methods: {
-    // 获取身份列表
     getAllRent() {
       var self = this;
-      API.households(self.currentPage, self.pageSize).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-      });
+      API.households(self.currentPage, self.pageSize)
+        .then((res) => {
+          self.tableData = res.data;
+          self.totalPage = res.total;
+          self.loading = false;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
     },
     changeType(val) {
       var self = this;
       self.typeDisabled = true;
       self.renter_name = "";
       self.currentPage = 1;
+      self.getAllRent();
     },
 
     // 搜索
     search() {
       var self = this;
-      if (!self.type) {
-        self.$message.error("请先选择搜索方式");
-      } else {
-        if (self.type == 1) {
-          var keyword = self.renter_name;
-          API.searchAddress(self.currentPage, self.pageSize, keyword).then(
-            (res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-              self.$message.success("搜索成功！");
-            }
-          );
-        }
-        if (self.type == 2) {
-          var name = self.renter_name;
-          API.searchHousehold(self.currentPage, self.pageSize, name).then(
-            (res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-              self.$message.success("搜索成功！");
-            }
-          );
-        }
+      if (self.type == 1) {
+        var keyword = self.renter_name;
+        API.searchAddress(self.currentPage, self.pageSize, keyword).then(
+          (res) => {
+            self.tableData = res.data;
+            self.totalPage = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
+      }
+      if (self.type == 2) {
+        var name = self.renter_name;
+        API.searchHousehold(self.currentPage, self.pageSize, name).then(
+          (res) => {
+            self.tableData = res.data;
+            self.totalPage = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
       }
     },
 

@@ -24,7 +24,7 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="地址">
+          <!-- <el-form-item label="地址">
             <div style="font-size: 20px; margin-bottom: 30px;">
               <el-select v-model="form.address" placeholder="请选择地址" @change="addressChange">
                 <el-option
@@ -36,8 +36,8 @@
               </el-select>
             </div>
 
-            <!-- <el-input v-model="form.address_id" style="width: 220px"></el-input> -->
-          </el-form-item>
+            <el-input v-model="form.address_id" style="width: 220px"></el-input>
+          </el-form-item> -->
           <el-form-item label="人脸图片">
             <el-upload
               action="https://api.fengniaotuangou.cn/api/upload"
@@ -190,9 +190,9 @@ export default {
         href: "",
         notify_score: "", // 相似度
         notify_user: "", // 通知的手机号
-        address_id: "",
+        // address_id: "",
       },
-      addressList: [],
+      // addressList: [],
       // dialogDel: false,
       dialogLogs: false,
       logsData: [],
@@ -218,24 +218,24 @@ export default {
       });
     },
     // 获取地址列表
-    getAddress() {
-      var self = this;
-      API.address(self.currentPage, self.pageSize).then((res) => {
-        console.log("getAddress", res);
-        self.addressList = res.data;
-      });
-    },
+    // getAddress() {
+    //   var self = this;
+    //   API.address(self.currentPage, self.pageSize).then((res) => {
+    //     console.log("getAddress", res);
+    //     self.addressList = res.data;
+    //   });
+    // },
     // 选择地址
-    addressChange(val) {
-      var self = this;
-      self.form.address_id = val;
-      console.log(self.form.address_id);
-    },
+    // addressChange(val) {
+    //   var self = this;
+    //   self.form.address_id = val;
+    //   console.log(self.form.address_id);
+    // },
     // 添加可以人物
     addDangerFace() {
       var self = this;
       self.dialogDangerFace = true;
-      self.getAddress();
+      // self.getAddress();
     },
     // 进出记录
     handleLogs(index, row) {
@@ -308,7 +308,7 @@ export default {
           href: "",
           notify_score: "",
           notify_user: "",
-          address_id: "",
+          // address_id: "",
         };
         self.notify_user = "";
         // self.form.href = "";
