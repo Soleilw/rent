@@ -253,7 +253,7 @@ export default {
     oneChange() {
       var self = this;
       console.log("oneChange", self.form);
-      self.form.service.length === 6
+      self.form.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
@@ -264,8 +264,9 @@ export default {
       self.dialogBuy = true;
       console.log("handleEdit", row);
       self.form = row;
+      self.serviceList = row.service;
       // console.log(row);
-      self.form.service.length === 6
+      self.form.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
@@ -273,6 +274,7 @@ export default {
       var self = this;
       self.showServiceOrder = true;
       self.product_id = row.id;
+      self.keyword = "";
       API.server(self.currentPage, self.pageSize, self.product_id).then(
         (res) => {
           self.orderData = res.data;

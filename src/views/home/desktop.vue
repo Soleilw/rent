@@ -64,7 +64,7 @@
         :page-sizes="[10, 20, 30, 40, 50]"
         :page-size="areaPageSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
+        :total="areaTotalPage"
         @size-change="handleAreaSize"
       ></el-pagination>
     </div>
@@ -76,7 +76,7 @@
         :page-sizes="[10, 20, 30, 40, 50]"
         :page-size="letsPageSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
+        :total="letsTotalPage"
         @size-change="handleLetsSize"
       ></el-pagination>
     </div>
@@ -89,7 +89,7 @@
         :page-sizes="[10, 20, 30, 40, 50]"
         :page-size="letsPageSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
+        :total="letsTotalPage"
         @size-change="handleLetsSize"
       ></el-pagination>
     </div>
