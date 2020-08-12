@@ -85,7 +85,7 @@
     </el-dialog>
 
     <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
-      <el-table-column label="名称" type="selection"></el-table-column>
+      <!-- <el-table-column label="名称" type="selection"></el-table-column> -->
       <el-table-column prop="id" label="商品ID" width="100px"></el-table-column>
       <el-table-column prop="title" label="商品名称"></el-table-column>
       <el-table-column prop="price" label="商品价格"></el-table-column>
@@ -264,7 +264,7 @@ export default {
       self.dialogBuy = true;
       console.log("handleEdit", row);
       self.form = row;
-      self.serviceList = row.service;
+      // self.serviceList = row.service;
       // console.log(row);
       self.form.service.length === 1
         ? (self.checkAll = true)
