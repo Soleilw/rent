@@ -309,11 +309,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],
@@ -343,11 +343,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],
@@ -369,11 +369,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],

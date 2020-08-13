@@ -28,7 +28,12 @@
       </div>
     </div>
     <!-- 表格数据 -->
-    <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table
+      :data="tableData"
+      empty-text="暂无数据"
+      border
+      :header-cell-style="{background:'#f0f0f0'}"
+    >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column v-if="lets == ''" prop="name" label="房屋地址"></el-table-column>
       <el-table-column v-else prop="name" label="单元编号"></el-table-column>
@@ -321,11 +326,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],
@@ -355,11 +360,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],
@@ -381,11 +386,11 @@ export default {
                     name: res.data[self.num].name,
                     data: [
                       {
-                        value: res.data[self.num].man_percent,
+                        value: res.data[self.num].man,
                         name: "男生人数",
                       },
                       {
-                        value: res.data[self.num].woman_percent,
+                        value: res.data[self.num].woman,
                         name: "女生人数",
                       },
                     ],
