@@ -262,10 +262,10 @@ export default {
     handleEdit(index, row) {
       var self = this;
       self.dialogBuy = true;
-      console.log("handleEdit", row);
       self.form = row;
-      // self.serviceList = row.service;
-      // console.log(row);
+      // self.form.service = row.service
+      // self.checkAll = row.service.length >= self.form.service.length;
+      
       self.form.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);

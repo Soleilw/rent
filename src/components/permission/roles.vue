@@ -217,8 +217,8 @@ export default {
         "checkBuy", // 查询服务
         "suspected", // 可疑人物
 
-        "total", // 统计
-        "rentersTotal",
+        // "total", // 统计
+        // "rentersTotal",
         "permission", // 角色管理
         "roleGet",
         "roleAdd",
