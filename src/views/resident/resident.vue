@@ -29,7 +29,7 @@
 
     <!-- 表格数据 -->
     <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}">
-      <el-table-column prop="id" label="用户ID"></el-table-column>
+      <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="snapshot.name" label="用户名"></el-table-column>
       <el-table-column prop="typeString" label="用户身份"></el-table-column>
       <el-table-column prop="snapshot" label="人脸照片">
@@ -113,7 +113,7 @@
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
         <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
-          <el-table-column prop="id" label="用户ID"></el-table-column>
+          <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="number" label="证件号"></el-table-column>
           <el-table-column prop="time" label="时间"></el-table-column>
           <el-table-column prop="direction" label="进出状态">
