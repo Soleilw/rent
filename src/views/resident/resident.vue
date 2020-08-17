@@ -28,7 +28,12 @@
     </div>
 
     <!-- 表格数据 -->
-    <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table
+      :data="tableData"
+      empty-text="暂无数据"
+      border
+      :header-cell-style="{background:'#f0f0f0'}"
+    >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="snapshot.name" label="用户名"></el-table-column>
       <el-table-column prop="typeString" label="用户身份"></el-table-column>
@@ -69,30 +74,62 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-					<el-dropdown>
-						<el-button type="primary">
-							操作<i class="el-icon-arrow-down el-icon--right"></i>
-						</el-button>
-						<el-dropdown-menu slot="dropdown">
-							<el-dropdown-item>
-								<el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录</el-button>
-							</el-dropdown-item>
-							<el-dropdown-item>
-								<el-button size="mini" type="primary" v-if="scope.row.state == 1" @click="handleAudit(scope.$index, scope.row)">审核</el-button>
-							</el-dropdown-item>
-							<el-dropdown-item>
-								<el-button size="mini" type="primary" v-if="isShow" @click="openServe(scope.$index, scope.row)">开通服务</el-button>
-							</el-dropdown-item>
-							<el-dropdown-item>
-							<el-button size="mini" type="success" @click="openedServe(scope.$index, scope.row)">已开通的服务</el-button>
-							</el-dropdown-item>
-							<el-dropdown-item>
-								<el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
-							</el-dropdown-item>
-						</el-dropdown-menu>
-					</el-dropdown>
-				</template>
-
+          <el-dropdown>
+            <el-button type="primary">
+              操作
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>
+                <el-button
+                  size="mini"
+                  type="primary"
+                  @click="handleLogs(scope.$index, scope.row)"
+                >进出记录</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  size="mini"
+                  type="primary"
+                  v-if="scope.row.state == 1"
+                  @click="handleAudit(scope.$index, scope.row)"
+                >审核</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  size="mini"
+                  type="primary"
+                  v-if="isShow"
+                  @click="openServe(scope.$index, scope.row)"
+                >开通服务</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  size="mini"
+                  type="success"
+                  @click="openedServe(scope.$index, scope.row)"
+                >已开通的服务</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  type="success"
+                  size="mini"
+                  @click="handleFace(scope.$index, scope.row)"
+                >开通人脸</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  type="danger"
+                  size="mini"
+                  @click="handleForbidden(scope.$index, scope.row)"
+                >禁用人脸</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -177,6 +214,36 @@
       </span>
     </el-dialog>
 
+    <!-- 禁用人脸 -->
+    <el-dialog
+      :visible.sync="dialogForbidden"
+      title="禁用人脸"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否禁用人脸</div>
+      <span>
+        <el-button type="primary" @click="forbiddenFace">禁用</el-button>
+        <el-button type="danger" @click="dialogForbidden = false">取消</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 开通人脸 -->
+    <el-dialog
+      :visible.sync="dialogFace"
+      title="开通人脸"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否开通人脸</div>
+      <span>
+        <el-button type="primary" @click="pushFace">开通</el-button>
+        <el-button type="danger" @click="dialogFace = false">取消</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 开通服务 -->
     <el-dialog
       title="开通服务"
@@ -218,6 +285,7 @@
 
 <script>
 import API from "@/api/index.js";
+import { log } from "util";
 
 export default {
   data() {
@@ -272,6 +340,10 @@ export default {
         },
       ],
       typeDisabled: false,
+      dialogForbidden: false,
+      forbidden_id: "",
+      dialogFace: false,
+      openFace_id: "",
     };
   },
   mounted() {
@@ -325,6 +397,31 @@ export default {
           }
         );
       }
+    },
+    handleFace(index, row) {
+      var self = this;
+      self.openFace_id = row.id;
+      self.dialogFace = true;
+    },
+    pushFace() {
+      var self = this;
+      API.pushFace(self.openFace_id).then(res => {
+        self.dialogFace = false;
+        self.$message.success("开通成功");
+      })
+    },
+    handleForbidden(index, row) {
+      var self = this;
+      console.log(row);
+      self.forbidden_id = row.id;
+      self.dialogForbidden = true;
+    },
+    forbiddenFace() {
+      var self = this;
+      API.failFace(self.forbidden_id).then((res) => {
+        self.dialogForbidden = false;
+        self.$message.success("禁用成功");
+      });
     },
 
     // 审核

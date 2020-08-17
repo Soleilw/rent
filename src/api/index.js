@@ -304,6 +304,18 @@ API.dangerLog = function (page, limit, danger_id) {
 		danger_id: danger_id
 	})
 }
+// 禁用人脸
+API.failFace = function (id) {
+	return axios.post(url.FailFace, {
+		id: id
+	})
+}
+// 禁用人脸
+API.pushFace = function (id) {
+	return axios.post(url.PushFace, {
+		id: id
+	})
+}
 
 // 统计
 API.statistics = function (page, limit, area_id, address_id) {
