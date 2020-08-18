@@ -377,6 +377,8 @@ export default {
     // 搜索
     search() {
       var self = this;
+      self.currentPage = 1;
+      self.pageSize = 10
       if (self.type == 1) {
         var keyword = self.renter_name;
         API.searchAddress(self.currentPage, self.pageSize, keyword).then(

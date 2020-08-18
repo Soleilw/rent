@@ -655,6 +655,8 @@ export default {
       switch (value) {
         case 0:
           self.$nextTick(() => {
+            self.currentResidentPage = 1;
+            self.pageSizeResident = 10
             self.user = "全部";
             API.addressResidents(
               self.currentResidentPage,
@@ -668,6 +670,8 @@ export default {
           break;
         case 1:
           self.$nextTick(() => {
+            self.houseOwnerCurrentPage = 1
+            self.houseOwnerPageSize = 10
             self.user = "户主";
             API.addressResidents(
               self.houseOwnerCurrentPage,
@@ -683,6 +687,8 @@ export default {
           break;
         case 2:
           self.$nextTick(() => {
+            self.renterCurrentPage = 1;
+            self.renterPageSize = 10
             self.user = "租客";
             API.addressResidents(
               self.renterCurrentPage,
@@ -697,6 +703,8 @@ export default {
           break;
         case 3:
           self.$nextTick(() => {
+            self.managementCurrentPage = 1
+            self.managementPageSize = 10
             self.user = "物业";
             API.addressResidents(
               self.managementCurrentPage,
