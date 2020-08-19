@@ -344,6 +344,8 @@ export default {
       forbidden_id: "",
       dialogFace: false,
       openFace_id: "",
+      member_type: "",
+      card_number: ''
     };
   },
   mounted() {
@@ -378,7 +380,7 @@ export default {
     search() {
       var self = this;
       self.currentPage = 1;
-      self.pageSize = 10
+      self.pageSize = 10;
       if (self.type == 1) {
         var keyword = self.renter_name;
         API.searchAddress(self.currentPage, self.pageSize, keyword).then(
@@ -407,10 +409,10 @@ export default {
     },
     pushFace() {
       var self = this;
-      API.pushFace(self.openFace_id).then(res => {
+      API.pushFace(self.openFace_id).then((res) => {
         self.dialogFace = false;
         self.$message.success("开通成功");
-      })
+      });
     },
     handleForbidden(index, row) {
       var self = this;
@@ -429,16 +431,27 @@ export default {
     // 审核
     handleAudit(index, row) {
       var self = this;
+      console.log(row);
       self.renter_id = row.id;
+      self.member_type = row.type;
+      self.card_number = row.snapshot.card_number
       self.dialogAudit = true;
     },
     toAudit() {
       var self = this;
-      API.audit(self.renter_id, 2).then((res) => {
-        self.$message.success("提交成功");
-        self.dialogAudit = false;
-        self.getAllRent();
-      });
+      if (self.member_type == 3) {
+        API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
+          self.$message.success("提交成功");
+          self.dialogAudit = false;
+          self.getAllRent();
+        });
+      } else {
+        API.audit(self.renter_id, 2).then((res) => {
+          self.$message.success("提交成功");
+          self.dialogAudit = false;
+          self.getAllRent();
+        });
+      }
     },
     unAudit() {
       var self = this;
