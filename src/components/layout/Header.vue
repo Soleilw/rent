@@ -5,7 +5,7 @@
 				<img src="../../assets/image/logo.png" alt="">
 			</div>
 			<div class="title">
-				<span>图巴诺校园安全</span>
+				<span>出租屋安全后台管理</span>
 			</div>
 			<!-- 折叠按钮 -->
 			<div class="collapse-btn" @click="collapseChage">
@@ -166,7 +166,7 @@
 		height: 50px;
 		line-height: 50px;
 		margin-left: 45px;
-		font-size: 20px;
+		font-size: 18px;
 	}
 
 	.collapse-btn {

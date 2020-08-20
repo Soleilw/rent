@@ -59,8 +59,7 @@
             size="mini"
             @click="handleResident(scope.$index, scope.row)"
           >查看住户信息</el-button>
-          <!-- <el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
-          <!-- <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button> -->
+          <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -119,12 +118,36 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  size="mini"
-                  @click="handleLogs(scope.$index, scope.row)"
-                >进出记录</el-button>
-                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                <el-dropdown>
+                  <el-button type="primary">
+                    操作
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleLogs(scope.$index, scope.row)"
+                      >进出记录</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleVistorPer(scope.$index, scope.row)"
+                      >访客</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        v-if="isShow"
+                        @click="handleDel(scope.$index, scope.row)"
+                      >删除</el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </el-table-column>
           </el-table>
@@ -173,12 +196,36 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  size="mini"
-                  @click="handleLogs(scope.$index, scope.row)"
-                >进出记录</el-button>
-                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                <el-dropdown>
+                  <el-button type="primary">
+                    操作
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleLogs(scope.$index, scope.row)"
+                      >进出记录</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleVistorPer(scope.$index, scope.row)"
+                      >访客</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        v-if="isShow"
+                        @click="handleDel(scope.$index, scope.row)"
+                      >删除</el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </el-table-column>
           </el-table>
@@ -227,12 +274,36 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  size="mini"
-                  @click="handleLogs(scope.$index, scope.row)"
-                >进出记录</el-button>
-                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                <el-dropdown>
+                  <el-button type="primary">
+                    操作
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleLogs(scope.$index, scope.row)"
+                      >进出记录</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleVistorPer(scope.$index, scope.row)"
+                      >访客</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        v-if="isShow"
+                        @click="handleDel(scope.$index, scope.row)"
+                      >删除</el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </el-table-column>
           </el-table>
@@ -281,12 +352,36 @@
             </el-table-column>
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  size="mini"
-                  @click="handleLogs(scope.$index, scope.row)"
-                >进出记录</el-button>
-                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                <el-dropdown>
+                  <el-button type="primary">
+                    操作
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleLogs(scope.$index, scope.row)"
+                      >进出记录</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleVistorPer(scope.$index, scope.row)"
+                      >访客</el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        v-if="isShow"
+                        @click="handleDel(scope.$index, scope.row)"
+                      >删除</el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </template>
             </el-table-column>
           </el-table>
@@ -302,6 +397,55 @@
             ></el-pagination>
           </div>
         </template>
+      </div>
+    </el-dialog>
+    <!-- 访客 -->
+    <el-dialog title="访客记录" :visible.sync="dialogVisitor" @close="closeLog">
+      <div class="box">
+        <el-table :data="visitorList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="name" label="真实姓名"></el-table-column>
+          <el-table-column prop="interviewee_name" label="拜访人"></el-table-column>
+          <el-table-column prop="phone" label="手机号"></el-table-column>
+          <el-table-column prop="visitor_date" label="到访时间"></el-table-column>
+          <el-table-column prop="href" label="人脸照片">
+            <template slot-scope="scope">
+              <div v-if="scope.row.href">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
+                  <img
+                    slot="reference"
+                    :src="scope.row.href"
+                    style="max-width:180px;max-height:80px;"
+                  />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                size="mini"
+                @click="handleVisitorLogs(scope.$index, scope.row)"
+              >进出记录</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <!-- 分页 -->
+      <div class="block">
+        <el-pagination
+          @current-change="handleCurrenVisitor"
+          :current-page.sync="currentVisitorPage"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="pageSizeVisitor"
+          layout="sizes, prev, pager, next, jumper"
+          :total="totalVisitorPage"
+          @size-change="handleSizeVisitor"
+        ></el-pagination>
       </div>
     </el-dialog>
 
@@ -421,6 +565,51 @@
       </div>
     </el-dialog>
 
+    <!-- 访客进出记录 -->
+    <el-dialog title="进出记录" :visible.sync="dialogVisitorLogs">
+      <div class="box">
+        <el-table :data="visitorLogsData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table-column prop="id" label="用户ID"></el-table-column>
+          <el-table-column prop="number" label="证件号"></el-table-column>
+          <el-table-column prop="time" label="时间"></el-table-column>
+          <el-table-column prop="direction" label="进出状态">
+            <template slot-scope="scope">
+              <span v-if="scope.row.direction == 1">进入</span>
+              <span v-else-if="scope.row.direction == 2">外出</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="image" label="人脸照片">
+            <template slot-scope="scope">
+              <div v-if="scope.row.image">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.image" style="max-width:800px;max-height:800px;" />
+                  <img
+                    slot="reference"
+                    :src="scope.row.image"
+                    style="max-width:180px;max-height:80px;"
+                  />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="block">
+        <el-pagination
+          @current-change="handleCurrentLogs"
+          :current-page.sync="currentLogsPage"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="pageSizeLogs"
+          layout="sizes, prev, pager, next, jumper"
+          :total="totalLogsPage"
+          @size-change="handleSizeLogs"
+        ></el-pagination>
+      </div>
+    </el-dialog>
+
     <!-- 删除提示框 -->
     <el-dialog
       :visible.sync="dialogDel"
@@ -482,6 +671,7 @@ export default {
       pageSizeResident: 10,
       totalResidentPage: 0,
       dialogBuild: false, // 房屋编号
+      dialogVisitor: false,
       // rooms: '',
       // addrooms: [],
       buildForm: {
@@ -543,6 +733,13 @@ export default {
       building_id: "",
       permission: localStorage.getItem("permissions"),
       isShow: false,
+      visitorList: [],
+      currentVisitorPage: 1, // 分页
+      pageSizeVisitor: 10,
+      totalVisitorPage: 0,
+      dialogVisitorLogs: false,
+      visitorLogsData: [],
+      interviewee_name: ''
     };
   },
   mounted() {
@@ -563,7 +760,6 @@ export default {
         self.totalPage = res.total;
       });
     },
-
     // 搜索
     search() {
       var self = this;
@@ -656,7 +852,7 @@ export default {
         case 0:
           self.$nextTick(() => {
             self.currentResidentPage = 1;
-            self.pageSizeResident = 10
+            self.pageSizeResident = 10;
             self.user = "全部";
             API.addressResidents(
               self.currentResidentPage,
@@ -670,8 +866,8 @@ export default {
           break;
         case 1:
           self.$nextTick(() => {
-            self.houseOwnerCurrentPage = 1
-            self.houseOwnerPageSize = 10
+            self.houseOwnerCurrentPage = 1;
+            self.houseOwnerPageSize = 10;
             self.user = "户主";
             API.addressResidents(
               self.houseOwnerCurrentPage,
@@ -688,7 +884,7 @@ export default {
         case 2:
           self.$nextTick(() => {
             self.renterCurrentPage = 1;
-            self.renterPageSize = 10
+            self.renterPageSize = 10;
             self.user = "租客";
             API.addressResidents(
               self.renterCurrentPage,
@@ -703,8 +899,8 @@ export default {
           break;
         case 3:
           self.$nextTick(() => {
-            self.managementCurrentPage = 1
-            self.managementPageSize = 10
+            self.managementCurrentPage = 1;
+            self.managementPageSize = 10;
             self.user = "物业";
             API.addressResidents(
               self.managementCurrentPage,
@@ -748,8 +944,38 @@ export default {
       );
     },
 
-    // 编辑
-    // handleEdit() {},
+    // 访客
+    handleVistor(index, row) {
+      var self = this;
+      self.dialogVisitor = true;
+      self.address_id = row.id;
+      console.log(row);
+      API.visitors(1, self.pageSizeVisitor, self.address_id).then((res) => {
+        console.log("访客", res);
+        self.visitorList = res.data;
+      });
+    },
+    handleVistorPer(index, row) {
+      var self = this;
+      self.dialogVisitor = true;
+      self.address_id = row.id;
+      self.interviewee_name = row.name
+      console.log(row);
+      API.visitorsPer(1, self.pageSizeVisitor, self.interviewee_name).then((res) => {
+        console.log("访客", res);
+        self.visitorList = res.data;
+      });
+    },
+    closeLog() {
+      var self = this;
+      self.currentVisitorPage = 1,
+      self.pageSizeVisitor = 10,
+      console.log(111);
+    },
+    handleVisitorLogs(index, row) {
+      var self = this;
+      self.dialogVisitorLogs = true;
+    },
     // 删除--查看住户信息
     handleDel(index, row) {
       var self = this;
@@ -993,6 +1219,24 @@ export default {
         (res) => {
           // console.log("获取楼栋信息", res);
           self.buildingList = res.data;
+        }
+      );
+    },
+    handleCurrenVisitor(val) {
+      var self = this;
+      self.currentVisitorPage = val;
+      API.visitors(val, self.pageSizeVisitor, self.address_id).then((res) => {
+        console.log("访客", res);
+        self.visitorList = res.data;
+      });
+    },
+    handleSizeVisitor(val) {
+      var self = this;
+      self.pageSizeVisitor = val;
+      API.visitors(self.currentVisitorPage, val, self.address_id).then(
+        (res) => {
+          console.log("访客", res);
+          self.visitorList = res.data;
         }
       );
     },

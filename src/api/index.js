@@ -335,4 +335,21 @@ API.statistics = function (page, limit, area_id, address_id) {
 	})
 }
 
+// 访客
+API.visitors = function (page, limit, address_id) {
+	return axios.get(url.Visitors, {
+		page: page,
+		limit: limit,
+		address_id: address_id
+	})
+}
+
+API.visitorsPer = function (page, limit, name) {
+	return axios.get(url.Visitors, {
+		page: page,
+		limit: limit,
+		name: name
+	})
+}
+
 export default API

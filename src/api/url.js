@@ -53,6 +53,8 @@ const url = {
 	"PushFace": BaseURL + '/pushFace', // 开通人脸
 
 	'Statistics': BaseURL + '/statistics', // 统计
+
+	'Visitors': BaseURL + '/visitors', // 访客
 	
 }
 
