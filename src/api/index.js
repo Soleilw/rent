@@ -12,10 +12,11 @@ API.houser = function (page, limit, address_id) {
 	})
 }
 // 审核
-API.audit = function (id, state) {
+API.audit = function (id, state, self) {
 	return axios.post(url.CheckManagers, {
 		id: id,
-		state: state
+		state: state,
+		self: self
 	})
 }
 // 审核家庭成员
@@ -336,20 +337,14 @@ API.statistics = function (page, limit, area_id, address_id) {
 }
 
 // 访客
-API.visitors = function (page, limit, address_id) {
+API.visitors = function (page, limit, address_id, room_id) {
 	return axios.get(url.Visitors, {
 		page: page,
 		limit: limit,
-		address_id: address_id
+		address_id: address_id,
+		room_id: room_id
 	})
 }
 
-API.visitorsPer = function (page, limit, name) {
-	return axios.get(url.Visitors, {
-		page: page,
-		limit: limit,
-		name: name
-	})
-}
 
 export default API

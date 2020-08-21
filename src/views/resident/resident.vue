@@ -446,7 +446,7 @@ export default {
           self.getAllRent();
         });
       } else {
-        API.audit(self.renter_id, 2).then((res) => {
+        API.audit(self.renter_id, 2, 1).then((res) => {
           self.$message.success("提交成功");
           self.dialogAudit = false;
           self.getAllRent();
@@ -455,7 +455,7 @@ export default {
     },
     unAudit() {
       var self = this;
-      API.audit(self.renter_id, 3).then((res) => {
+      API.audit(self.renter_id, 3, 1).then((res) => {
         self.$message.success("提交成功");
         self.dialogAudit = false;
         self.getAllRent();

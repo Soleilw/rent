@@ -59,7 +59,6 @@
             size="mini"
             @click="handleResident(scope.$index, scope.row)"
           >查看住户信息</el-button>
-          <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -131,13 +130,7 @@
                         @click="handleLogs(scope.$index, scope.row)"
                       >进出记录</el-button>
                     </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="handleVistorPer(scope.$index, scope.row)"
-                      >访客</el-button>
-                    </el-dropdown-item>
+
                     <el-dropdown-item>
                       <el-button
                         size="mini"
@@ -209,13 +202,7 @@
                         @click="handleLogs(scope.$index, scope.row)"
                       >进出记录</el-button>
                     </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="handleVistorPer(scope.$index, scope.row)"
-                      >访客</el-button>
-                    </el-dropdown-item>
+
                     <el-dropdown-item>
                       <el-button
                         size="mini"
@@ -287,13 +274,7 @@
                         @click="handleLogs(scope.$index, scope.row)"
                       >进出记录</el-button>
                     </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="handleVistorPer(scope.$index, scope.row)"
-                      >访客</el-button>
-                    </el-dropdown-item>
+
                     <el-dropdown-item>
                       <el-button
                         size="mini"
@@ -365,13 +346,7 @@
                         @click="handleLogs(scope.$index, scope.row)"
                       >进出记录</el-button>
                     </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        size="mini"
-                        type="primary"
-                        @click="handleVistorPer(scope.$index, scope.row)"
-                      >访客</el-button>
-                    </el-dropdown-item>
+
                     <el-dropdown-item>
                       <el-button
                         size="mini"
@@ -429,7 +404,7 @@
               <el-button
                 type="primary"
                 size="mini"
-                @click="handleVisitorLogs(scope.$index, scope.row)"
+                @click="handleLogs(scope.$index, scope.row)"
               >进出记录</el-button>
             </template>
           </el-table-column>
@@ -461,6 +436,11 @@
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
+              <el-button
+                type="primary"
+                size="mini"
+                @click="handleVistor(scope.$index, scope.row)"
+              >访客</el-button>
               <el-button
                 type="danger"
                 size="mini"
@@ -521,7 +501,7 @@
     </el-dialog>
 
     <!-- 进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogLogs">
+    <el-dialog title="进出记录" :visible.sync="dialogLogs" @close="closeLog">
       <div class="box">
         <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
           <el-table-column prop="id" label="用户ID"></el-table-column>
@@ -739,7 +719,8 @@ export default {
       totalVisitorPage: 0,
       dialogVisitorLogs: false,
       visitorLogsData: [],
-      interviewee_name: ''
+      interviewee_name: "",
+      room_id: ''
     };
   },
   mounted() {
@@ -948,28 +929,21 @@ export default {
     handleVistor(index, row) {
       var self = this;
       self.dialogVisitor = true;
-      self.address_id = row.id;
+      self.address_id = row.address_id;
+      self.room_id = row.id
       console.log(row);
-      API.visitors(1, self.pageSizeVisitor, self.address_id).then((res) => {
+      API.visitors(1, self.pageSizeVisitor, self.address_id, self.room_id).then((res) => {
         console.log("访客", res);
         self.visitorList = res.data;
       });
     },
-    handleVistorPer(index, row) {
-      var self = this;
-      self.dialogVisitor = true;
-      self.address_id = row.id;
-      self.interviewee_name = row.name
-      console.log(row);
-      API.visitorsPer(1, self.pageSizeVisitor, self.interviewee_name).then((res) => {
-        console.log("访客", res);
-        self.visitorList = res.data;
-      });
-    },
+
     closeLog() {
       var self = this;
-      self.currentVisitorPage = 1,
-      self.pageSizeVisitor = 10,
+      self.currentVisitorPage = 1;
+      self.pageSizeVisitor = 10;
+      self.currentLogsPage = 1;
+      self.pageSizeLogs = 10;
       console.log(111);
     },
     handleVisitorLogs(index, row) {
@@ -1225,7 +1199,7 @@ export default {
     handleCurrenVisitor(val) {
       var self = this;
       self.currentVisitorPage = val;
-      API.visitors(val, self.pageSizeVisitor, self.address_id).then((res) => {
+      API.visitors(val, self.pageSizeVisitor, self.address_id, self.room_id).then((res) => {
         console.log("访客", res);
         self.visitorList = res.data;
       });
@@ -1233,7 +1207,7 @@ export default {
     handleSizeVisitor(val) {
       var self = this;
       self.pageSizeVisitor = val;
-      API.visitors(self.currentVisitorPage, val, self.address_id).then(
+      API.visitors(self.currentVisitorPage, val, self.address_id, self.room_id).then(
         (res) => {
           console.log("访客", res);
           self.visitorList = res.data;
