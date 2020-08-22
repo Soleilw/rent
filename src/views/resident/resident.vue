@@ -270,7 +270,7 @@
     </el-dialog>
 
     <!-- 已开通服务 -->
-    <el-dialog title="进出记录" :visible.sync="dialogOpenedServe">
+    <el-dialog title="已开通服务" :visible.sync="dialogOpenedServe">
       <div class="box">
         <el-table :data="serviceList" border :header-cell-style="{background:'#f0f0f0'}">
           <el-table-column prop="id" label="订单ID"></el-table-column>
@@ -345,7 +345,9 @@ export default {
       dialogFace: false,
       openFace_id: "",
       member_type: "",
-      card_number: ''
+      card_number: "",
+      check: "",
+      family: "",
     };
   },
   mounted() {
@@ -359,6 +361,13 @@ export default {
       var self = this;
       API.households(self.currentPage, self.pageSize)
         .then((res) => {
+          console.log(res);
+          res.data.forEach((item) => {
+            if (item.expireTime) {
+              item.expireTime = item.expireTime.slice(0, 10);
+              // console.log(item.expireTime);
+            }
+          });
           self.tableData = res.data;
           self.totalPage = res.total;
           self.loading = false;
@@ -434,32 +443,52 @@ export default {
       console.log(row);
       self.renter_id = row.id;
       self.member_type = row.type;
-      self.card_number = row.snapshot.card_number
+      self.card_number = row.snapshot.card_number;
+      self.check = row.check;
       self.dialogAudit = true;
+      if (self.check == 0) {
+        self.$message.warning("该用户身份未核验!");
+        self.dialogAudit = false;
+      } else if (self.check == 2) {
+        self.$message.warning("该用户身份信息错误!");
+        self.dialogAudit = false;
+      }
     },
     toAudit() {
       var self = this;
-      if (self.member_type == 3) {
-        API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
-          self.$message.success("提交成功");
-          self.dialogAudit = false;
-          self.getAllRent();
-        });
-      } else {
-        API.audit(self.renter_id, 2, 1).then((res) => {
-          self.$message.success("提交成功");
-          self.dialogAudit = false;
-          self.getAllRent();
-        });
+      if (self.check == 1) {
+        if (self.member_type == 3) {
+          API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        } else {
+          API.audit(self.renter_id, 2, 1).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        }
       }
     },
     unAudit() {
       var self = this;
-      API.audit(self.renter_id, 3, 1).then((res) => {
-        self.$message.success("提交成功");
-        self.dialogAudit = false;
-        self.getAllRent();
-      });
+      if (self.check == 1) {
+        if (self.member_type == 3) {
+          API.audit(self.renter_id, 3, self.card_number).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        } else {
+          API.audit(self.renter_id, 3, 1).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        }
+      }
     },
     serveChange(val) {
       var self = this;
@@ -529,15 +558,26 @@ export default {
     handleDel(index, row) {
       var self = this;
       self.id = row.id;
+      self.card_number = row.snapshot.card_number;
+      self.family = row.type;
       self.dialogDel = true;
+      console.log(row);
     },
     toDel() {
       var self = this;
-      API.delHousehold(self.id).then((res) => {
-        self.$message.success("删除成功");
-        self.dialogDel = false;
-        self.getAllRent();
-      });
+      if (self.family == 3) {
+        API.delHousehold(self.id, self.card_number).then((res) => {
+          self.$message.success("删除成功");
+          self.dialogDel = false;
+          self.getAllRent();
+        });
+      } else {
+        API.delHousehold(self.id, 1).then((res) => {
+          self.$message.success("删除成功");
+          self.dialogDel = false;
+          self.getAllRent();
+        });
+      }
     },
 
     // 分页

@@ -106,9 +106,10 @@ API.searchAddress = function (page, limit, keyword) {
 }
 
 // 删除住户
-API.delHousehold = function (id) {
+API.delHousehold = function (id, self) {
 	return axios.del(url.Household, {
-		id: id
+		id: id,
+		self: self
 	})
 }
 

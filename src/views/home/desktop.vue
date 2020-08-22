@@ -139,7 +139,7 @@ export default {
       dialogLogs: false,
       bar: {
         title: {
-          text: "社区人数统计",
+          text: "社区人数统计 (点击或者滚动查看数据)",
           left: "center",
         },
         tooltip: {},
@@ -147,6 +147,11 @@ export default {
           data: [],
         },
         yAxis: {},
+        dataZoom: [
+          {
+            type: "inside",
+          },
+        ],
         series: [],
       },
       pie: {
@@ -275,16 +280,36 @@ export default {
       barChart.setOption(self.bar);
       self.nameList = [];
       self.countList = [];
-      API.statistics().then((res) => {
+      API.statistics(1, 10000).then((res) => {
         res.data.forEach((item) => {
           self.nameList.push(item.name);
           self.countList.push(item.count);
+        });
+        var zoomSize = 6;
+        barChart.on("click", function (params) {
+          console.log(
+            self.nameList[Math.max(params.dataIndex - zoomSize / 2, 0)]
+          );
+          barChart.dispatchAction({
+            type: "dataZoom",
+            startValue:
+              self.nameList[Math.max(params.dataIndex - zoomSize / 2, 0)],
+            endValue:
+              self.nameList[
+                Math.min(params.dataIndex + zoomSize / 2, self.nameList.length - 1)
+              ],
+          });
         });
         barChart.setOption(
           (self.bar = {
             xAxis: {
               data: self.nameList,
             },
+            dataZoom: [
+              {
+                type: "inside",
+              },
+            ],
             series: [
               {
                 name: "社区总人数",
@@ -314,7 +339,7 @@ export default {
         var pieUserChart = require("echarts").init(pieCharUsertDom);
         pieUserChart.setOption(self.pie);
         if (self.area == "" && self.lets == "" && self.username == "admin") {
-          API.statistics().then((res) => {
+          API.statistics(self.currentPage, self.pageSize).then((res) => {
             pieUserChart.setOption(
               (self.pie = {
                 title: {

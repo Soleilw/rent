@@ -93,6 +93,7 @@
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 3">家庭成员</span>
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
@@ -165,6 +166,8 @@
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 3">家庭成员</span>
+
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
@@ -237,6 +240,8 @@
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 3">家庭成员</span>
+
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
@@ -309,6 +314,8 @@
               <template slot-scope="scope">
                 <span v-if="scope.row.type == 1">户主</span>
                 <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 3">家庭成员</span>
+
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
@@ -369,6 +376,79 @@
               layout="sizes, prev, pager, next, jumper"
               :total="managementTotalPage"
               @size-change="handlemanagementSize"
+            ></el-pagination>
+          </div>
+        </template>
+        <template v-if="user == '家庭成员'">
+          <el-table :data="familyList" border :header-cell-style="{background:'#f0f0f0'}">
+            <el-table-column prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <el-table-column prop="name" label="真实姓名"></el-table-column>
+            <el-table-column prop="type" label="用户身份">
+              <template slot-scope="scope">
+                <span v-if="scope.row.type == 1">户主</span>
+                <span v-else-if="scope.row.type == 2">租客</span>
+                <span v-else-if="scope.row.type == 3">家庭成员</span>
+                <span v-else-if="scope.row.type == 4">物业</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="card_number" label="身份证号"></el-table-column>
+            <el-table-column prop="phone" label="手机号"></el-table-column>
+            <el-table-column prop="href" label="人脸图片">
+              <template slot-scope="scope">
+                <div v-if="scope.row.href">
+                  <el-popover placement="top-start" title trigger="click">
+                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
+                    <img
+                      slot="reference"
+                      :src="scope.row.href"
+                      style="max-width:180px;max-height:80px;"
+                    />
+                  </el-popover>
+                </div>
+                <div v-else>
+                  <span>--暂无图片--</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <el-dropdown>
+                  <el-button type="primary">
+                    操作
+                    <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="handleLogs(scope.$index, scope.row)"
+                      >进出记录</el-button>
+                    </el-dropdown-item>
+
+                    <el-dropdown-item>
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        v-if="isShow"
+                        @click="handleDel(scope.$index, scope.row)"
+                      >删除</el-button>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="block">
+            <el-pagination
+              @current-change="handleFamily"
+              :current-page.sync="familyCurrentPage"
+              :page-sizes="[10, 20, 30, 40, 50]"
+              :page-size="familyPageSize"
+              layout="sizes, prev, pager, next, jumper"
+              :total="familyTotalPage"
+              @size-change="handleFamilySize"
             ></el-pagination>
           </div>
         </template>
@@ -680,10 +760,15 @@ export default {
           value: 3,
           label: "物业",
         },
+        {
+          value: 4,
+          label: "家庭成员",
+        },
       ],
       houseOwnerList: [], // 户主列表
       renterList: [], // 租客列表
       managementList: [], // 物业列表
+      familyList: [],
 
       houseOwnerCurrentPage: 1, // 户主列表分页
       houseOwnerPageSize: 10,
@@ -696,6 +781,10 @@ export default {
       managementCurrentPage: 1, //物业列表分页
       managementPageSize: 10,
       managementTotalPage: 0,
+
+      familyCurrentPage: 1, //物业列表分页
+      familyPageSize: 10,
+      familyTotalPage: 0,
 
       dialogLogs: false, // 进出记录
       logsData: [],
@@ -720,7 +809,9 @@ export default {
       dialogVisitorLogs: false,
       visitorLogsData: [],
       interviewee_name: "",
-      room_id: ''
+      room_id: "",
+      familyType: "",
+      card_number: "",
     };
   },
   mounted() {
@@ -894,6 +985,22 @@ export default {
             });
           });
           break;
+        case 4:
+          self.$nextTick(() => {
+            self.familyCurrentPage = 1;
+            self.familyPageSize = 10;
+            self.user = "家庭成员";
+            API.addressResidents(
+              self.familyCurrentPage,
+              self.familyPageSize,
+              self.address_id,
+              3
+            ).then((res) => {
+              self.familyList = res.data;
+              self.familyTotalPage = res.total;
+            });
+          });
+          break;
       }
     },
     closeShowUser() {
@@ -930,12 +1037,14 @@ export default {
       var self = this;
       self.dialogVisitor = true;
       self.address_id = row.address_id;
-      self.room_id = row.id
+      self.room_id = row.id;
       console.log(row);
-      API.visitors(1, self.pageSizeVisitor, self.address_id, self.room_id).then((res) => {
-        console.log("访客", res);
-        self.visitorList = res.data;
-      });
+      API.visitors(1, self.pageSizeVisitor, self.address_id, self.room_id).then(
+        (res) => {
+          console.log("访客", res);
+          self.visitorList = res.data;
+        }
+      );
     },
 
     closeLog() {
@@ -954,67 +1063,156 @@ export default {
     handleDel(index, row) {
       var self = this;
       self.id = row.id;
+      self.familyType = row.type;
+      self.card_number = row.card_number;
+      console.log(row);
       self.dialogDel = true;
     },
     toDel() {
       var self = this;
-      API.delHousehold(self.id).then((res) => {
-        switch (self.user) {
-          case "全部":
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            API.addressResidents(
-              self.currentResidentPage,
-              self.pageSizeResident,
-              self.address_id
-            ).then((res) => {
-              console.log("所有", res);
-              self.residentData = res.data;
-              self.totalResidentPage = res.total;
-            });
-            break;
-          case "户主":
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            API.addressResidents(
-              self.houseOwnerCurrentPage,
-              self.houseOwnerPageSize,
-              self.address_id,
-              1
-            ).then((res) => {
-              console.log("户主", res);
-              self.houseOwnerList = res.data;
-              self.houseOwnerTotalPage = res.total;
-            });
-            break;
-          case "租客":
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            API.addressResidents(
-              self.renterCurrentPage,
-              self.renterPageSize,
-              self.address_id,
-              2
-            ).then((res) => {
-              self.renterList = res.data;
-              self.renterTotalPage = res.total;
-            });
-            break;
-          case "物业":
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            API.addressResidents(
-              self.managementCurrentPage,
-              self.managementPageSize,
-              self.address_id,
-              4
-            ).then((res) => {
-              self.managementList = res.data;
-              self.managementTotalPage = res.total;
-            });
-            break;
-        }
-      });
+      if (self.familyType == 3) {
+        API.delHousehold(self.id, self.card_number).then((res) => {
+          switch (self.user) {
+            case "全部":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.currentResidentPage,
+                self.pageSizeResident,
+                self.address_id
+              ).then((res) => {
+                console.log("所有", res);
+                self.residentData = res.data;
+                self.totalResidentPage = res.total;
+              });
+              break;
+            case "户主":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.houseOwnerCurrentPage,
+                self.houseOwnerPageSize,
+                self.address_id,
+                1
+              ).then((res) => {
+                console.log("户主", res);
+                self.houseOwnerList = res.data;
+                self.houseOwnerTotalPage = res.total;
+              });
+              break;
+            case "租客":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.renterCurrentPage,
+                self.renterPageSize,
+                self.address_id,
+                2
+              ).then((res) => {
+                self.renterList = res.data;
+                self.renterTotalPage = res.total;
+              });
+              break;
+            case "物业":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.managementCurrentPage,
+                self.managementPageSize,
+                self.address_id,
+                4
+              ).then((res) => {
+                self.managementList = res.data;
+                self.managementTotalPage = res.total;
+              });
+              break;
+            case "家庭成员":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.familyCurrentPage,
+                self.familyPageSize,
+                self.address_id,
+                3
+              ).then((res) => {
+                self.familyList = res.data;
+                self.familyTotalPage = res.total;
+              });
+              break;
+          }
+        });
+      } else {
+        API.delHousehold(self.id, 1).then((res) => {
+          switch (self.user) {
+            case "全部":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.currentResidentPage,
+                self.pageSizeResident,
+                self.address_id
+              ).then((res) => {
+                console.log("所有", res);
+                self.residentData = res.data;
+                self.totalResidentPage = res.total;
+              });
+              break;
+            case "户主":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.houseOwnerCurrentPage,
+                self.houseOwnerPageSize,
+                self.address_id,
+                1
+              ).then((res) => {
+                console.log("户主", res);
+                self.houseOwnerList = res.data;
+                self.houseOwnerTotalPage = res.total;
+              });
+              break;
+            case "租客":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.renterCurrentPage,
+                self.renterPageSize,
+                self.address_id,
+                2
+              ).then((res) => {
+                self.renterList = res.data;
+                self.renterTotalPage = res.total;
+              });
+              break;
+            case "物业":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.managementCurrentPage,
+                self.managementPageSize,
+                self.address_id,
+                4
+              ).then((res) => {
+                self.managementList = res.data;
+                self.managementTotalPage = res.total;
+              });
+              break;
+            case "家庭成员":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              API.addressResidents(
+                self.familyCurrentPage,
+                self.familyPageSize,
+                self.address_id,
+                3
+              ).then((res) => {
+                self.familyList = res.data;
+                self.familyTotalPage = res.total;
+              });
+              break;
+          }
+        });
+      }
     },
 
     // 删除--楼栋管理
@@ -1160,6 +1358,31 @@ export default {
         self.managementList = res.data;
       });
     },
+    handleFamily(val) {
+      var self = this;
+      self.familyCurrentPage = val;
+      API.addressResidents(
+        val,
+        self.familyPageSize,
+        self.address_id,
+        3
+      ).then((res) => {
+        self.familyList = res.data;
+      });
+    },
+    handleFamilySize(val) {
+      var self = this;
+      self.familyPageSize = val;
+      API.addressResidents(
+        self.familyCurrentPage,
+        val,
+        self.address_id,
+        3
+      ).then((res) => {
+        self.familyList = res.data;
+        self.familyTotalPage = res.total;
+      });
+    },
 
     // 进出记录分页
     handleCurrentLogs(val) {
@@ -1199,7 +1422,12 @@ export default {
     handleCurrenVisitor(val) {
       var self = this;
       self.currentVisitorPage = val;
-      API.visitors(val, self.pageSizeVisitor, self.address_id, self.room_id).then((res) => {
+      API.visitors(
+        val,
+        self.pageSizeVisitor,
+        self.address_id,
+        self.room_id
+      ).then((res) => {
         console.log("访客", res);
         self.visitorList = res.data;
       });
@@ -1207,12 +1435,15 @@ export default {
     handleSizeVisitor(val) {
       var self = this;
       self.pageSizeVisitor = val;
-      API.visitors(self.currentVisitorPage, val, self.address_id, self.room_id).then(
-        (res) => {
-          console.log("访客", res);
-          self.visitorList = res.data;
-        }
-      );
+      API.visitors(
+        self.currentVisitorPage,
+        val,
+        self.address_id,
+        self.room_id
+      ).then((res) => {
+        console.log("访客", res);
+        self.visitorList = res.data;
+      });
     },
   },
 };
