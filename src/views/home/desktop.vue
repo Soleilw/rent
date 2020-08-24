@@ -139,7 +139,7 @@ export default {
       dialogLogs: false,
       bar: {
         title: {
-          text: "社区人数统计 (点击或者滚动查看数据)",
+          text: "社区人数统计",
           left: "center",
         },
         tooltip: {},
