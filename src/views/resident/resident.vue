@@ -33,7 +33,7 @@
       empty-text="暂无数据"
       border
       :header-cell-style="{background:'#f0f0f0'}"
-    >
+     >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="snapshot.name" label="用户名"></el-table-column>
       <el-table-column prop="typeString" label="用户身份"></el-table-column>
@@ -191,6 +191,7 @@
       </div>
     </el-dialog>
 
+    <!-- 审核 -->
     <el-dialog :visible.sync="dialogAudit" title="审核" width="20%" align="center">
       <div style="font-size: 20px; margin-bottom: 30px;">是否通过审核</div>
       <span>
@@ -206,7 +207,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-    >
+     >
       <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
       <span>
         <el-button type="primary" @click="toDel">删除</el-button>
@@ -221,7 +222,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-    >
+     >
       <div style="font-size: 20px; margin-bottom: 30px;">是否禁用人脸</div>
       <span>
         <el-button type="primary" @click="forbiddenFace">禁用</el-button>
@@ -236,7 +237,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-    >
+     >
       <div style="font-size: 20px; margin-bottom: 30px;">是否开通人脸</div>
       <span>
         <el-button type="primary" @click="pushFace">开通</el-button>
@@ -251,7 +252,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-    >
+     >
       <div style="font-size: 20px; margin-bottom: 30px;">
         <el-select v-model="title" placeholder="请选择需要开通的服务" @change="serveChange">
           <el-option
