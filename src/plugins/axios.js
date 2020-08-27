@@ -31,65 +31,64 @@ instance.interceptors.request.use(config => {
 // 响应拦截
 instance.interceptors.response.use(res => {
 	if (res.status === 200) {
-		switch(res.data.code) {
-			case 10001: 
-			Message.warning({
-				message: '请重新登录'
-			})
-			setTimeout(() => {
-				localStorage.removeItem('username')
-				localStorage.removeItem('token')
-				localStorage.removeItem('role')
-				localStorage.removeItem('permissions')
-				window.location.reload()
-				this.$router.replace('/login')
-			}, 1000)
-			break;
+		switch (res.data.code) {
+			case 10001:
+				Message.warning({
+					message: '请重新登录'
+				})
+				setTimeout(() => {
+					localStorage.removeItem('username')
+					localStorage.removeItem('token')
+					localStorage.removeItem('role')
+					localStorage.removeItem('permissions')
+					window.location.reload()
+					this.$router.replace('/login')
+				}, 1000)
+				break;
 			case 10002:
-			Message.warning({
-				message: res.data.toast
-			})
-			break;
+				Message.warning({
+					message: res.data.desc
+				})
+				
+				break;
 			case 10003:
-			Message.warning({
-				message: res.data.toast
-			})
-			break;
+				Message.warning({
+					message: res.data.desc
+				})
+				break;
 			case 10004:
-			Message.warning({
-				message: res.data.toast
-			})
-			break;
+				Message.warning({
+					message: res.data.desc
+				})
+				break;
 			case 10005:
-			Message.warning({
-				message: res.data.toast
-			})
-			break;
-			default: 
-			return res.data
+				Message.warning({
+					message: res.data.desc
+				})
 		}
+		return res.data;
 	}
 }, err => {
 	if (err.response.status) {
 		Message.warning({
-			message: err.response.data.msg
+			message: err.response.data.desc
 		})
 	}
-	if (err.response.data.msg === 'need login') {
-		Message.warning({
-			message: '请重新登录'
-		})
-		localStorage.removeItem('username')
-		localStorage.removeItem('token')
-		localStorage.removeItem('role')
-		localStorage.removeItem('permissions')
-		window.location.reload()
-		this.$router.replace('/login')
-	}
+	// if (err.response.data.msg === 'need login') {
+	// 	Message.warning({
+	// 		message: '请重新登录'
+	// 	})
+	// 	localStorage.removeItem('username')
+	// 	localStorage.removeItem('token')
+	// 	localStorage.removeItem('role')
+	// 	localStorage.removeItem('permissions')
+	// 	window.location.reload()
+	// 	this.$router.replace('/login')
+	// }
 	return Promise.reject(err)
 })
 
-http.get = function(url, data = {}) {
+http.get = function (url, data = {}) {
 	return new Promise((resolve, reject) => {
 		instance.get(url, {
 			params: data
@@ -101,7 +100,7 @@ http.get = function(url, data = {}) {
 	})
 }
 
-http.del = function(url, data = {}) {
+http.del = function (url, data = {}) {
 	return new Promise((resolve, reject) => {
 		instance.delete(url, {
 			params: data
@@ -113,7 +112,7 @@ http.del = function(url, data = {}) {
 	})
 }
 
-http.post = function(url, data) {
+http.post = function (url, data) {
 	return new Promise((resolve, reject) => {
 		instance.post(url, Qs.stringify(data)).then(res => {
 			resolve(res.data)
@@ -123,7 +122,7 @@ http.post = function(url, data) {
 	})
 }
 
-http.put = function(url, data) {
+http.put = function (url, data) {
 	return new Promise((resolve, reject) => {
 		instance.put(url, Qs.stringify(data)).then(res => {
 			resolve(res.data)

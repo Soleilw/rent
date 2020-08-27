@@ -55,6 +55,10 @@ const url = {
 	'Statistics': BaseURL + '/statistics', // 统计
 
 	'Visitors': BaseURL + '/visitors', // 访客
+	'MatchFace': BaseURL + '/match/face', // 手动通过人脸对比
+	'VerifyPerson': BaseURL + '/verify/person', // 手动验证身份
+	'Creation': BaseURL + '/creation/household', // 创建账号
+	'UserInfo': BaseURL + '/user/info', // 通过名字获取用户
 	
 }
 

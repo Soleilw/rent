@@ -25,6 +25,9 @@
           <el-button slot="append" icon="el-icon-search" @click="search(renter_name)"></el-button>
         </el-input>
       </div>
+      <div class="btn">
+        <el-button type="primary" @click="addUser">添加身份</el-button>
+      </div>
     </div>
 
     <!-- 表格数据 -->
@@ -33,7 +36,8 @@
       empty-text="暂无数据"
       border
       :header-cell-style="{background:'#f0f0f0'}"
-     >
+      max-height="620"
+    >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="snapshot.name" label="用户名"></el-table-column>
       <el-table-column prop="typeString" label="用户身份"></el-table-column>
@@ -106,13 +110,13 @@
               <el-dropdown-item>
                 <el-button
                   size="mini"
-                  type="success"
+                  type="primary"
                   @click="openedServe(scope.$index, scope.row)"
                 >已开通的服务</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
-                  type="success"
+                  type="primary"
                   size="mini"
                   @click="handleFace(scope.$index, scope.row)"
                 >开通人脸</el-button>
@@ -123,6 +127,27 @@
                   size="mini"
                   @click="handleForbidden(scope.$index, scope.row)"
                 >禁用人脸</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="handlePassFace(scope.$index, scope.row)"
+                >通过人脸</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="handleVerifyID(scope.$index, scope.row)"
+                >验证身份证</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="handleChangeFace(scope.$index, scope.row)"
+                >更换人脸</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -136,20 +161,25 @@
     <!-- 分页 -->
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="pageSize"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
 
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
-        <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="logsData"
+          border
+          :header-cell-style="{background:'#f0f0f0'}"
+          max-height="620"
+        >
           <el-table-column prop="id" label="ID"></el-table-column>
           <el-table-column prop="number" label="证件号"></el-table-column>
           <el-table-column prop="time" label="时间"></el-table-column>
@@ -180,7 +210,7 @@
       </div>
       <div class="block">
         <el-pagination
-          @current-change="handleCurrentLogs"
+          @current-change="logsCurrent"
           :current-page.sync="currentLogsPage"
           :page-sizes="[10, 20, 30, 40, 50]"
           :page-size="pageSizeLogs"
@@ -207,7 +237,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-     >
+    >
       <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
       <span>
         <el-button type="primary" @click="toDel">删除</el-button>
@@ -222,7 +252,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-     >
+    >
       <div style="font-size: 20px; margin-bottom: 30px;">是否禁用人脸</div>
       <span>
         <el-button type="primary" @click="forbiddenFace">禁用</el-button>
@@ -237,7 +267,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-     >
+    >
       <div style="font-size: 20px; margin-bottom: 30px;">是否开通人脸</div>
       <span>
         <el-button type="primary" @click="pushFace">开通</el-button>
@@ -252,7 +282,7 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-     >
+    >
       <div style="font-size: 20px; margin-bottom: 30px;">
         <el-select v-model="title" placeholder="请选择需要开通的服务" @change="serveChange">
           <el-option
@@ -281,6 +311,209 @@
         </el-table>
       </div>
     </el-dialog>
+
+    <!-- 添加身份 -->
+    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false">
+      <div class="box">
+        <el-form :model="userForm" label-width="80px">
+          <el-form-item label="姓名">
+            <!-- <el-input v-model="form.username" placeholder="请输入姓名"></el-input> -->
+            <el-select
+              v-model="name"
+              placeholder="请输入用户名"
+              filterable
+              @change="userListChange"
+              remote
+              :remote-method="remoteMethod"
+            >
+              <el-option
+                v-for="item in userList"
+                :key="item.value"
+                :label="item.value + ' ' + item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="选择身份">
+            <el-select v-model="userForm.type" placeholder="请选择身份" @change="roleChange">
+              <el-option
+                v-for="item in rolesList"
+                :key="item.type"
+                :label="item.name"
+                :value="item.type"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="选择社区">
+            <el-select
+              v-model="pro_id"
+              placeholder="请选择省份"
+              @change="proChange"
+              style="margin-right: 10px;"
+            >
+              <el-option
+                v-for="item in proList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="city_id"
+              placeholder="请选择市级"
+              @change="cityChange"
+              style="margin-right: 10px;"
+            >
+              <el-option
+                v-for="item in cityList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="areas_id"
+              placeholder="请选择区级"
+              @change="areasChange"
+              style="margin-right: 10px;"
+            >
+              <el-option
+                v-for="item in communityList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="community_id"
+              placeholder="请选择社区"
+              @change="communityChange"
+              style="margin-right: 10px;"
+            >
+              <el-option
+                v-for="item in areaList"
+                :key="item.id"
+                :label="item.title"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="address"
+              placeholder="请选择详细地址"
+              @change="detailAddressChnage"
+              style="margin-right: 10px;"
+              filterable
+            >
+              <el-option
+                v-for="item in detailAddressList"
+                :key="item.id"
+                :label="item.address"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+            <el-select
+              v-model="room_id"
+              placeholder="请选择门牌号"
+              @change="roomIdChange"
+              style="margin-right: 10px;"
+            >
+              <el-option
+                v-for="item in roomList"
+                :key="item.id"
+                :label="item.door_number"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <div class="submit">
+            <el-form-item>
+              <el-button type="primary" @click="newUser">提交</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+    </el-dialog>
+    <!-- 通过人脸 -->
+    <el-dialog
+      :visible.sync="dialogPassFace"
+      title="通过人脸"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否通过人脸</div>
+      <span>
+        <el-button type="primary" @click="passFace">通过</el-button>
+        <el-button type="danger" @click="dialogPassFace = false">取消</el-button>
+      </span>
+    </el-dialog>
+    <!-- 验证身份证 -->
+    <el-dialog
+      :visible.sync="dialogVerify"
+      title="验证身份证"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否通过身份验证</div>
+      <span>
+        <el-button type="primary" @click="verifyID">通过</el-button>
+        <el-button type="danger" @click="dialogVerify = false">取消</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 更换人脸 -->
+    <el-dialog
+      title="更换人脸"
+      :visible.sync="dialogChangeFace"
+      :close-on-click-modal="false"
+      width="500px"
+    >
+      <div class="box">
+        <el-form :model="familyForm">
+          <div class="tips">
+            <p>
+              <span>提示：</span>更换后的人脸照片会覆盖掉原有的人脸照片！
+            </p>
+          </div>
+          <el-form-item label="更换人脸图片">
+            <el-upload
+              action="https://upload-z2.qiniup.com"
+              ref="upload"
+              :limit="1"
+              :before-upload="beforeAvatarUpload"
+              :auto-upload="false"
+              :on-success="handleAvatarSuccess"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :on-change="handleChange"
+              :data="imgData"
+            >
+              <el-button size="small" type="primary">选择图片</el-button>
+            </el-upload>
+            <div v-if="hasNewImage" style="color: red; font-size: 12px;">* 点击文件名可删除所选图片</div>
+
+            <div class="up-img" v-if="old_href">
+              <span style="display: flex;justify-items: center;color: #409eff;">原人脸图片</span>
+              <img class="pic-box" :src="old_href" />
+            </div>
+            <div class="up-img" v-if="familyForm.href">
+              <span style="display: flex;justify-items: center;color: #67C23A;">新人脸图片</span>
+              <img class="pic-box" :src="familyForm.href" />
+            </div>
+            <div class="up-img" v-else>
+              <img class="pic-box" :src="change_href" />
+            </div>
+          </el-form-item>
+          <div class="submit">
+            <el-form-item>
+              <el-button type="primary" @click="changeFace">提交</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -297,9 +530,9 @@ export default {
       },
 
       tableData: [], // 表格数据
-      currentPage: 1, // 分页
-      pageSize: 10,
-      totalPage: 0,
+      current: 1, // 分页
+      size: 10,
+      total: 0,
 
       dialogLogs: false, // 进出记录
       logsData: [],
@@ -348,29 +581,96 @@ export default {
       member_type: "",
       card_number: "",
       check: "",
-      family: "",
+      // family: "",
+      dialogUser: false,
+      userForm: {
+        user_id: "",
+        areas_id: "",
+        type: "",
+        address_id: "",
+        address: "",
+        room_id: "",
+        self: "",
+      },
+      rolesList: [
+        {
+          name: "户主",
+          type: 1,
+        },
+        {
+          name: "租客",
+          type: 2,
+        },
+        {
+          name: "家庭成员",
+          type: 3,
+        },
+        {
+          name: "物业",
+          type: 4,
+        },
+      ],
+      proList: [], // 省级列表
+      pro_id: "",
+      cityList: [], // 市级列表
+      city_id: "",
+      communityList: [], // 区级列表
+      community_id: "",
+      areaList: [], //  社区列表
+      areas_id: "",
+      detailAddressList: [], // 详细地址
+      address_id: "",
+      address: "",
+      roomList: [], // 门牌号
+      room_id: "",
+      user: "",
+      userList: [],
+      userData: [],
+      list: [],
+      dialogPassFace: false,
+      dialogVerify: false,
+      dialogChangeFace: false,
+      imgData: {
+        key: "",
+        token: "",
+      },
+      fileName: "",
+      suffix: "",
+      qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
+      familyForm: {
+        href: "",
+        only_in: "",
+        id: "",
+      },
+      old_href: "", // 原人脸图片
+      change_href: "",
+      hasNewImage: false,
+      new_file: "",
+      name: "",
     };
   },
   mounted() {
     this.getAllRent();
+    this.getPro();
+    this.getUser();
     if (this.username == "admin") {
       this.isShow = true;
     }
   },
   methods: {
+    // 表格数据
     getAllRent() {
       var self = this;
-      API.households(self.currentPage, self.pageSize)
+      API.households(self.current, self.size)
         .then((res) => {
           console.log(res);
           res.data.forEach((item) => {
             if (item.expireTime) {
               item.expireTime = item.expireTime.slice(0, 10);
-              // console.log(item.expireTime);
             }
           });
           self.tableData = res.data;
-          self.totalPage = res.total;
+          self.total = res.total;
           self.loading = false;
         })
         .catch((err) => {
@@ -378,40 +678,265 @@ export default {
           console.log(err);
         });
     },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      if (self.renter_name) {
+        switch (self.type) {
+          case 1:
+            var keyword = self.renter_name;
+            API.searchAddress(val, self.size, keyword).then((res) => {
+              self.tableData = res.data;
+              self.total = res.total;
+            });
+            break;
+          case 2:
+            var name = self.renter_name;
+            API.searchHousehold(val, self.size, name).then((res) => {
+              self.tableData = res.data;
+              self.total = res.total;
+            });
+        }
+      } else {
+        API.households(val, self.size).then((res) => {
+          self.tableData = res.data;
+          self.total = res.total;
+        });
+      }
+    },
+    // 每页几条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      if (self.renter_name) {
+        switch (self.type) {
+          case 1:
+            var keyword = self.renter_name;
+            API.searchAddress(1, val, keyword).then((res) => {
+              self.tableData = res.data;
+              self.total = res.total;
+            });
+            break;
+          case 2:
+            var name = self.renter_name;
+            API.searchHousehold(1, val, name).then((res) => {
+              self.tableData = res.data;
+              self.total = res.total;
+            });
+        }
+      } else {
+        API.households(self.current, val).then((res) => {
+          self.tableData = res.data;
+          self.total = res.total;
+          self.current = 1;
+        });
+      }
+    },
+
+    // 搜索方式
     changeType(val) {
       var self = this;
       self.typeDisabled = true;
       self.renter_name = "";
-      self.currentPage = 1;
+      self.current = 1;
       self.getAllRent();
     },
-
     // 搜索
     search() {
       var self = this;
-      self.currentPage = 1;
-      self.pageSize = 10;
+      self.current = 1;
+      self.size = 10;
       if (self.type == 1) {
         var keyword = self.renter_name;
-        API.searchAddress(self.currentPage, self.pageSize, keyword).then(
-          (res) => {
-            self.tableData = res.data;
-            self.totalPage = res.total;
-            self.$message.success("搜索成功！");
-          }
-        );
+        API.searchAddress(self.current, self.size, keyword).then((res) => {
+          self.tableData = res.data;
+          self.total = res.total;
+          self.$message.success("搜索成功！");
+        });
       }
       if (self.type == 2) {
         var name = self.renter_name;
-        API.searchHousehold(self.currentPage, self.pageSize, name).then(
-          (res) => {
-            self.tableData = res.data;
-            self.totalPage = res.total;
-            self.$message.success("搜索成功！");
-          }
-        );
+        API.searchHousehold(self.current, self.size, name).then((res) => {
+          self.tableData = res.data;
+          self.total = res.total;
+          self.$message.success("搜索成功！");
+        });
       }
     },
+
+  
+    // 获取用户
+    getUser() {
+      var self = this;
+
+      API.userInfo(self.name).then((res) => {
+        self.userData = res;
+        self.list = self.userData.map((item) => {
+          return { label:` ${item.name}` , value: `${item.user_id}`};
+        });
+      });
+    },
+    userListChange(val) {
+      console.log(val);
+      var self = this;
+      self.userForm.user_id = val;
+    },
+    remoteMethod(query) {
+      if (query !== "") {
+        setTimeout(() => {
+          this.userList = this.list.filter((item) => {
+            return item.label.indexOf(query) > -1;
+          });
+        }, 200);
+
+      }
+    },
+    roleChange(value) {
+      var self = this;
+      self.userForm.type = value;
+      console.log(value);
+    },
+    getPro() {
+      var self = this;
+      
+      API.areas(1, 40000, 0).then((res) => {
+        self.proList = res.data;
+      });
+    },
+    getCity(val) {
+      var self = this;
+      API.areas(1, 40000, val).then((res) => {
+        self.cityList = res.data;
+      });
+    },
+    getAreas(val) {
+      var self = this;
+      API.areas(1, 40000, val).then((res) => {
+        console.log("getAreas", res);
+        self.areaList = res.data;
+      });
+    },
+    getCommunity(val) {
+      var self = this;
+      API.areas(1, 100, val).then((res) => {
+        self.communityList = res.data;
+      });
+    },
+    getDetailAddress(val) {
+      var self = this;
+      API.addresses(1, 40000, val).then((res) => {
+        self.detailAddressList = res.data;
+      });
+    },
+    getRoomId(val) {
+      var self = this;
+      API.gainRooms(1, 4000, val).then((res) => {
+        self.roomList = res.data;
+      });
+    },
+    proChange(val) {
+      var self = this;
+      console.log(self.pro_id)
+      self.getCity(val);
+    },
+    cityChange(val) {
+      var self = this;
+
+      self.getCommunity(val);
+    },
+    areasChange(val) {
+      var self = this;
+      self.getAreas(val);
+    },
+    communityChange(val) {
+      var self = this;
+      self.userForm.areas_id = val;
+      self.getDetailAddress(val);
+      self.address = "";
+    },
+    detailAddressChnage(val) {
+      var self = this;
+      self.userForm.address_id = val;
+      console.log(val);
+      self.getRoomId(val);
+      self.room_id = "";
+    },
+    roomIdChange(val) {
+      console.log(val);
+      var self = this;
+      self.userForm.room_id = val;
+    },
+      // 添加身份
+    addUser(index, row) {
+      var self = this;
+      self.dialogUser = true;
+    },
+    newUser() {
+      var self= this;
+      console.log(self.userForm);
+      console.log(self.pro_id , self.city_id , self.community_id , self.areas_id,self.address, self.room_id);
+      // API.creation(self.userForm).then(res => {
+      //   console.log(res);
+      // })
+    },
+
+    // 操作
+    // 通过人脸
+    handlePassFace(index, row) {
+      var self = this;
+      self.dialogPassFace = true;
+      self.user_id = row.user_id;
+      self.member_type = row.type;
+      self.card_number = row.snapshot.card_number;
+      console.log(row);
+    },
+    passFace() {
+      var self = this;
+      if (self.member_type == 3) {
+        API.matchFace(self.user_id, self.card_number).then((res) => {
+          self.dialogPassFace = false;
+          self.$message.success("通过成功");
+        });
+      } else {
+        API.matchFace(self.user_id, 1).then((res) => {
+          self.dialogPassFace = false;
+          self.$message.success("通过成功");
+        });
+      }
+    },
+    // 验证身份证
+    handleVerifyID(index, row) {
+      var self = this;
+      self.dialogVerify = true;
+      self.user_id = row.user_id;
+      self.member_type = row.type;
+      self.card_number = row.snapshot.card_number;
+    },
+    verifyID() {
+      var self = this;
+      if (self.member_type == 3) {
+        API.verifyPerson(self.user_id, self.card_number).then((res) => {
+          self.dialogVerify = false;
+          self.$message.success("通过成功");
+        });
+      } else {
+        API.verifyPerson(self.user_id, 1).then((res) => {
+          self.dialogVerify = false;
+          self.$message.success("通过成功");
+        });
+      }
+    },
+    // 更换人脸
+    handleChangeFace(index, row) {
+      var self = this;
+      self.dialogChangeFace = true;
+    },
+    changeFace() {
+      var self = this;
+    },
+
+    // 开通人脸
     handleFace(index, row) {
       var self = this;
       self.openFace_id = row.id;
@@ -424,6 +949,7 @@ export default {
         self.$message.success("开通成功");
       });
     },
+    // 禁用人脸
     handleForbidden(index, row) {
       var self = this;
       console.log(row);
@@ -491,11 +1017,7 @@ export default {
         }
       }
     },
-    serveChange(val) {
-      var self = this;
-      self.serveForm.product_id = val;
-      console.log(self.serveForm.product_id);
-    },
+
     // 开通服务
     openServe(index, row) {
       var self = this;
@@ -513,6 +1035,11 @@ export default {
         self.serviceLists = res.data;
       });
     },
+    serveChange(val) {
+      var self = this;
+      self.serveForm.product_id = val;
+      console.log(self.serveForm.product_id);
+    },
     // 已开通服务
     openedServe(index, row) {
       var self = this;
@@ -525,7 +1052,6 @@ export default {
         self.serviceList = res;
       });
     },
-
     toConfirm() {
       var self = this;
       console.log(self.serveForm);
@@ -536,6 +1062,8 @@ export default {
         self.title = "";
       });
     },
+
+    // 进出记录
     handleLogs(index, row) {
       var self = this;
       self.dialogLogs = true;
@@ -543,8 +1071,6 @@ export default {
       console.log(row);
       self.getFaceLogs();
     },
-
-    // 进出记录
     getFaceLogs() {
       var self = this;
       API.faceLogs(self.currentLogsPage, self.pageSizeLogs, self.face_id).then(
@@ -556,17 +1082,18 @@ export default {
       );
     },
 
+    // 删除
     handleDel(index, row) {
       var self = this;
       self.id = row.id;
       self.card_number = row.snapshot.card_number;
-      self.family = row.type;
+      self.member_type = row.type;
       self.dialogDel = true;
       console.log(row);
     },
     toDel() {
       var self = this;
-      if (self.family == 3) {
+      if (self.member_type == 3) {
         API.delHousehold(self.id, self.card_number).then((res) => {
           self.$message.success("删除成功");
           self.dialogDel = false;
@@ -581,65 +1108,8 @@ export default {
       }
     },
 
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.currentPage = val;
-      if (self.renter_name) {
-        switch (self.type) {
-          case 1:
-            var keyword = self.renter_name;
-            API.searchAddress(val, self.pageSize, keyword).then((res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-            });
-            break;
-          case 2:
-            var name = self.renter_name;
-            API.searchHousehold(val, self.pageSize, name).then((res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-            });
-        }
-      } else {
-        API.households(val, self.pageSize).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-        });
-      }
-    },
-
-    // 每页几条
-    handleSizeChange(val) {
-      var self = this;
-      self.pageSize = val;
-      if (self.renter_name) {
-        switch (self.type) {
-          case 1:
-            var keyword = self.renter_name;
-            API.searchAddress(1, val, keyword).then((res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-            });
-            break;
-          case 2:
-            var name = self.renter_name;
-            API.searchHousehold(1, val, name).then((res) => {
-              self.tableData = res.data;
-              self.totalPage = res.total;
-            });
-        }
-      } else {
-        API.households(self.currentPage, val).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-          self.currentPage = 1;
-        });
-      }
-    },
-
     // 进出记录
-    handleCurrentLogs(val) {
+    logsCurrent(val) {
       var self = this;
       self.currentLogsPage = val;
       API.faceLogs(val, self.pageSizeLogs, self.face_id).then((res) => {
@@ -653,6 +1123,59 @@ export default {
       API.faceLogs(self.currentLogsPage, val, self.face_id).then((res) => {
         self.logsData = res.data;
       });
+    },
+
+    // 人脸信息
+    handleChange(file) {
+      var self = this;
+      self.change_href = URL.createObjectURL(file.raw);
+      self.hasNewImage = true;
+    },
+    handleRemove(file) {
+      var self = this;
+      self.change_href = "";
+      self.hasNewImage = false;
+    },
+    beforeAvatarUpload(file) {
+      var self = this;
+      // self.familyForm.href = file.name;
+      self.fileName = md5(file.name);
+      self.suffix = file.name.substring(file.name.lastIndexOf(".") + 1);
+      self.imgData.key = `tmp_${self.fileName}.${self.suffix}`;
+    },
+    handleAvatarSuccess(res, file) {
+      var self = this;
+      file.url = `${self.qiniuaddr}/${res.key}`;
+      self.familyForm.href = file.url;
+      API.studentFace(self.familyForm).then((res) => {
+        self.$message.success("上传成功");
+        self.current = 1;
+        self.getStudent();
+        self.$refs.upload.clearFiles();
+        self.familyForm.href = "";
+        self.change_href = "";
+        self.old_href = "";
+        self.imgData.key = "";
+        self.familyForm.user_id = "";
+        self.dialogFace = false;
+      });
+    },
+    handleExceed(file, fileList) {
+      //图片上传超过数量限制
+      var self = this;
+      self.$message.error("上传图片不能超过1张!重新上传");
+      self.$refs.upload.clearFiles();
+      self.familyForm.href = "";
+      self.imgData.key = "";
+      self.familyForm.user_id = "";
+    },
+    getQiniuToken() {
+      var self = this;
+      axios
+        .get("https://api.fengniaotuangou.cn/api/upload/token")
+        .then((res) => {
+          self.imgData.token = res.data.uptoken;
+        });
     },
   },
 };

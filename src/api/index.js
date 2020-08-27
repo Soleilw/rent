@@ -346,6 +346,31 @@ API.visitors = function (page, limit, address_id, room_id) {
 		room_id: room_id
 	})
 }
+// 手动通过人脸对比
+API.matchFace = function (user_id, self) {
+	return axios.post(url.MatchFace, {
+		user_id: user_id,
+		self: self
+	})
+}
+// 手动验证身份
+API.verifyPerson = function (user_id, self) {
+	return axios.post(url.VerifyPerson, {
+		user_id: user_id,
+		self: self
+	})
+}
+// 创建账号
+API.creation = function (data) {
+	return axios.post(url.Creation, data)
+}
+
+// 通过名字获取用户
+API.userInfo = function (name) {
+	return axios.get(url.UserInfo, {
+		name: name
+	})
+}
 
 
 export default API
