@@ -372,5 +372,14 @@ API.userInfo = function (name) {
 	})
 }
 
+// 修改人脸
+API.editFace = function (user_id, self, href) {
+	return axios.post(url.EditFace, {
+		user_id: user_id,
+		self: self,
+		href: href
+	})
+}
+
 
 export default API

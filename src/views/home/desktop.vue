@@ -33,6 +33,7 @@
       empty-text="暂无数据"
       border
       :header-cell-style="{background:'#f0f0f0'}"
+      max-height="620"
     >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column v-if="lets == ''" prop="name" label="房屋地址"></el-table-column>
@@ -52,50 +53,50 @@
     <!-- 分页 全部-->
     <div class="block" v-if="area == '' && lets == ''">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="pageSize"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
     <!-- 分页 社区-->
     <div class="block" v-if="area != '' && lets == ''">
       <el-pagination
-        @current-change="handleArea"
-        :current-page.sync="areaCurrentPage"
+        @current-change="areaCurrentChange"
+        :current-page.sync="areaCurrent"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="areaPageSize"
+        :page-size="areaSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="areaTotalPage"
-        @size-change="handleAreaSize"
+        :total="areaTotal"
+        @size-change="areaSizeChange"
       ></el-pagination>
     </div>
     <!-- 分页 房屋-->
     <div class="block" v-if="area != '' && lets != ''">
       <el-pagination
-        @current-change="handleLets"
-        :current-page.sync="letsCurrentPage"
+        @current-change="letsCurrentchange"
+        :current-page.sync="letsCurrent"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="letsPageSize"
+        :page-size="letsSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="letsTotalPage"
-        @size-change="handleLetsSize"
+        :total="letsTotal"
+        @size-change="letsSizeChange"
       ></el-pagination>
     </div>
 
     <!-- 分页 房屋 社区-->
     <div class="block" v-if="username != 'admin' && lets != ''">
       <el-pagination
-        @current-change="handleLets"
-        :current-page.sync="letsCurrentPage"
+        @current-change="letsCurrentchange"
+        :current-page.sync="letsCurrent"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="letsPageSize"
+        :page-size="letsSize"
         layout="sizes, prev, pager, next, jumper"
-        :total="letsTotalPage"
-        @size-change="handleLetsSize"
+        :total="letsTotal"
+        @size-change="letsSizeChange"
       ></el-pagination>
     </div>
     <!-- 条形统计图 -->
@@ -119,15 +120,15 @@ export default {
     return {
       loading: true,
       tableData: [],
-      currentPage: 1, // 全部 分页
-      pageSize: 10,
-      totalPage: 0,
-      areaCurrentPage: 1, // 社区 分页
-      areaPageSize: 10,
-      areaTotalPage: 0,
-      letsCurrentPage: 1, // 房屋 分页
-      letsPageSize: 10,
-      letsTotalPage: 0,
+      current: 1, // 全部 分页
+      size: 10,
+      total: 0,
+      areaCurrent: 1, // 社区 分页
+      areaSize: 10,
+      areaTotal: 0,
+      letsCurrent: 1, // 房屋 分页
+      letsSize: 10,
+      letsTotal: 0,
       username: localStorage.getItem("username"),
       isAdmin: true,
       area: "",
@@ -219,11 +220,11 @@ export default {
       if (self.username == "admin") {
         self.letList = [];
       }
-      API.statistics(1, self.pageSize)
+      API.statistics(1, self.size)
         .then((res) => {
           self.tableData = res.data;
-          self.totalPage = res.total;
-          self.currentPage = 1;
+          self.total = res.total;
+          self.current = 1;
           self.loading = false;
         })
         .catch((err) => {
@@ -250,11 +251,11 @@ export default {
       var self = this;
       self.area_id = value;
       self.lets = "";
-      API.statistics(1, self.areaPageSize, self.area_id).then((res) => {
+      API.statistics(1, self.areaSize, self.area_id).then((res) => {
         self.tableData = res.data;
-        self.totalPage = res.total;
-        self.currentPage = 1;
-        self.areaCurrentPage = 1;
+        self.areaTotal = res.total;
+        self.current = 1;
+        self.areaCurrent = 1;
       });
       self.getLet();
     },
@@ -263,11 +264,11 @@ export default {
       var self = this;
       console.log(value);
       self.address_id = value;
-      API.statistics(1, self.pageSize, self.area_id, self.address_id).then(
+      API.statistics(1, self.size, self.area_id, self.address_id).then(
         (res) => {
           self.tableData = res.data;
-          self.totalPage = res.total;
-          self.pageSize = 10;
+          self.letsTotal = res.total;
+          self.size = 10;
         }
       );
     },
@@ -339,7 +340,7 @@ export default {
         var pieUserChart = require("echarts").init(pieCharUsertDom);
         pieUserChart.setOption(self.pie);
         if (self.area == "" && self.lets == "" && self.username == "admin") {
-          API.statistics(self.currentPage, self.pageSize).then((res) => {
+          API.statistics(self.current, self.size).then((res) => {
             pieUserChart.setOption(
               (self.pie = {
                 title: {
@@ -370,8 +371,8 @@ export default {
           self.username == "admin"
         ) {
           API.statistics(
-            self.areaCurrentPage,
-            self.areaPageSize,
+            self.areaCurrent,
+            self.areaSize,
             self.area_id
           ).then((res) => {
             pieUserChart.setOption(
@@ -399,7 +400,7 @@ export default {
             );
           });
         } else if (self.username != "admin") {
-          API.statistics(self.currentPage, self.pageSize).then((res) => {
+          API.statistics(self.current, self.size).then((res) => {
             pieUserChart.setOption(
               (self.pie = {
                 title: {
@@ -429,60 +430,60 @@ export default {
     },
 
     // 全部 分页
-    handleCurrentChange(val) {
+    currentChange(val) {
       var self = this;
-      API.statistics(val, self.pageSize).then((res) => {
+      API.statistics(val, self.size).then((res) => {
         self.tableData = res.data;
-        self.totalPage = res.total;
+        self.total = res.total;
       });
     },
     // 每页几条
-    handleSizeChange(val) {
+    sizeChange(val) {
       var self = this;
-      self.pageSize = val;
+      self.size = val;
       API.statistics(1, val).then((res) => {
         self.tableData = res.data;
-        self.totalPage = res.total;
-        self.currentPage = 1;
+        self.total = res.total;
+        self.current = 1;
       });
     },
     // 选择社区后 分页
-    handleArea(val) {
+    areaCurrentChange(val) {
       var self = this;
-      API.statistics(val, self.areaPageSize, self.area_id).then((res) => {
+      API.statistics(val, self.areaSize, self.area_id).then((res) => {
         self.tableData = res.data;
-        self.areaTotalPage = res.total;
+        self.areaTotal = res.total;
       });
     },
-    handleAreaSize(val) {
+    areaSizeChange(val) {
       var self = this;
-      self.areaPageSize = val;
+      self.areaSize = val;
       API.statistics(1, val, self.area_id).then((res) => {
         self.tableData = res.data;
-        self.areaTotalPage = res.total;
-        self.areaCurrentPage = 1;
+        self.areaTotal = res.total;
+        self.areaCurrent = 1;
       });
     },
     // 选择出租屋后 分页
-    handleLets(val) {
+    letsCurrentchange(val) {
       var self = this;
       API.statistics(
         val,
-        self.letsPageSize,
+        self.letsSize,
         self.area_id,
         self.address_id
       ).then((res) => {
         self.tableData = res.data;
-        self.letsTotalPage = res.total;
+        self.letsTotal = res.total;
       });
     },
-    handleLetsSize(val) {
+    letsSizeChange(val) {
       var self = this;
-      self.letsPageSize = val;
+      self.letsSize = val;
       API.statistics(1, val, self.area_id, self.address_id).then((res) => {
         self.tableData = res.data;
-        self.letsTotalPage = res.total;
-        self.letsCurrentPage = 1;
+        self.letsTotal = res.total;
+        self.letsCurrent = 1;
       });
     },
   },

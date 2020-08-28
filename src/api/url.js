@@ -59,6 +59,7 @@ const url = {
 	'VerifyPerson': BaseURL + '/verify/person', // 手动验证身份
 	'Creation': BaseURL + '/creation/household', // 创建账号
 	'UserInfo': BaseURL + '/user/info', // 通过名字获取用户
+	'EditFace': BaseURL + '/edit/href', // 修改人脸
 	
 }
 

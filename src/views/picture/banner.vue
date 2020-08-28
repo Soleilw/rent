@@ -175,6 +175,7 @@ export default {
     },
     handleChange(file) {
       var self = this;
+      console.log(file);
       self.form.href = URL.createObjectURL(file.raw);
       self.hasNewImage = true;
     },

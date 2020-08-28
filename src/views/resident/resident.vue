@@ -210,13 +210,13 @@
       </div>
       <div class="block">
         <el-pagination
-          @current-change="logsCurrent"
-          :current-page.sync="currentLogsPage"
+          @current-change="logsCurrentChange"
+          :current-page.sync="logsCurrent"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeLogs"
+          :page-size="logsSize"
           layout="sizes, prev, pager, next, jumper"
-          :total="totalLogsPage"
-          @size-change="handleSizeLogs"
+          :total="logsTotal"
+          @size-change="logsSizeChange"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -313,7 +313,13 @@
     </el-dialog>
 
     <!-- 添加身份 -->
-    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false">
+    <el-dialog
+      title="添加用户"
+      :visible.sync="dialogUser"
+      width="60%"
+      :close-on-click-modal="false"
+      @close="closeUser"
+    >
       <div class="box">
         <el-form :model="userForm" label-width="80px">
           <el-form-item label="姓名">
@@ -328,8 +334,8 @@
             >
               <el-option
                 v-for="item in userList"
-                :key="item.value"
-                :label="item.value + ' ' + item.label"
+                :key="item.id"
+                :label=" item.label + '' +item.value"
                 :value="item.value"
               ></el-option>
             </el-select>
@@ -479,7 +485,7 @@
           </div>
           <el-form-item label="更换人脸图片">
             <el-upload
-              action="https://upload-z2.qiniup.com"
+              action="https://api.fengniaotuangou.cn/api/upload"
               ref="upload"
               :limit="1"
               :before-upload="beforeAvatarUpload"
@@ -488,7 +494,6 @@
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-change="handleChange"
-              :data="imgData"
             >
               <el-button size="small" type="primary">选择图片</el-button>
             </el-upload>
@@ -520,6 +525,7 @@
 <script>
 import API from "@/api/index.js";
 import { log } from "util";
+import md5 from "blueimp-md5";
 
 export default {
   data() {
@@ -536,9 +542,9 @@ export default {
 
       dialogLogs: false, // 进出记录
       logsData: [],
-      currentLogsPage: 1, // 分页--进出记录
-      pageSizeLogs: 10,
-      totalLogsPage: 0,
+      logsCurrent: 1, // 分页--进出记录
+      logsSize: 10,
+      logsTotal: 0,
       dialogAudit: false, // 审核
       renter_id: "", // 住户id
       renter_name: "", // 搜索
@@ -590,7 +596,15 @@ export default {
         address_id: "",
         address: "",
         room_id: "",
-        self: "",
+        self: 1,
+      },
+      userForms: {
+        user_id: "",
+        areas_id: "",
+        type: "",
+        address_id: "",
+        address: "",
+        self: 1,
       },
       rolesList: [
         {
@@ -601,10 +615,10 @@ export default {
           name: "租客",
           type: 2,
         },
-        {
-          name: "家庭成员",
-          type: 3,
-        },
+        // {
+        //   name: "家庭成员",
+        //   type: 3,
+        // },
         {
           name: "物业",
           type: 4,
@@ -647,6 +661,7 @@ export default {
       hasNewImage: false,
       new_file: "",
       name: "",
+      detailAddress: "",
     };
   },
   mounted() {
@@ -663,7 +678,7 @@ export default {
       var self = this;
       API.households(self.current, self.size)
         .then((res) => {
-          console.log(res);
+          self.loading = false;
           res.data.forEach((item) => {
             if (item.expireTime) {
               item.expireTime = item.expireTime.slice(0, 10);
@@ -671,7 +686,6 @@ export default {
           });
           self.tableData = res.data;
           self.total = res.total;
-          self.loading = false;
         })
         .catch((err) => {
           self.loading = false;
@@ -682,55 +696,95 @@ export default {
     currentChange(val) {
       var self = this;
       self.current = val;
+      self.loading = true;
       if (self.renter_name) {
         switch (self.type) {
           case 1:
             var keyword = self.renter_name;
-            API.searchAddress(val, self.size, keyword).then((res) => {
-              self.tableData = res.data;
-              self.total = res.total;
-            });
+            API.searchAddress(val, self.size, keyword)
+              .then((res) => {
+                self.loading = false;
+                self.tableData = res.data;
+                self.total = res.total;
+              })
+              .catch((err) => {
+                self.loading = false;
+                console.log(err);
+              });
             break;
           case 2:
             var name = self.renter_name;
-            API.searchHousehold(val, self.size, name).then((res) => {
-              self.tableData = res.data;
-              self.total = res.total;
-            });
+            API.searchHousehold(val, self.size, name)
+              .then((res) => {
+                self.loading = false;
+
+                self.tableData = res.data;
+                self.total = res.total;
+              })
+              .catch((err) => {
+                self.loading = false;
+                console.log(err);
+              });
         }
       } else {
-        API.households(val, self.size).then((res) => {
-          self.tableData = res.data;
-          self.total = res.total;
-        });
+        API.households(val, self.size)
+          .then((res) => {
+            self.loading = false;
+
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+            console.log(err);
+          });
       }
     },
     // 每页几条
     sizeChange(val) {
       var self = this;
       self.size = val;
+      self.loading = true;
       if (self.renter_name) {
         switch (self.type) {
           case 1:
             var keyword = self.renter_name;
-            API.searchAddress(1, val, keyword).then((res) => {
-              self.tableData = res.data;
-              self.total = res.total;
-            });
+            API.searchAddress(self.current, val, keyword)
+              .then((res) => {
+                self.loading = false;
+                self.tableData = res.data;
+                self.total = res.total;
+              })
+              .catch((err) => {
+                self.loading = false;
+                console.log(err);
+              });
             break;
           case 2:
             var name = self.renter_name;
-            API.searchHousehold(1, val, name).then((res) => {
-              self.tableData = res.data;
-              self.total = res.total;
-            });
+            API.searchHousehold(self.current, val, name)
+              .then((res) => {
+                self.loading = false;
+
+                self.tableData = res.data;
+                self.total = res.total;
+              })
+              .catch((err) => {
+                self.loading = false;
+                console.log(err);
+              });
         }
       } else {
-        API.households(self.current, val).then((res) => {
-          self.tableData = res.data;
-          self.total = res.total;
-          self.current = 1;
-        });
+        API.households(self.current, val)
+          .then((res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+            console.log(err);
+          });
       }
     },
 
@@ -765,15 +819,16 @@ export default {
       }
     },
 
-  
     // 获取用户
     getUser() {
       var self = this;
-
       API.userInfo(self.name).then((res) => {
         self.userData = res;
         self.list = self.userData.map((item) => {
-          return { label:` ${item.name}` , value: `${item.user_id}`};
+          return {
+            label: ` ${item.card_number + " " + item.name}`,
+            value: `${" " + item.user_id}`,
+          };
         });
       });
     },
@@ -781,6 +836,12 @@ export default {
       console.log(val);
       var self = this;
       self.userForm.user_id = val;
+      self.userForms.user_id = val;
+      let obj = {};
+      obj = this.userList.find((item) => {
+        return item;
+      });
+      self.card_number = obj.label.slice(0, 17);
     },
     remoteMethod(query) {
       if (query !== "") {
@@ -789,30 +850,30 @@ export default {
             return item.label.indexOf(query) > -1;
           });
         }, 200);
-
       }
     },
     roleChange(value) {
       var self = this;
       self.userForm.type = value;
+      self.userForms.type = value;
       console.log(value);
     },
     getPro() {
       var self = this;
-      
-      API.areas(1, 40000, 0).then((res) => {
+
+      API.areas(1, 4000, 0).then((res) => {
         self.proList = res.data;
       });
     },
     getCity(val) {
       var self = this;
-      API.areas(1, 40000, val).then((res) => {
+      API.areas(1, 4000, val).then((res) => {
         self.cityList = res.data;
       });
     },
     getAreas(val) {
       var self = this;
-      API.areas(1, 40000, val).then((res) => {
+      API.areas(1, 4000, val).then((res) => {
         console.log("getAreas", res);
         self.areaList = res.data;
       });
@@ -825,7 +886,7 @@ export default {
     },
     getDetailAddress(val) {
       var self = this;
-      API.addresses(1, 40000, val).then((res) => {
+      API.addresses(1, 4000, val).then((res) => {
         self.detailAddressList = res.data;
       });
     },
@@ -837,48 +898,119 @@ export default {
     },
     proChange(val) {
       var self = this;
-      console.log(self.pro_id)
+      console.log(self.pro_id);
+      let obj = {};
+      obj = this.proList.find((item) => {
+        return item.id === val;
+      });
+      self.detailAddress = obj.title;
       self.getCity(val);
     },
     cityChange(val) {
       var self = this;
-
+      let obj = {};
+      obj = this.cityList.find((item) => {
+        return item.id === val;
+      });
+      self.detailAddress += obj.title;
       self.getCommunity(val);
     },
     areasChange(val) {
       var self = this;
+      let obj = {};
+      obj = this.communityList.find((item) => {
+        return item.id === val;
+      });
+      self.detailAddress += obj.title;
       self.getAreas(val);
     },
     communityChange(val) {
       var self = this;
       self.userForm.areas_id = val;
+      self.userForms.areas_id = val;
+      let obj = {};
+      obj = this.areaList.find((item) => {
+        return item.id === val;
+      });
+      self.detailAddress += obj.title;
       self.getDetailAddress(val);
       self.address = "";
     },
     detailAddressChnage(val) {
       var self = this;
-      self.userForm.address_id = val;
       console.log(val);
+      self.userForm.address_id = val;
+      self.userForms.address_id = val;
+      let obj = {};
+      obj = this.detailAddressList.find((item) => {
+        return item.id === val;
+      });
+      self.detailAddress += obj.address;
       self.getRoomId(val);
       self.room_id = "";
     },
     roomIdChange(val) {
       console.log(val);
       var self = this;
+      let obj = {};
+      obj = this.roomList.find((item) => {
+        return item.id === val;
+      });
+      console.log(obj);
+      self.detailAddress += obj.door_number;
       self.userForm.room_id = val;
     },
-      // 添加身份
+    // 添加身份
     addUser(index, row) {
       var self = this;
       self.dialogUser = true;
     },
+    closeUser() {
+      var self = this;
+      self.pro_id = "";
+      self.city_id = "";
+      self.community_id = "";
+      self.areas_id = "";
+      self.address_id = "";
+      self.address = "";
+      self.room_id = "";
+      self.name = "";
+      self.userForm = {};
+    },
     newUser() {
-      var self= this;
-      console.log(self.userForm);
-      console.log(self.pro_id , self.city_id , self.community_id , self.areas_id,self.address, self.room_id);
-      // API.creation(self.userForm).then(res => {
-      //   console.log(res);
-      // })
+      var self = this;
+      self.userForm.address = self.detailAddress;
+      self.userForms.address = self.detailAddress;
+      if (self.userForm.room_id) {
+        API.creation(self.userForm).then((res) => {
+          self.dialogUser = false;
+          self.$message.success("添加成功");
+          self.getAllRent();
+          self.userForm = {
+            user_id: "",
+            areas_id: "",
+            type: "",
+            address_id: "",
+            address: "",
+            room_id: "",
+            self: 1,
+          };
+        });
+      } else {
+        API.creation(self.userForms).then((res) => {
+          self.dialogUser = false;
+          self.$message.success("添加成功");
+          self.getAllRent();
+          self.userForms = {
+            user_id: "",
+            areas_id: "",
+            type: "",
+            address_id: "",
+            address: "",
+            self: 1,
+          };
+        });
+      }
     },
 
     // 操作
@@ -926,14 +1058,6 @@ export default {
           self.$message.success("通过成功");
         });
       }
-    },
-    // 更换人脸
-    handleChangeFace(index, row) {
-      var self = this;
-      self.dialogChangeFace = true;
-    },
-    changeFace() {
-      var self = this;
     },
 
     // 开通人脸
@@ -1073,13 +1197,29 @@ export default {
     },
     getFaceLogs() {
       var self = this;
-      API.faceLogs(self.currentLogsPage, self.pageSizeLogs, self.face_id).then(
+      API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
         (res) => {
           console.log("getFaceLogs", res);
           self.logsData = res.data;
-          self.totalLogsPage = res.total;
+          self.logsTotal = res.total;
         }
       );
+    },
+    // 进出记录
+    logsCurrentChange(val) {
+      var self = this;
+      self.logsCurrent = val;
+      API.faceLogs(val, self.logsSize, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
+
+    logsSizeChange(val) {
+      var self = this;
+      self.logsSize = val;
+      API.faceLogs(self.logsCurrent, val, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
     },
 
     // 删除
@@ -1108,26 +1248,50 @@ export default {
       }
     },
 
-    // 进出记录
-    logsCurrent(val) {
+    // 更换人脸
+    handleChangeFace(index, row) {
       var self = this;
-      self.currentLogsPage = val;
-      API.faceLogs(val, self.pageSizeLogs, self.face_id).then((res) => {
-        self.logsData = res.data;
-      });
+      self.dialogChangeFace = true;
+      self.user_id = row.user_id;
+      self.member_type = row.type;
+      self.card_number = row.snapshot.card_number;
+      self.old_href = row.snapshot.href;
+      console.log(row);
     },
-
-    handleSizeLogs(val) {
+    changeFace() {
       var self = this;
-      self.pageSizeLogs = val;
-      API.faceLogs(self.currentLogsPage, val, self.face_id).then((res) => {
-        self.logsData = res.data;
-      });
+      if (self.change_href === "") {
+        self.familyForm.href = self.old_href;
+        if (self.member_type == 3) {
+          API.editFace(
+            self.user_id,
+            self.card_number,
+            self.familyForm.href
+          ).then((res) => {
+            self.$message.success("上传成功");
+            self.current = 1;
+            self.getAllRent();
+            self.familyForm.href = "";
+            self.dialogChangeFace = false;
+          });
+        } else {
+          API.editFace(self.user_id, 1, self.href).then((res) => {
+            self.$message.success("上传成功");
+            self.current = 1;
+            self.getAllRent();
+            self.familyForm.href = "";
+            self.dialogChangeFace = false;
+          });
+        }
+      } else {
+        this.$refs.upload.submit();
+      }
     },
 
     // 人脸信息
     handleChange(file) {
       var self = this;
+      console.log(1, file);
       self.change_href = URL.createObjectURL(file.raw);
       self.hasNewImage = true;
     },
@@ -1137,28 +1301,46 @@ export default {
       self.hasNewImage = false;
     },
     beforeAvatarUpload(file) {
-      var self = this;
-      // self.familyForm.href = file.name;
-      self.fileName = md5(file.name);
-      self.suffix = file.name.substring(file.name.lastIndexOf(".") + 1);
-      self.imgData.key = `tmp_${self.fileName}.${self.suffix}`;
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        this.$message.error("上传图片大小不能超过 2MB!");
+      }
+      return isLt2M;
     },
     handleAvatarSuccess(res, file) {
       var self = this;
-      file.url = `${self.qiniuaddr}/${res.key}`;
+      console.log(111, res);
+      file.url = `${res.data}`;
       self.familyForm.href = file.url;
-      API.studentFace(self.familyForm).then((res) => {
-        self.$message.success("上传成功");
-        self.current = 1;
-        self.getStudent();
-        self.$refs.upload.clearFiles();
-        self.familyForm.href = "";
-        self.change_href = "";
-        self.old_href = "";
-        self.imgData.key = "";
-        self.familyForm.user_id = "";
-        self.dialogFace = false;
-      });
+      if (self.member_type == 3) {
+        API.editFace(self.user_id, self.card_number, self.familyForm.href).then(
+          (res) => {
+            self.$message.success("上传成功");
+            self.current = 1;
+            self.getAllRent();
+            self.$refs.upload.clearFiles();
+            self.familyForm.href = "";
+            self.change_href = "";
+            self.old_href = "";
+            self.imgData.key = "";
+            self.familyForm.user_id = "";
+            self.dialogChangeFace = false;
+          }
+        );
+      } else {
+        API.editFace(self.user_id, 1, self.familyForm.href).then((res) => {
+          self.$message.success("上传成功");
+          self.current = 1;
+          self.getAllRent();
+          self.$refs.upload.clearFiles();
+          self.familyForm.href = "";
+          self.change_href = "";
+          self.old_href = "";
+          self.imgData.key = "";
+          self.familyForm.user_id = "";
+          self.dialogChangeFace = false;
+        });
+      }
     },
     handleExceed(file, fileList) {
       //图片上传超过数量限制
@@ -1193,5 +1375,23 @@ export default {
 .service-item {
   margin: 10px;
   padding: 0 10px;
+}
+.upload-btn {
+  margin-top: 10px;
+}
+
+.up-img {
+  display: inline-block;
+  margin: 0 50px;
+}
+
+.pic-box {
+  max-width: 100%;
+  height: 200px;
+}
+
+.tips {
+  margin-bottom: 20px;
+  color: red;
 }
 </style>

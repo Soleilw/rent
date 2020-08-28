@@ -47,31 +47,32 @@ instance.interceptors.response.use(res => {
 				break;
 			case 10002:
 				Message.warning({
-					message: res.data.desc
+					message: res.data.toast
 				})
 				
 				break;
 			case 10003:
 				Message.warning({
-					message: res.data.desc
+					message: res.data.toast
 				})
 				break;
 			case 10004:
 				Message.warning({
-					message: res.data.desc
+					message: res.data.toast
 				})
 				break;
 			case 10005:
 				Message.warning({
-					message: res.data.desc
+					message: res.data.toast
 				})
 		}
 		return res.data;
 	}
 }, err => {
-	if (err.response.status) {
+	console.log(err);
+	if (err) {
 		Message.warning({
-			message: err.response.data.desc
+			message: err
 		})
 	}
 	// if (err.response.data.msg === 'need login') {
