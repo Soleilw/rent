@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addUser">添加用户</el-button>
@@ -40,13 +40,13 @@
 
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
 
@@ -176,6 +176,7 @@ import API from "@/api//index.js";
 export default {
   data() {
     return {
+      loading: true,
       dialogUser: false,
       form: {
         id: "",
@@ -219,8 +220,9 @@ export default {
       id: "", // 删除id
 
       // 分页
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      size: 10,
+      total: 0,
     };
   },
   mounted() {
@@ -232,7 +234,7 @@ export default {
     // 获取社区列表（省市区选中）
     getPro() {
       var self = this;
-      API.areas(self.currentPage, 100, 0).then((res) => {
+      API.areas(self.current, 100, 0).then((res) => {
         self.proList = res.data;
       });
     },
@@ -241,7 +243,7 @@ export default {
     },
     getCity(val) {
       var self = this;
-      API.areas(self.currentPage, 100, val).then((res) => {
+      API.areas(self.current, 100, val).then((res) => {
         self.cityList = res.data;
       });
     },
@@ -250,7 +252,7 @@ export default {
     },
     getCommunity(val) {
       var self = this;
-      API.areas(self.currentPage, 100, val).then((res) => {
+      API.areas(self.current, 100, val).then((res) => {
         self.communityList = res.data;
       });
     },
@@ -263,22 +265,58 @@ export default {
 
     getAreas(val) {
       var self = this;
-      API.areas(self.currentPage, 100, val).then((res) => {
+      API.areas(self.current, 100, val).then((res) => {
         self.areaList = res.data;
       });
     },
 
     getRoles() {
       var self = this;
-      API.getRole(self.currentPage).then((res) => {
-        self.rolesList = res.data;
-      });
+      API.getRole(self.current)
+        .then((res) => {
+          self.loading = false;
+          self.rolesList = res.data;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
     },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.getRole(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.rolesList = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.users(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
     getUsers() {
       var self = this;
-      API.users(self.currentPage).then((res) => {
+      API.users(self.current).then((res) => {
         self.tableData = res.data;
-        self.totalPage = res.total;
+        self.total = res.total;
       });
     },
     addUser() {
@@ -310,7 +348,7 @@ export default {
           self.dialogUser = false;
           self.$message.success("提交成功");
           self.getUsers();
-          self.currentPage = 1;
+          self.current = 1;
           self.form = {};
         });
       } else {
@@ -345,7 +383,7 @@ export default {
           self.dialogResetPassWord = false;
           self.$message.success("修改成功");
           self.getUsers();
-          self.currentPage = 1;
+          self.current = 1;
           self.pwdForm = {};
         });
       } else {
@@ -364,21 +402,7 @@ export default {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getUsers();
-        self.currentPage = 1;
-      });
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getUsers();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.users(self.currentPage, val).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
+        self.current = 1;
       });
     },
   },

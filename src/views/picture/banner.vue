@@ -43,7 +43,7 @@
       </div>
     </el-dialog>
 
-    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <el-table-column prop="id" label="轮播图ID"></el-table-column>
       <el-table-column prop="href" label="缩略图">
         <template slot-scope="scope">
@@ -60,13 +60,13 @@
 
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
 
@@ -102,8 +102,9 @@ export default {
 
       tableDate: [],
 
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      size: 10,
+      total: 0,
       qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
 
       hasNewImage: false,
@@ -120,16 +121,47 @@ export default {
     // 获取轮播图
     getBanner() {
       var self = this;
-      API.banners(self.currentPage)
+      API.banners(self.current)
         .then((res) => {
-          self.tableDate = res.data;
-          self.totalPage = res.total;
           self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
         })
         .catch((err) => {
           self.loading = false;
         });
     },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true
+      API.banners(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.banners(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
     // 操作
     handleDelete(index, row) {
       var self = this;
@@ -143,7 +175,7 @@ export default {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getBanner();
-        self.currentPage = 1;
+        self.current = 1;
       });
     },
     // 上传图片
@@ -187,7 +219,7 @@ export default {
       self.form.href = file.url;
       API.banner(self.form).then((res) => {
         self.$message.success("上传成功");
-        self.currentPage = 1;
+        self.current = 1;
         self.getBanner();
         self.$refs.upload.clearFiles();
         self.form.href = "";
@@ -210,19 +242,6 @@ export default {
         .then((res) => {
           self.imgData.token = res.data.uptoken;
         });
-    },
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getBanner();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.banners(self.currentPage, val).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
     },
   },
 };

@@ -23,6 +23,7 @@
             ></el-option>
           </el-select>
           <el-button slot="append" icon="el-icon-search" @click="search(renter_name)"></el-button>
+          <el-button slot="append" icon="el-icon-refresh" @click="refresh"></el-button>
         </el-input>
       </div>
       <div class="btn">
@@ -528,12 +529,11 @@ import { log } from "util";
 import md5 from "blueimp-md5";
 
 export default {
+  inject: ["reload"],
+
   data() {
     return {
       loading: true,
-      form: {
-        identity: "",
-      },
 
       tableData: [], // 表格数据
       current: 1, // 分页
@@ -545,9 +545,11 @@ export default {
       logsCurrent: 1, // 分页--进出记录
       logsSize: 10,
       logsTotal: 0,
+      
       dialogAudit: false, // 审核
       renter_id: "", // 住户id
       renter_name: "", // 搜索
+
       id: "", // 删除id
       dialogDel: false,
       dialogOpenServe: false,
@@ -570,7 +572,6 @@ export default {
       type: 2, // 选中的搜索方式
       typeList: [
         {
-          // 搜索方式
           value: 1,
           label: "按地址搜索",
         },
@@ -615,10 +616,6 @@ export default {
           name: "租客",
           type: 2,
         },
-        // {
-        //   name: "家庭成员",
-        //   type: 3,
-        // },
         {
           name: "物业",
           type: 4,
@@ -648,8 +645,6 @@ export default {
         key: "",
         token: "",
       },
-      fileName: "",
-      suffix: "",
       qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
       familyForm: {
         href: "",
@@ -701,7 +696,7 @@ export default {
         switch (self.type) {
           case 1:
             var keyword = self.renter_name;
-            API.searchAddress(val, self.size, keyword)
+            API.searchHousehold(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
                 self.tableData = res.data;
@@ -714,7 +709,7 @@ export default {
             break;
           case 2:
             var name = self.renter_name;
-            API.searchHousehold(val, self.size, name)
+            API.searchHousehold(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
 
@@ -749,7 +744,7 @@ export default {
         switch (self.type) {
           case 1:
             var keyword = self.renter_name;
-            API.searchAddress(self.current, val, keyword)
+            API.searchHousehold(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
                 self.tableData = res.data;
@@ -762,10 +757,9 @@ export default {
             break;
           case 2:
             var name = self.renter_name;
-            API.searchHousehold(self.current, val, name)
+            API.searchHousehold(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
-
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -803,20 +797,28 @@ export default {
       self.size = 10;
       if (self.type == 1) {
         var keyword = self.renter_name;
-        API.searchAddress(self.current, self.size, keyword).then((res) => {
-          self.tableData = res.data;
-          self.total = res.total;
-          self.$message.success("搜索成功！");
-        });
+        API.searchHousehold(self.current, self.size, name, keyword).then(
+          (res) => {
+            self.tableData = res.data;
+            self.total = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
       }
       if (self.type == 2) {
         var name = self.renter_name;
-        API.searchHousehold(self.current, self.size, name).then((res) => {
-          self.tableData = res.data;
-          self.total = res.total;
-          self.$message.success("搜索成功！");
-        });
+        API.searchHousehold(self.current, self.size, name, keyword).then(
+          (res) => {
+            self.tableData = res.data;
+            self.total = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
       }
+    },
+    // 刷新
+    refresh() {
+      this.reload();
     },
 
     // 获取用户
@@ -1197,6 +1199,7 @@ export default {
     },
     getFaceLogs() {
       var self = this;
+      self.logsCurrent = 1;
       API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
         (res) => {
           console.log("getFaceLogs", res);
@@ -1213,7 +1216,6 @@ export default {
         self.logsData = res.data;
       });
     },
-
     logsSizeChange(val) {
       var self = this;
       self.logsSize = val;

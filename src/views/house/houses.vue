@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading">
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addHouses" v-if="isShow">添加房屋</el-button>
@@ -13,6 +13,7 @@
           @keyup.enter.native="search(house_id)"
         >
           <el-button slot="append" icon="el-icon-search" @click="search(house_id)"></el-button>
+          <el-button slot="append" icon="el-icon-refresh" @click="refresh"></el-button>
         </el-input>
       </div>
     </div>
@@ -46,7 +47,7 @@
     </el-dialog>
 
     <!-- 表格数据 -->
-    <el-table :data="tableData" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table :data="tableData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column prop="address" label="房屋地址"></el-table-column>
       <el-table-column prop="room_count" label="单元总数"></el-table-column>
@@ -59,6 +60,7 @@
             size="mini"
             @click="handleResident(scope.$index, scope.row)"
           >查看住户信息</el-button>
+          <el-button type="primary" size="mini" @click="handleFace(scope.$index, scope.row)">全库推送人脸</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -68,7 +70,6 @@
       title="查看所有住户信息"
       :visible.sync="dialogResident"
       width="80%"
-      @close="closeShowUser"
       :close-on-click-modal="false"
     >
       <div class="box">
@@ -85,7 +86,12 @@
           </div>
         </div>
         <template v-if="user == '全部'">
-          <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="residentData"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号"></el-table-column>
             <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -147,18 +153,23 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleCurrentResident"
-              :current-page.sync="currentResidentPage"
+              @current-change="residentCurrentChange"
+              :current-page.sync="rensidentCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="pageSizeResident"
+              :page-size="residentSize"
               layout="sizes, prev, pager, next, jumper"
-              :total="totalResidentPage"
-              @size-change="handleSizeResident"
+              :total="residentTotal"
+              @size-change="residentSizeChange"
             ></el-pagination>
           </div>
         </template>
         <template v-if="user == '户主'">
-          <el-table :data="houseOwnerList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="houseOwnerList"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号"></el-table-column>
             <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -221,18 +232,23 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleCurrentHouseOwner"
-              :current-page.sync="houseOwnerCurrentPage"
+              @current-change="HouseOwnerCurrentChange"
+              :current-page.sync="houseOwnerCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="houseOwnerPageSize"
+              :page-size="houseOwnerSize"
               layout="sizes, prev, pager, next, jumper"
-              :total="houseOwnerTotalPage"
-              @size-change="handleSizeHouseOwner"
+              :total="houseOwnerTotal"
+              @size-change="HouseOwnerSizeChange"
             ></el-pagination>
           </div>
         </template>
         <template v-if="user == '租客'">
-          <el-table :data="renterList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="renterList"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号"></el-table-column>
             <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -295,18 +311,23 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleCurrentRenter"
-              :current-page.sync="renterCurrentPage"
+              @current-change="RenterCurrentChange"
+              :current-page.sync="renterCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="renterPageSize"
+              :page-size="renterSize"
               layout="sizes, prev, pager, next, jumper"
-              :total="renterTotalPage"
-              @size-change="handleRenterSize"
+              :total="renterTotal"
+              @size-change="renterSizeChange"
             ></el-pagination>
           </div>
         </template>
         <template v-if="user == '物业'">
-          <el-table :data="managementList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="managementList"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号"></el-table-column>
             <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -369,18 +390,23 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleManagement"
-              :current-page.sync="managementCurrentPage"
+              @current-change="managementCurrntChange"
+              :current-page.sync="managementCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="managementPageSize"
+              :page-size="managementSize"
               layout="sizes, prev, pager, next, jumper"
-              :total="managementTotalPage"
-              @size-change="handlemanagementSize"
+              :total="managementTotal"
+              @size-change="managementSizeChange"
             ></el-pagination>
           </div>
         </template>
         <template v-if="user == '家庭成员'">
-          <el-table :data="familyList" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="familyList"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="room_id" label="房屋编号"></el-table-column>
             <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -442,22 +468,27 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleFamily"
-              :current-page.sync="familyCurrentPage"
+              @current-change="familyCurrentChange"
+              :current-page.sync="familyCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="familyPageSize"
+              :page-size="familySize"
               layout="sizes, prev, pager, next, jumper"
-              :total="familyTotalPage"
-              @size-change="handleFamilySize"
+              :total="familyTotal"
+              @size-change="familySizeChange"
             ></el-pagination>
           </div>
         </template>
       </div>
     </el-dialog>
     <!-- 访客 -->
-    <el-dialog title="访客记录" :visible.sync="dialogVisitor" @close="closeLog">
+    <el-dialog title="访客记录" :visible.sync="dialogVisitor">
       <div class="box">
-        <el-table :data="visitorList" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="visitorList"
+          border
+          :header-cell-style="{background:'#f0f0f0'}"
+          max-height="620"
+        >
           <el-table-column prop="name" label="真实姓名"></el-table-column>
           <el-table-column prop="interviewee_name" label="拜访人"></el-table-column>
           <el-table-column prop="phone" label="手机号"></el-table-column>
@@ -493,13 +524,13 @@
       <!-- 分页 -->
       <div class="block">
         <el-pagination
-          @current-change="handleCurrenVisitor"
-          :current-page.sync="currentVisitorPage"
+          @current-change="visitorCurrentChange"
+          :current-page.sync="visitorCurrent"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeVisitor"
+          :page-size="visitorSize"
           layout="sizes, prev, pager, next, jumper"
-          :total="totalVisitorPage"
-          @size-change="handleSizeVisitor"
+          :total="visitorTotal"
+          @size-change="visitorSizeChange"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -512,7 +543,12 @@
             <el-button type="primary" @click="HandleAddBuild">添加房屋编号</el-button>
           </div>
         </div>
-        <el-table :data="buildingList" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="buildingList"
+          border
+          :header-cell-style="{background:'#f0f0f0'}"
+          max-height="620"
+        >
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -533,13 +569,13 @@
       <!-- 分页 -->
       <div class="block">
         <el-pagination
-          @current-change="handleCurrenBuildingt"
-          :current-page.sync="currentBuildingPage"
+          @current-change="buildingCurrentChange"
+          :current-page.sync="buildingCurrent"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeBuilding"
+          :page-size="buildingSize"
           layout="sizes, prev, pager, next, jumper"
-          :total="totalBuildingPage"
-          @size-change="handleSizeBuilding"
+          :total="buildingTotal"
+          @size-change="buildingSizeChange"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -581,9 +617,14 @@
     </el-dialog>
 
     <!-- 进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogLogs" @close="closeLog">
+    <el-dialog title="进出记录" :visible.sync="dialogLogs">
       <div class="box">
-        <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="logsData"
+          border
+          :header-cell-style="{background:'#f0f0f0'}"
+          max-height="620"
+        >
           <el-table-column prop="id" label="用户ID"></el-table-column>
           <el-table-column prop="number" label="证件号"></el-table-column>
           <el-table-column prop="time" label="时间"></el-table-column>
@@ -614,13 +655,13 @@
       </div>
       <div class="block">
         <el-pagination
-          @current-change="handleCurrentLogs"
-          :current-page.sync="currentLogsPage"
+          @current-change="logsCurrentChange"
+          :current-page.sync="logsCurrent"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeLogs"
+          :page-size="logsSize"
           layout="sizes, prev, pager, next, jumper"
-          :total="totalLogsPage"
-          @size-change="handleSizeLogs"
+          :total="logsTotal"
+          @size-change="logsSizeChange"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -628,7 +669,12 @@
     <!-- 访客进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogVisitorLogs">
       <div class="box">
-        <el-table :data="visitorLogsData" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="visitorLogsData"
+          border
+          :header-cell-style="{background:'#f0f0f0'}"
+          max-height="620"
+        >
           <el-table-column prop="id" label="用户ID"></el-table-column>
           <el-table-column prop="number" label="证件号"></el-table-column>
           <el-table-column prop="time" label="时间"></el-table-column>
@@ -659,13 +705,13 @@
       </div>
       <div class="block">
         <el-pagination
-          @current-change="handleCurrentLogs"
-          :current-page.sync="currentLogsPage"
+          @current-change="logsCurrentChange"
+          :current-page.sync="logsCurrent"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSizeLogs"
+          :page-size="logsSize"
           layout="sizes, prev, pager, next, jumper"
-          :total="totalLogsPage"
-          @size-change="handleSizeLogs"
+          :total="logsTotal"
+          @size-change="logsSizeChange"
         ></el-pagination>
       </div>
     </el-dialog>
@@ -685,16 +731,31 @@
       </span>
     </el-dialog>
 
+    <!-- 全库推送人脸 -->
+    <el-dialog
+      :visible.sync="dialogFace"
+      title="开通人脸"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px;">是否全库推送人脸</div>
+      <span>
+        <el-button type="primary" @click="pushFace">推送</el-button>
+        <el-button type="danger" @click="dialogFace = false">取消</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 分页 -->
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="pageSize"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
   </div>
@@ -709,10 +770,13 @@ export default {
   components: {
     vMap,
   },
+  inject: ["reload"],
+
   data() {
     return {
-      loading: false,
+      loading: true,
       dialogHouses: false,
+      dialogFace: false,
       form: {
         name: "",
         sex: "",
@@ -721,19 +785,18 @@ export default {
 
       tableData: [], // 表格数据
 
-      currentPage: 1, // 分页
-      pageSize: 10,
-      totalPage: 0,
+      current: 1, // 分页
+      size: 10,
+      total: 0,
 
       dialogResident: false, // 查看住户
       residentData: [],
-      currentResidentPage: 1,
-      pageSizeResident: 10,
-      totalResidentPage: 0,
+      rensidentCurrent: 1,
+      residentSize: 10,
+      residentTotal: 0,
       dialogBuild: false, // 房屋编号
       dialogVisitor: false,
-      // rooms: '',
-      // addrooms: [],
+
       buildForm: {
         address_id: "",
         rooms: [],
@@ -770,54 +833,57 @@ export default {
       managementList: [], // 物业列表
       familyList: [],
 
-      houseOwnerCurrentPage: 1, // 户主列表分页
-      houseOwnerPageSize: 10,
-      houseOwnerTotalPage: 0,
+      houseOwnerCurrent: 1, // 户主列表分页
+      houseOwnerSize: 10,
+      houseOwnerTotal: 0,
 
-      renterCurrentPage: 1, // 租客列表分页
-      renterPageSize: 10,
-      renterTotalPage: 0,
+      renterCurrent: 1, // 租客列表分页
+      renterSize: 10,
+      renterTotal: 0,
 
-      managementCurrentPage: 1, //物业列表分页
-      managementPageSize: 10,
-      managementTotalPage: 0,
+      managementCurrent: 1, //物业列表分页
+      managementSize: 10,
+      managementTotal: 0,
 
-      familyCurrentPage: 1, //物业列表分页
-      familyPageSize: 10,
-      familyTotalPage: 0,
+      familyCurrent: 1, //物业列表分页
+      familySize: 10,
+      familyTotal: 0,
 
       dialogLogs: false, // 进出记录
       logsData: [],
-      currentLogsPage: 1,
-      pageSizeLogs: 10,
-      totalLogsPage: 0,
+      logsCurrent: 1,
+      logsSize: 10,
+      logsTotal: 0,
       dialogDel: false,
+
+      dialogAddBuild: false,
+      dialogDelBuild: false,
       buildingList: [], // 楼栋列表
       address_id: "",
-      dialogAddBuild: false,
-      currentBuildingPage: 1, // 分页
-      pageSizeBuilding: 10,
-      totalBuildingPage: 0,
-      dialogDelBuild: false,
+
+      buildingCurrent: 1, // 分页
+      buildingSize: 10,
+      buildingTotal: 0,
       building_id: "",
-      permission: localStorage.getItem("permissions"),
       isShow: false,
-      visitorList: [],
-      currentVisitorPage: 1, // 分页
-      pageSizeVisitor: 10,
-      totalVisitorPage: 0,
+
       dialogVisitorLogs: false,
+      visitorList: [],
+      visitorCurrent: 1, // 分页
+      visitorSize: 10,
+      visitorTotal: 0,
+      
       visitorLogsData: [],
       interviewee_name: "",
       room_id: "",
       familyType: "",
       card_number: "",
+      permission: localStorage.getItem("permissions"),
     };
   },
   mounted() {
     this.getnewHouses();
     var permissionList = this.permission.split(",");
-    // console.log(permissionList.includes('housesAdd'));
     if (permissionList.includes("housesAdd")) {
       this.isShow = true;
     }
@@ -826,30 +892,90 @@ export default {
     // 获取房屋列表
     getnewHouses() {
       var self = this;
-      API.addresses(self.currentPage, self.pageSize).then((res) => {
-        // console.log("获取房屋列表", res.data);
-        self.tableData = res.data;
-        self.totalPage = res.total;
-      });
+      API.addresses(self.current, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
     },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      if (self.house_id == "") {
+        API.addresses(val, self.size)
+          .then((res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+          });
+      } else {
+        API.addresses(val, self.size, 0, self.house_id)
+          .then((res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+          });
+      }
+    },
+    // 每页几条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      if (self.house_id == "") {
+        API.addresses(self.current, val)
+          .then((res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+          });
+      } else {
+        API.addresses(self.current, val, 0, self.house_id)
+          .then((res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+          })
+          .catch((err) => {
+            self.loading = false;
+          });
+      }
+    },
+
     // 搜索
     search() {
       var self = this;
-      API.addresses(self.currentPage, self.pageSize, 0, self.house_id).then(
-        (res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-          // self.house_id = "";
-          self.$message.success("搜索成功！");
-        }
-      );
+      API.addresses(self.current, self.size, 0, self.house_id).then((res) => {
+        self.tableData = res.data;
+        self.total = res.total;
+        // self.house_id = "";
+        self.$message.success("搜索成功！");
+      });
+    },
+    // 刷新
+    refresh() {
+      this.reload();
     },
 
     addHouses() {
       var self = this;
       self.dialogHouses = true;
     },
-
     newHouses() {
       var self = this;
     },
@@ -860,6 +986,7 @@ export default {
       self.dialogBuild = true;
       self.buildForm.address_id = row.id;
       self.address_id = row.id;
+      self.buildingCurrent = 1;
       self.getBuilding();
     },
     HandleAddBuild(index, row) {
@@ -870,13 +997,71 @@ export default {
     getBuilding() {
       var self = this;
       API.gainRooms(
-        self.currentBuildingPage,
-        self.pageSizeBuilding,
+        self.buildingCurrent,
+        self.buildingSize,
         self.address_id
       ).then((res) => {
-        // console.log("获取楼栋信息", res);
         self.buildingList = res.data;
-        self.totalBuildingPage = res.total;
+        self.buildingTotal = res.total;
+      });
+    },
+    // 楼栋管理分页
+    buildingCurrentChange(val) {
+      var self = this;
+      self.buildingCurrent = val;
+      API.gainRooms(val, self.buildingSize, self.address_id).then((res) => {
+        self.buildingList = res.data;
+        self.buildingTotal = res.total;
+      });
+    },
+    buildingSizeChange(val) {
+      var self = this;
+      self.buildingSize = val;
+      API.gainRooms(self.buildingCurrent, val, self.address_id).then((res) => {
+        self.buildingList = res.data;
+        self.buildingTotal = res.total;
+      });
+    },
+
+    // 访客
+    handleVistor(index, row) {
+      var self = this;
+      self.dialogVisitor = true;
+      self.address_id = row.address_id;
+      self.room_id = row.id;
+      self.visitorCurrent = 1;
+      API.visitors(
+        self.visitorCurrent,
+        self.visitorSize,
+        self.address_id,
+        self.room_id
+      ).then((res) => {
+        self.visitorList = res.data;
+        self.visitorTotal = res.total;
+      });
+    },
+    // 访客分页
+    visitorCurrentChange(val) {
+      var self = this;
+      self.visitorCurrent = val;
+      API.visitors(val, self.visitorSize, self.address_id, self.room_id).then(
+        (res) => {
+          self.visitorList = res.data;
+          self.visitorTotal = res.total;
+        }
+      );
+    },
+    visitorSizeChange(val) {
+      var self = this;
+      self.visitorSize = val;
+      API.visitors(
+        self.visitorCurrent,
+        val,
+        self.address_id,
+        self.room_id
+      ).then((res) => {
+        self.visitorList = res.data;
+        self.visitorTotal = res.total;
       });
     },
 
@@ -889,7 +1074,6 @@ export default {
       var self = this;
       self.buildForm.rooms.pop("");
     },
-
     newRooms() {
       var self = this;
       API.rooms(self.buildForm).then((res) => {
@@ -906,16 +1090,15 @@ export default {
       var self = this;
       self.dialogResident = true;
       self.address_id = row.id;
-      console.log(self.house_id);
-      console.log(self.user);
+      self.user = "全部";
+      self.rensidentCurrent = 1;
       API.addressResidents(
-        self.currentResidentPage,
-        self.pageSizeResident,
+        self.rensidentCurrent,
+        self.residentSize,
         self.address_id
       ).then((res) => {
-        console.log("所有", res);
         self.residentData = res.data;
-        self.totalResidentPage = res.total;
+        self.residentTotal = res.total;
       });
     },
     handleUser(value) {
@@ -923,94 +1106,187 @@ export default {
       switch (value) {
         case 0:
           self.$nextTick(() => {
-            self.currentResidentPage = 1;
-            self.pageSizeResident = 10;
+            self.rensidentCurrent = 1;
+            self.residentSize = 10;
             self.user = "全部";
             API.addressResidents(
-              self.currentResidentPage,
-              self.pageSizeResident,
+              self.rensidentCurrent,
+              self.residentSize,
               self.address_id
             ).then((res) => {
               self.residentData = res.data;
-              self.totalResidentPage = res.total;
+              self.residentTotal = res.total;
             });
           });
           break;
         case 1:
           self.$nextTick(() => {
-            self.houseOwnerCurrentPage = 1;
-            self.houseOwnerPageSize = 10;
+            self.houseOwnerCurrent = 1;
+            self.houseOwnerSize = 10;
             self.user = "户主";
             API.addressResidents(
-              self.houseOwnerCurrentPage,
-              self.houseOwnerPageSize,
+              self.houseOwnerCurrent,
+              self.houseOwnerSize,
               self.address_id,
               1
             ).then((res) => {
               console.log("户主", res);
               self.houseOwnerList = res.data;
-              self.houseOwnerTotalPage = res.total;
+              self.houseOwnerTotal = res.total;
             });
           });
           break;
         case 2:
           self.$nextTick(() => {
-            self.renterCurrentPage = 1;
-            self.renterPageSize = 10;
+            self.renterCurrent = 1;
+            self.renterSize = 10;
             self.user = "租客";
             API.addressResidents(
-              self.renterCurrentPage,
-              self.renterPageSize,
+              self.renterCurrent,
+              self.renterSize,
               self.address_id,
               2
             ).then((res) => {
               self.renterList = res.data;
-              self.renterTotalPage = res.total;
+              self.renterTotal = res.total;
             });
           });
           break;
         case 3:
           self.$nextTick(() => {
-            self.managementCurrentPage = 1;
-            self.managementPageSize = 10;
+            self.managementCurrent = 1;
+            self.managementSize = 10;
             self.user = "物业";
             API.addressResidents(
-              self.managementCurrentPage,
-              self.managementPageSize,
+              self.managementCurrent,
+              self.managementSize,
               self.address_id,
               4
             ).then((res) => {
               self.managementList = res.data;
-              self.managementTotalPage = res.total;
+              self.managementTotal = res.total;
             });
           });
           break;
         case 4:
           self.$nextTick(() => {
-            self.familyCurrentPage = 1;
-            self.familyPageSize = 10;
+            self.familyCurrent = 1;
+            self.familySize = 10;
             self.user = "家庭成员";
             API.addressResidents(
-              self.familyCurrentPage,
-              self.familyPageSize,
+              self.familyCurrent,
+              self.familySize,
               self.address_id,
               3
             ).then((res) => {
               self.familyList = res.data;
-              self.familyTotalPage = res.total;
+              self.familyTotal = res.total;
             });
           });
           break;
       }
     },
-    closeShowUser() {
+    // 全部住户分页
+    residentCurrentChange(val) {
       var self = this;
-      self.user = "全部";
-      self.residentData = [];
-      self.houseOwnerList = [];
-      self.renterList = [];
-      self.managementList = [];
-      self.currentResidentPage = 1;
+      self.rensidentCurrent = val;
+      API.addressResidents(val, self.residentSize, self.address_id).then(
+        (res) => {
+          self.residentData = res.data;
+        }
+      );
+    },
+    residentSizeChange(val) {
+      var self = this;
+      self.residentSize = val;
+      API.addressResidents(self.rensidentCurrent, val, self.address_id).then(
+        (res) => {
+          self.residentData = res.data;
+        }
+      );
+    },
+    // 户主分页
+    HouseOwnerCurrentChange(val) {
+      var self = this;
+      self.houseOwnerCurrent = val;
+      API.addressResidents(val, self.houseOwnerSize, self.address_id, 1).then(
+        (res) => {
+          self.houseOwnerList = res.data;
+        }
+      );
+    },
+    HouseOwnerSizeChange(val) {
+      var self = this;
+      self.houseOwnerSize = val;
+      API.addressResidents(
+        self.houseOwnerCurrent,
+        val,
+        self.address_id,
+        1
+      ).then((res) => {
+        self.houseOwnerList = res.data;
+      });
+    },
+    // 租客分页
+    RenterCurrentChange(val) {
+      var self = this;
+      self.renterCurrent = val;
+      API.addressResidents(val, self.renterSize, self.address_id, 2).then(
+        (res) => {
+          self.renterList = res.data;
+        }
+      );
+    },
+    renterSizeChange(val) {
+      var self = this;
+      self.renterSize = val;
+      API.addressResidents(self.renterCurrent, val, self.address_id, 2).then(
+        (res) => {
+          self.renterList = res.data;
+        }
+      );
+    },
+    // 物业分页
+    managementCurrntChange(val) {
+      var self = this;
+      self.managementCurrent = val;
+      API.addressResidents(val, self.managementSize, self.address_id, 4).then(
+        (res) => {
+          self.managementList = res.data;
+        }
+      );
+    },
+    managementSizeChange(val) {
+      var self = this;
+      self.managementSize = val;
+      API.addressResidents(
+        self.managementCurrent,
+        val,
+        self.address_id,
+        4
+      ).then((res) => {
+        self.managementList = res.data;
+      });
+    },
+    // 家庭成员分头
+    familyCurrentChange(val) {
+      var self = this;
+      self.familyCurrent = val;
+      API.addressResidents(val, self.familySize, self.address_id, 3).then(
+        (res) => {
+          self.familyList = res.data;
+        }
+      );
+    },
+    familySizeChange(val) {
+      var self = this;
+      self.familySize = val;
+      API.addressResidents(self.familyCurrent, val, self.address_id, 3).then(
+        (res) => {
+          self.familyList = res.data;
+          self.familyTotal = res.total;
+        }
+      );
     },
 
     // 进出记录
@@ -1018,47 +1294,54 @@ export default {
       var self = this;
       self.dialogLogs = true;
       self.face_id = row.face_id;
-      console.log(row);
+      self.logsCurrent = 1;
       self.getFaceLogs();
     },
     getFaceLogs() {
       var self = this;
-      API.faceLogs(self.currentLogsPage, self.pageSizeLogs, self.face_id).then(
+      API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
         (res) => {
           console.log("getFaceLogs", res);
           self.logsData = res.data;
-          self.totalLogsPage = res.total;
+          self.logsTotal = res.total;
         }
       );
     },
-
-    // 访客
-    handleVistor(index, row) {
+    // 进出记录分页
+    logsCurrentChange(val) {
       var self = this;
-      self.dialogVisitor = true;
-      self.address_id = row.address_id;
-      self.room_id = row.id;
+      self.logsCurrent = val;
+      API.faceLogs(val, self.logsSize, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
+    logsSizeChange(val) {
+      var self = this;
+      self.logsSize = val;
+      API.faceLogs(self.logsCurrent, val, self.face_id).then((res) => {
+        self.logsData = res.data;
+      });
+    },
+
+    // 全库推送人脸
+    handleFace(index, row) {
+      var self = this;
+      self.dialogFace = true;
       console.log(row);
-      API.visitors(1, self.pageSizeVisitor, self.address_id, self.room_id).then(
-        (res) => {
-          console.log("访客", res);
-          self.visitorList = res.data;
-        }
-      );
+      self.address_id = row.id;
+    },
+    pushFace() {
+      var self = this;
+      API.pushAddressFace(self.address_id)
+        .then((res) => {
+          self.$message.success("推送成功");
+          self.dialogFace = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
-    closeLog() {
-      var self = this;
-      self.currentVisitorPage = 1;
-      self.pageSizeVisitor = 10;
-      self.currentLogsPage = 1;
-      self.pageSizeLogs = 10;
-      console.log(111);
-    },
-    handleVisitorLogs(index, row) {
-      var self = this;
-      self.dialogVisitorLogs = true;
-    },
     // 删除--查看住户信息
     handleDel(index, row) {
       var self = this;
@@ -1077,66 +1360,66 @@ export default {
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.currentResidentPage,
-                self.pageSizeResident,
+                self.rensidentCurrent,
+                self.residentSize,
                 self.address_id
               ).then((res) => {
                 console.log("所有", res);
                 self.residentData = res.data;
-                self.totalResidentPage = res.total;
+                self.residentTotal = res.total;
               });
               break;
             case "户主":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.houseOwnerCurrentPage,
-                self.houseOwnerPageSize,
+                self.houseOwnerCurrent,
+                self.houseOwnerSize,
                 self.address_id,
                 1
               ).then((res) => {
                 console.log("户主", res);
                 self.houseOwnerList = res.data;
-                self.houseOwnerTotalPage = res.total;
+                self.houseOwnerTotal = res.total;
               });
               break;
             case "租客":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.renterCurrentPage,
-                self.renterPageSize,
+                self.renterCurrent,
+                self.renterSize,
                 self.address_id,
                 2
               ).then((res) => {
                 self.renterList = res.data;
-                self.renterTotalPage = res.total;
+                self.renterTotal = res.total;
               });
               break;
             case "物业":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.managementCurrentPage,
-                self.managementPageSize,
+                self.managementCurrent,
+                self.managementSize,
                 self.address_id,
                 4
               ).then((res) => {
                 self.managementList = res.data;
-                self.managementTotalPage = res.total;
+                self.managementTotal = res.total;
               });
               break;
             case "家庭成员":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.familyCurrentPage,
-                self.familyPageSize,
+                self.familyCurrent,
+                self.familySize,
                 self.address_id,
                 3
               ).then((res) => {
                 self.familyList = res.data;
-                self.familyTotalPage = res.total;
+                self.familyTotal = res.total;
               });
               break;
           }
@@ -1148,66 +1431,66 @@ export default {
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.currentResidentPage,
-                self.pageSizeResident,
+                self.rensidentCurrent,
+                self.residentSize,
                 self.address_id
               ).then((res) => {
                 console.log("所有", res);
                 self.residentData = res.data;
-                self.totalResidentPage = res.total;
+                self.residentTotal = res.total;
               });
               break;
             case "户主":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.houseOwnerCurrentPage,
-                self.houseOwnerPageSize,
+                self.houseOwnerCurrent,
+                self.houseOwnerSize,
                 self.address_id,
                 1
               ).then((res) => {
                 console.log("户主", res);
                 self.houseOwnerList = res.data;
-                self.houseOwnerTotalPage = res.total;
+                self.houseOwnerTotal = res.total;
               });
               break;
             case "租客":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.renterCurrentPage,
-                self.renterPageSize,
+                self.renterCurrent,
+                self.renterSize,
                 self.address_id,
                 2
               ).then((res) => {
                 self.renterList = res.data;
-                self.renterTotalPage = res.total;
+                self.renterTotal = res.total;
               });
               break;
             case "物业":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.managementCurrentPage,
-                self.managementPageSize,
+                self.managementCurrent,
+                self.managementSize,
                 self.address_id,
                 4
               ).then((res) => {
                 self.managementList = res.data;
-                self.managementTotalPage = res.total;
+                self.managementTotal = res.total;
               });
               break;
             case "家庭成员":
               self.$message.success("删除成功");
               self.dialogDel = false;
               API.addressResidents(
-                self.familyCurrentPage,
-                self.familyPageSize,
+                self.familyCurrent,
+                self.familySize,
                 self.address_id,
                 3
               ).then((res) => {
                 self.familyList = res.data;
-                self.familyTotalPage = res.total;
+                self.familyTotal = res.total;
               });
               break;
           }
@@ -1227,222 +1510,6 @@ export default {
         self.dialogDelBuild = false;
         self.$message.success("删除成功");
         self.getBuilding();
-      });
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.currentPage = val;
-      if (self.house_id == "") {
-        API.addresses(val, self.pageSize).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-        });
-      } else {
-        API.addresses(val, self.pageSize, 0, self.house_id).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-        });
-      }
-    },
-    // 每页几条
-    handleSizeChange(val) {
-      var self = this;
-      self.pageSize = val;
-      if (self.house_id == "") {
-        API.addresses(self.currentPage, val).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-        });
-      } else {
-        API.addresses(self.currentPage, val, 0, self.house_id).then((res) => {
-          self.tableData = res.data;
-          self.totalPage = res.total;
-        });
-      }
-    },
-
-    // 全部住户分页
-    handleCurrentResident(val) {
-      var self = this;
-      self.currentResidentPage = val;
-      API.addressResidents(val, self.pageSizeResident, self.address_id).then(
-        (res) => {
-          self.residentData = res.data;
-        }
-      );
-    },
-    handleSizeResident(val) {
-      var self = this;
-      self.pageSizeResident = val;
-      API.addressResidents(self.currentResidentPage, val, self.address_id).then(
-        (res) => {
-          self.residentData = res.data;
-        }
-      );
-    },
-
-    // 户主分页
-    handleCurrentHouseOwner(val) {
-      var self = this;
-      self.houseOwnerCurrentPage = val;
-      API.addressResidents(
-        val,
-        self.houseOwnerPageSize,
-        self.address_id,
-        1
-      ).then((res) => {
-        self.houseOwnerList = res.data;
-      });
-    },
-    //
-    handleSizeHouseOwner(val) {
-      var self = this;
-      self.houseOwnerPageSize = val;
-      API.addressResidents(
-        self.houseOwnerCurrentPage,
-        val,
-        self.address_id,
-        1
-      ).then((res) => {
-        self.houseOwnerList = res.data;
-      });
-    },
-
-    // 租客分页
-    handleCurrentRenter(val) {
-      var self = this;
-      self.renterCurrentPage = val;
-      API.addressResidents(val, self.renterPageSize, self.address_id, 2).then(
-        (res) => {
-          self.renterList = res.data;
-        }
-      );
-    },
-    handleRenterSize(val) {
-      var self = this;
-      self.renterPageSize = val;
-      API.addressResidents(
-        self.renterCurrentPage,
-        val,
-        self.address_id,
-        2
-      ).then((res) => {
-        self.renterList = res.data;
-      });
-    },
-
-    // 物业分页
-    handleManagement(val) {
-      var self = this;
-      self.managementCurrentPage = val;
-      API.addressResidents(
-        val,
-        self.managementPageSize,
-        self.address_id,
-        4
-      ).then((res) => {
-        self.managementList = res.data;
-      });
-    },
-    handlemanagementSize(val) {
-      var self = this;
-      self.managementPageSize = val;
-      API.addressResidents(
-        self.managementCurrentPage,
-        val,
-        self.address_id,
-        4
-      ).then((res) => {
-        self.managementList = res.data;
-      });
-    },
-    handleFamily(val) {
-      var self = this;
-      self.familyCurrentPage = val;
-      API.addressResidents(
-        val,
-        self.familyPageSize,
-        self.address_id,
-        3
-      ).then((res) => {
-        self.familyList = res.data;
-      });
-    },
-    handleFamilySize(val) {
-      var self = this;
-      self.familyPageSize = val;
-      API.addressResidents(
-        self.familyCurrentPage,
-        val,
-        self.address_id,
-        3
-      ).then((res) => {
-        self.familyList = res.data;
-        self.familyTotalPage = res.total;
-      });
-    },
-
-    // 进出记录分页
-    handleCurrentLogs(val) {
-      var self = this;
-      self.currentLogsPage = val;
-      API.faceLogs(val, self.pageSizeLogs, self.face_id).then((res) => {
-        self.logsData = res.data;
-      });
-    },
-    handleSizeLogs(val) {
-      var self = this;
-      self.pageSizeLogs = val;
-      API.faceLogs(self.currentLogsPage, val, self.face_id).then((res) => {
-        self.logsData = res.data;
-      });
-    },
-
-    // 楼栋管理分页
-    handleCurrenBuildingt(val) {
-      var self = this;
-      self.currentBuildingPage = val;
-      API.gainRooms(val, self.pageSizeBuilding, self.address_id).then((res) => {
-        // console.log("获取楼栋信息", res);
-        self.buildingList = res.data;
-      });
-    },
-    handleSizeBuilding(val) {
-      var self = this;
-      self.pageSizeBuilding = val;
-      API.gainRooms(self.currentBuildingPage, val, self.address_id).then(
-        (res) => {
-          // console.log("获取楼栋信息", res);
-          self.buildingList = res.data;
-        }
-      );
-    },
-    handleCurrenVisitor(val) {
-      var self = this;
-      self.currentVisitorPage = val;
-      API.visitors(
-        val,
-        self.pageSizeVisitor,
-        self.address_id,
-        self.room_id
-      ).then((res) => {
-        console.log("访客", res);
-        self.visitorList = res.data;
-      });
-    },
-    handleSizeVisitor(val) {
-      var self = this;
-      self.pageSizeVisitor = val;
-      API.visitors(
-        self.currentVisitorPage,
-        val,
-        self.address_id,
-        self.room_id
-      ).then((res) => {
-        console.log("访客", res);
-        self.visitorList = res.data;
       });
     },
   },

@@ -1,4 +1,5 @@
 const BaseURL = "https://chu.fengniaotuangou.cn"
+// const BaseURL = "http://192.168.0.103"
 
 const url = {
 	// 登录
@@ -17,6 +18,7 @@ const url = {
 	'AddressResidents': BaseURL + '/address/residents', // 获取住户信息
 	'FaceLogs': BaseURL + '/face/logs', // 获取住户进出记录
 	'DelBuilding': BaseURL + '/room', // 删除楼栋
+	'PushAddressFace': BaseURL + '/push/address/face', // 全库推送人脸
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addMessageType">添加资讯类型</el-button>
@@ -56,13 +56,13 @@
     </el-table>
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
     <!-- 删除提示框 -->
@@ -89,6 +89,7 @@ export default {
   name: "messagetype",
   data() {
     return {
+      loading: true,
       hasNewImage: false,
       dialogMessageType: false,
       dialogDel: false,
@@ -100,8 +101,9 @@ export default {
 
       tableDate: [],
 
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      size: 10,
+      total: 0,
     };
   },
   mounted() {
@@ -110,10 +112,55 @@ export default {
   methods: {
     getMessageType() {
       var self = this;
-      API.messageTypes(self.currentPage).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
+      API.messageTypes(self.current)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.messageTypes(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.messageTypes(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
+    addMessageType() {
+      var self = this;
+      self.dialogMessageType = true;
+      self.hasNewImage = false;
+      self.form.href = "";
+      if (self.$refs.upload) {
+        self.$refs.upload.clearFiles();
+      }
     },
     newMessageType() {
       var self = this;
@@ -122,9 +169,10 @@ export default {
         self.dialogMessageType = false;
         self.getMessageType();
         self.form = {};
-        self.currentPage = 1;
+        self.current = 1;
       });
     },
+
     handleDelete(index, row) {
       var self = this;
       self.dialogDel = true;
@@ -137,18 +185,10 @@ export default {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getMessageType();
-        self.currentPage = 1;
+        self.current = 1;
       });
     },
-    addMessageType() {
-      var self = this;
-      self.dialogMessageType = true;
-      self.hasNewImage = false;
-      self.form.href = "";
-      if (self.$refs.upload) {
-        self.$refs.upload.clearFiles();
-      }
-    },
+
     handleRemove(file, fileList) {
       //移除图片
       var self = this;
@@ -166,9 +206,7 @@ export default {
     handleAvatarSuccess(res, file) {
       var self = this;
       //图片上传成功
-      // self.imageUrl = URL.createObjectURL(file.raw);
       self.$message.success("上传成功");
-      // console.log(file.response.data);
       self.form.href = file.response.data;
       self.hasNewImage = true;
     },
@@ -179,19 +217,6 @@ export default {
       self.$refs.upload.clearFiles();
       self.form.href = "";
       self.form.title = "";
-    },
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getMessageType();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.messageTypes(self.currentPage, val).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
     },
   },
 };

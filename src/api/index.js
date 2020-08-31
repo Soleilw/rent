@@ -55,6 +55,14 @@ API.delBuilding = function (id) {
 	})
 }
 
+// 全库推送人脸
+API.pushAddressFace = function (address_id) {
+	return axios.post(url.PushAddressFace, {
+		address_id: address_id
+	})
+
+}
+
 
 API.households = function (page, limit, user_id, address_id, type, state, room_id, name) {
 	return axios.get(url.Households, {
@@ -87,20 +95,12 @@ API.faceLogs = function (page, limit, face_id) {
 }
 
 
-// 搜索住户--用户名
-API.searchHousehold = function (page, limit, name) {
+// 搜索住户
+API.searchHousehold = function (page, limit, name, keyword) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
-		name: name
-	})
-}
-
-// 搜索住户--地址
-API.searchAddress = function (page, limit, keyword) {
-	return axios.get(url.Households, {
-		page: page,
-		limit: limit,
+		name: name,
 		keyword: keyword
 	})
 }

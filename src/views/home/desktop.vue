@@ -33,6 +33,7 @@
       empty-text="暂无数据"
       border
       :header-cell-style="{background:'#f0f0f0'}"
+      height="580"
       max-height="620"
     >
       <el-table-column prop="id" label="ID"></el-table-column>
@@ -130,7 +131,7 @@ export default {
       letsSize: 10,
       letsTotal: 0,
       username: localStorage.getItem("username"),
-      isAdmin: true,
+      isAdmin: true, // 社区选择--总后台
       area: "",
       areaList: [],
       lets: "",
@@ -220,18 +221,51 @@ export default {
       if (self.username == "admin") {
         self.letList = [];
       }
-      API.statistics(1, self.size)
+      API.statistics(self.current, self.size)
         .then((res) => {
+          self.loading = false;
           self.tableData = res.data;
           self.total = res.total;
           self.current = 1;
-          self.loading = false;
         })
         .catch((err) => {
           self.loading = false;
           console.log(err);
         });
     },
+    // 全部 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.statistics(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+    // 每页几条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.statistics(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+
     // 获取社区
     getArea() {
       var self = this;
@@ -251,26 +285,100 @@ export default {
       var self = this;
       self.area_id = value;
       self.lets = "";
-      API.statistics(1, self.areaSize, self.area_id).then((res) => {
-        self.tableData = res.data;
-        self.areaTotal = res.total;
-        self.current = 1;
-        self.areaCurrent = 1;
-      });
+      self.current = 1;
+      self.areaCurrent = 1;
+      self.loading = true;
+      API.statistics(self.areaCurrent, self.areaSize, self.area_id)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.areaTotal = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
       self.getLet();
     },
+    // 选择社区后 分页
+    areaCurrentChange(val) {
+      var self = this;
+      self.areaCurrent = val;
+      self.loading = true;
+      API.statistics(val, self.areaSize, self.area_id)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.areaTotal = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+    areaSizeChange(val) {
+      var self = this;
+      self.areaSize = val;
+      self.loading = true;
+      API.statistics(self.areaCurrent, val, self.area_id)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.areaTotal = res.total;
+          self.areaCurrent = 1;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+
     // 选择出租屋
     letType(value) {
       var self = this;
       console.log(value);
       self.address_id = value;
-      API.statistics(1, self.size, self.area_id, self.address_id).then(
+      self.loading = true;
+      self.letsCurrent = 1
+      API.statistics(self.letsCurrent, self.letsSize, self.area_id, self.address_id).then(
         (res) => {
+          self.loading =false
           self.tableData = res.data;
           self.letsTotal = res.total;
-          self.size = 10;
         }
-      );
+      ).catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+    // 选择出租屋后 分页
+    letsCurrentchange(val) {
+      var self = this;
+      self.letsCurrent = val
+      self.loading = true
+      API.statistics(val, self.letsSize, self.area_id, self.address_id).then(
+        (res) => {
+          self.loading = false
+          self.tableData = res.data;
+          self.letsTotal = res.total;
+        }
+      ).catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+    letsSizeChange(val) {
+      var self = this;
+      self.letsSize = val;
+      self.loading = true;
+      API.statistics(self.letsCurrent, val, self.area_id, self.address_id).then((res) => {
+        self.loading = false
+        self.tableData = res.data;
+        self.letsTotal = res.total;
+      }).catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
     },
 
     // 总后台 条形图
@@ -297,7 +405,10 @@ export default {
               self.nameList[Math.max(params.dataIndex - zoomSize / 2, 0)],
             endValue:
               self.nameList[
-                Math.min(params.dataIndex + zoomSize / 2, self.nameList.length - 1)
+                Math.min(
+                  params.dataIndex + zoomSize / 2,
+                  self.nameList.length - 1
+                )
               ],
           });
         });
@@ -370,35 +481,33 @@ export default {
           self.lets == "" &&
           self.username == "admin"
         ) {
-          API.statistics(
-            self.areaCurrent,
-            self.areaSize,
-            self.area_id
-          ).then((res) => {
-            pieUserChart.setOption(
-              (self.pie = {
-                title: {
-                  text: res.data[self.num].name,
-                  left: "center",
-                },
-                series: [
-                  {
-                    name: res.data[self.num].name,
-                    data: [
-                      {
-                        value: res.data[self.num].man,
-                        name: "男生人数",
-                      },
-                      {
-                        value: res.data[self.num].woman,
-                        name: "女生人数",
-                      },
-                    ],
+          API.statistics(self.areaCurrent, self.areaSize, self.area_id).then(
+            (res) => {
+              pieUserChart.setOption(
+                (self.pie = {
+                  title: {
+                    text: res.data[self.num].name,
+                    left: "center",
                   },
-                ],
-              })
-            );
-          });
+                  series: [
+                    {
+                      name: res.data[self.num].name,
+                      data: [
+                        {
+                          value: res.data[self.num].man,
+                          name: "男生人数",
+                        },
+                        {
+                          value: res.data[self.num].woman,
+                          name: "女生人数",
+                        },
+                      ],
+                    },
+                  ],
+                })
+              );
+            }
+          );
         } else if (self.username != "admin") {
           API.statistics(self.current, self.size).then((res) => {
             pieUserChart.setOption(
@@ -426,64 +535,6 @@ export default {
             );
           });
         }
-      });
-    },
-
-    // 全部 分页
-    currentChange(val) {
-      var self = this;
-      API.statistics(val, self.size).then((res) => {
-        self.tableData = res.data;
-        self.total = res.total;
-      });
-    },
-    // 每页几条
-    sizeChange(val) {
-      var self = this;
-      self.size = val;
-      API.statistics(1, val).then((res) => {
-        self.tableData = res.data;
-        self.total = res.total;
-        self.current = 1;
-      });
-    },
-    // 选择社区后 分页
-    areaCurrentChange(val) {
-      var self = this;
-      API.statistics(val, self.areaSize, self.area_id).then((res) => {
-        self.tableData = res.data;
-        self.areaTotal = res.total;
-      });
-    },
-    areaSizeChange(val) {
-      var self = this;
-      self.areaSize = val;
-      API.statistics(1, val, self.area_id).then((res) => {
-        self.tableData = res.data;
-        self.areaTotal = res.total;
-        self.areaCurrent = 1;
-      });
-    },
-    // 选择出租屋后 分页
-    letsCurrentchange(val) {
-      var self = this;
-      API.statistics(
-        val,
-        self.letsSize,
-        self.area_id,
-        self.address_id
-      ).then((res) => {
-        self.tableData = res.data;
-        self.letsTotal = res.total;
-      });
-    },
-    letsSizeChange(val) {
-      var self = this;
-      self.letsSize = val;
-      API.statistics(1, val, self.area_id, self.address_id).then((res) => {
-        self.tableData = res.data;
-        self.letsTotal = res.total;
-        self.letsCurrent = 1;
       });
     },
   },

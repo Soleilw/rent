@@ -53,7 +53,12 @@
           </div>
         </div>
         <div>
-          <el-table :data="orderData" border :header-cell-style="{background:'#f0f0f0'}">
+          <el-table
+            :data="orderData"
+            border
+            :header-cell-style="{background:'#f0f0f0'}"
+            max-height="620"
+          >
             <el-table-column prop="no" label="订单ID"></el-table-column>
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
             <el-table-column prop="user_name" label="用户名"></el-table-column>
@@ -71,20 +76,20 @@
           </el-table>
           <div class="block">
             <el-pagination
-              @current-change="handleOrderChange"
-              :current-page.sync="currentOrderPage"
+              @current-change="orderCurrentChange"
+              :current-page.sync="orderCurrent"
               :page-sizes="[10, 20, 30, 40, 50]"
-              :page-size="orderPageSize"
+              :page-size="orderSize"
               layout="sizes, prev, pager, next, jumper"
-              :total="orderTotalPage"
-              @size-change="handleOrderSizeChange"
+              :total="orderTotal"
+              @size-change="orderSizeChange"
             ></el-pagination>
           </div>
         </div>
       </div>
     </el-dialog>
 
-    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <!-- <el-table-column label="名称" type="selection"></el-table-column> -->
       <el-table-column prop="id" label="商品ID" width="100px"></el-table-column>
       <el-table-column prop="title" label="商品名称"></el-table-column>
@@ -96,9 +101,9 @@
       <el-table-column prop="updated_at" label="更新时间"></el-table-column>
       <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
-          <el-button size="mini" type="success" @click="handleEdit(scope.$index,scope.row)">编辑服务</el-button>
-          <el-button size="mini" type="success" @click="handleOrder(scope.$index,scope.row)">服务订单</el-button>
-          <el-button size="mini" type="danger" @click="delservice(scope.$index,scope.row)">删除</el-button>
+          <el-button size="mini" type="primary" @click="handleEdit(scope.$index,scope.row)">编辑服务</el-button>
+          <el-button size="mini" type="primary" @click="handleOrder(scope.$index,scope.row)">服务订单</el-button>
+          <el-button size="mini" type="danger" @click="delService(scope.$index,scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -120,13 +125,13 @@
 
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="pageSize"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
   </div>
@@ -148,8 +153,8 @@ export default {
       serviceIdList: [],
       serviceList: [
         {
-          title: "InAndOut",
           name: "进出服务",
+          title: "InAndOut",
         },
       ],
       form: {
@@ -171,14 +176,14 @@ export default {
         },
       ],
       orderData: [], // 订单列表
-      orderPageSize: 10,
-      orderTotalPage: 0,
-      currentOrderPage: 1,
+      orderSize: 10,
+      orderTotal: 0,
+      orderCurrent: 1,
 
       tableDate: [],
-      currentPage: 1,
-      totalPage: 0,
-      pageSize: 10,
+      current: 1,
+      total: 0,
+      size: 10,
 
       product_id: "",
       id: "",
@@ -192,30 +197,60 @@ export default {
     // 获取服务列表
     getBuys() {
       var self = this;
-      API.buys(self.currentPage, self.pageSize)
+      API.buys(self.current, self.size)
         .then((res) => {
-          self.tableDate = res.data;
-          self.totalPage = res.total;
           self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
         })
         .catch((err) => {
           self.loading = false;
           console.log(err);
         });
     },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.buys(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.buys(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+          console.log(err);
+        });
+    },
+
     // 搜索
     search() {
       var self = this;
-      API.server(
-        self.currentPage,
-        self.pageSize,
-        self.product_id,
-        self.keyword
-      ).then((res) => {
-        self.orderData = res.data;
-        self.orderTotalPage = res.total;
-        self.$message.success("搜索成功！");
-      });
+      API.server(self.current, self.size, self.product_id, self.keyword).then(
+        (res) => {
+          self.orderData = res.data;
+          self.orderTotal = res.total;
+          self.$message.success("搜索成功！");
+        }
+      );
     },
     // 编辑服务
     newBuy() {
@@ -225,7 +260,7 @@ export default {
         self.dialogBuy = false;
         self.$message.success("提交成功");
         self.getBuys();
-        self.currentPage = 1;
+        self.current = 1;
         self.form = {};
         self.form.service = [];
       });
@@ -252,7 +287,6 @@ export default {
     },
     oneChange() {
       var self = this;
-      console.log("oneChange", self.form);
       self.form.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
@@ -263,34 +297,72 @@ export default {
       var self = this;
       self.dialogBuy = true;
       self.form = row;
-      // self.form.service = row.service
-      // self.checkAll = row.service.length >= self.form.service.length;
-      
-      self.form.service.length === 1
+      var row_service = [];
+      row.service.forEach((item) => {
+        row_service.push({
+          title: item.title,
+          name: item.name,
+        });
+      });
+      self.form.service = row_service;
+      row.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
     },
+
     handleOrder(index, row) {
       var self = this;
       self.showServiceOrder = true;
       self.product_id = row.id;
       self.keyword = "";
-      API.server(self.currentPage, self.pageSize, self.product_id).then(
-        (res) => {
-          self.orderData = res.data;
-          self.orderTotalPage = res.total;
-          self.currentOrderPage = 1;
-
-          self.$message.success("获取数据成功");
-        }
-      );
+      API.server(self.current, self.size, self.product_id).then((res) => {
+        self.orderData = res.data;
+        self.orderTotal = res.total;
+        self.orderCurrent = 1;
+        self.$message.success("获取数据成功");
+      });
     },
-    delservice(index, row) {
+    // 订单列表分页
+    orderCurrentChange(val) {
+      var self = this;
+      self.orderCurrent = val;
+      if (self.keyword == "") {
+        API.server(val, self.orderSize, self.product_id).then((res) => {
+          self.orderData = res.data;
+          self.orderTotal = res.total;
+        });
+      } else {
+        API.server(val, self.orderSize, self.product_id, self.keyword).then(
+          (res) => {
+            self.orderData = res.data;
+            self.orderTotal = res.total;
+          }
+        );
+      }
+    },
+    // 当前分页
+    orderSizeChange(val) {
+      var self = this;
+      if (self.keyword == "") {
+        API.server(self.orderCurrent, val, self.product_id).then((res) => {
+          self.orderData = res.data;
+          self.orderTotal = res.total;
+        });
+      } else {
+        API.server(self.orderCurrent, val, self.product_id, self.keyword).then(
+          (res) => {
+            self.orderData = res.data;
+            self.orderTotal = res.total;
+          }
+        );
+      }
+    },
+
+    delService(index, row) {
       var self = this;
       self.id = row.id;
       self.dialogDel = true;
     },
-
     // 删除服务
     toDel() {
       var self = this;
@@ -299,59 +371,6 @@ export default {
         self.dialogDel = false;
         self.getBuys();
       });
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getBuys();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.buys(self.currentPage, val).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
-    },
-    // 订单列表分页
-    handleOrderChange(val) {
-      var self = this;
-      self.currentOrderPage = val;
-      if (self.keyword == "") {
-        API.server(val, self.orderPageSize, self.product_id).then((res) => {
-          self.orderData = res.data;
-          self.orderTotalPage = res.total;
-        });
-      } else {
-        API.server(val, self.orderPageSize, self.product_id, self.keyword).then(
-          (res) => {
-            self.orderData = res.data;
-            self.orderTotalPage = res.total;
-          }
-        );
-      }
-    },
-
-    // 当前分页
-    handleOrderSizeChange(val) {
-      var self = this;
-      if (self.keyword == "") {
-        API.server(self.currentOrderPage, val, self.product_id).then((res) => {
-          self.orderData = res.data;
-          self.orderTotalPage = res.total;
-        });
-      } else {
-        API.server(
-          self.currentOrderPage,
-          val,
-          self.product_id,
-          self.keyword
-        ).then((res) => {
-          self.orderData = res.data;
-          self.orderTotalPage = res.total;
-        });
-      }
     },
   },
 };

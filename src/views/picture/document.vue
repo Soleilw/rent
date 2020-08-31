@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addDocument">添加文档</el-button>
@@ -65,13 +65,13 @@
     </el-dialog>
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
   </div>
@@ -92,6 +92,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       dialogDocument: false,
       form: {
         title: "",
@@ -157,8 +158,9 @@ export default {
       tableDate: [],
       dialogDel: false,
       id: "",
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      size: 10,
+      total: 0,
     };
   },
   mounted() {
@@ -168,22 +170,48 @@ export default {
     // 获取资讯类型
     getDocument() {
       var self = this;
-      API.documents(self.currentPage).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
+      API.documents(self.current)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
     },
-    // 添加文档
-    newDocument() {
+    // 分页
+    currentChange(val) {
       var self = this;
-      API.document(self.form).then((res) => {
-        self.$message.success("提交成功");
-        self.dialogDocument = false;
-        self.getDocument();
-        self.form = {};
-        self.currentPage = 1;
-      });
+      self.current = val;
+      self.loading = true;
+      API.documents(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
     },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.documents(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
+    // 添加文档
     addDocument() {
       var self = this;
       self.dialogDocument = true;
@@ -191,6 +219,16 @@ export default {
         title: "",
         detail: "",
       };
+    },
+    newDocument() {
+      var self = this;
+      API.document(self.form).then((res) => {
+        self.$message.success("提交成功");
+        self.dialogDocument = false;
+        self.getDocument();
+        self.form = {};
+        self.current = 1;
+      });
     },
 
     // 富文本选择图片时的事件
@@ -217,39 +255,25 @@ export default {
       }
     },
 
+    // 操作
     handleEdit(index, row) {
       var self = this;
       self.dialogDocument = true;
       self.form = row;
     },
-    // 操作
+
     handleDelete(index, row) {
       var self = this;
       self.dialogDel = true;
       self.id = row.id;
     },
-
     toDel() {
       var self = this;
       API.delDocument(self.id).then((res) => {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getDocument();
-        self.currentPage = 1;
-      });
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getDocument();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.documents(self.currentPage, val).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
+        self.current = 1;
       });
     },
   },

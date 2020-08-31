@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addRole">添加角色</el-button>
@@ -33,13 +33,13 @@
 
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
 
@@ -49,9 +49,6 @@
           <el-form-item label="角色名称">
             <el-input v-model="form.title" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
           </el-form-item>
-          <!-- 					<el-form-item label="角色名称(中文)">
-						<el-input v-model="form.name" placeholder="请输入角色名" :disabled="disabledRole"></el-input>
-          </el-form-item>-->
           <el-form-item label="选择权限">
             <el-checkbox v-model="checkAll" @change="AllChange">全选</el-checkbox>
             <div class="permission">
@@ -135,14 +132,6 @@
                 <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox>
               </el-checkbox-group>
             </div>
-            <!-- <div class="permission">
-              <el-checkbox-group v-model="form.permissions" class="permission-item">
-                <el-checkbox label="total" @change="oneChange" border>
-                  <span style="font-weight: bold;">统计</span>
-                </el-checkbox>
-                <el-checkbox label="rentersTotal" @change="oneChange">出租屋人数统计</el-checkbox>
-              </el-checkbox-group>
-            </div>-->
           </el-form-item>
           <div class="submit">
             <el-form-item>
@@ -162,6 +151,7 @@ import { log } from "util";
 export default {
   data() {
     return {
+      loading: true,
       dialogRole: false,
       form: {
         title: "",
@@ -230,19 +220,107 @@ export default {
         "manageDel",
         "manageResetPwd", // 重置密码
       ],
+      areaPerson: [
+        "resident", // 住户管理
+        "residentGet", // 获取住户列表
+
+        "house", // 房屋管理
+        "houses",
+        "housesAdd", // 新增房屋
+        "housesGet", // 房屋列表获取
+
+        "picture", // 图文管理
+        "banner", // 轮播图
+        "bannerAdd",
+        "bannerGet",
+        "bannerDel",
+
+        "message", // 资讯管理
+        "messageAdd",
+        "messageGet",
+        "messageDel",
+        "messageEdit",
+        "typeAdd",
+        "typeGet",
+        "typeDel",
+
+        "document", // 文档管理
+        "documentAdd",
+        "documentGet",
+        "documentDel",
+        "documentEdit",
+
+        "suspected", // 可疑人物
+
+        "permission", // 角色管理
+        "roleGet",
+        "roleAdd",
+        "roleEdit",
+        "roleDel",
+        "manageGet",
+        "manageAdd",
+        "manageEdit",
+        "manageDel",
+        "manageResetPwd", // 重置密码
+      ],
 
       dialogDel: false,
       id: "", // 删除id
       disabledRole: false,
       // 分页
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      size: 10,
+      total: 0,
+      role: localStorage.getItem("role"),
     };
   },
   mounted() {
     this.getRoles();
   },
   methods: {
+    getRoles() {
+      var self = this;
+      API.getRole(self.current)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.getRole(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.getRole(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
     addRole() {
       var self = this;
       self.dialogRole = true;
@@ -257,13 +335,6 @@ export default {
         self.form.permissions = self.checkAll ? self.permissionList : [];
       }
     },
-    getRoles() {
-      var self = this;
-      API.getRole(self.currentPage).then((res) => {
-        self.tableData = res.data;
-        self.totalPage = res.total;
-      });
-    },
     newRole() {
       var self = this;
       self.form.name = self.form.title;
@@ -272,7 +343,7 @@ export default {
         self.dialogRole = false;
         self.$message.success("提交成功");
         self.getRoles();
-        self.currentPage = 1;
+        self.current = 1;
         self.form = {};
         self.form.permissions = [];
       });
@@ -288,7 +359,14 @@ export default {
     },
     AllChange(val) {
       var self = this;
-      self.form.permissions = val ? self.permissionList : [];
+      if (
+        localStorage.getItem("username") == "admin" &&
+        self.form.name == "admin"
+      ) {
+        self.form.permissions = val ? self.permissionList : [];
+      } else {
+        self.form.permissions = val ? self.areaPerson : [];
+      }
     },
     oneChange(val) {
       var self = this;
@@ -308,22 +386,8 @@ export default {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getRoles();
-        self.currentPage = 1;
+        self.current = 1;
       });
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getRoles();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      // API.roles(self.currentPage, val).then(res => {
-      // 	self.tableData = res.data;
-      // 	self.totalPage = res.total;
-      // });
     },
   },
 };

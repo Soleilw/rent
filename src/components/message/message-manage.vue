@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
         <el-button type="primary" @click="addMessageMs">添加资讯</el-button>
       </div>
     </div>
 
-    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}">
+    <el-table :data="tableDate" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <el-table-column prop="id" label="资讯ID"></el-table-column>
       <el-table-column prop="type.title" label="资讯类型"></el-table-column>
       <!-- <el-table-column prop="detail" label="资讯描述"></el-table-column> -->
@@ -29,20 +29,20 @@
       <el-table-column prop="updated_at" label="更新时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="success" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="block">
       <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
+        @current-change="currentChange"
+        :current-page.sync="current"
         :page-sizes="[10, 20, 30, 40, 50]"
-        :page-size="10"
+        :page-size="size"
         layout="sizes, prev, pager, next, jumper"
-        :total="totalPage"
-        @size-change="handleSizeChange"
+        :total="total"
+        @size-change="sizeChange"
       ></el-pagination>
     </div>
 
@@ -141,6 +141,7 @@ export default {
   },
   data() {
     return {
+      loading: true,
       hasNewImage: false,
       disabled: false,
       dialogMessageMs: false,
@@ -224,8 +225,9 @@ export default {
 
       tableDate: [],
 
-      currentPage: 1,
-      totalPage: 0,
+      current: 1,
+      total: 0,
+      size: 10,
       imageUrl: "",
       is_show: 2,
       name: "",
@@ -239,18 +241,71 @@ export default {
     // 获取资讯类型
     getMessageType() {
       var self = this;
-      API.messageTypes(self.currentPage).then((res) => {
+      API.messageTypes(1).then((res) => {
         self.typeList = res.data;
       });
     },
     // 获取资讯内容
     getMessages() {
       var self = this;
-      API.messages(self.currentPage).then((res) => {
-        console.log("res.data", res.data);
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
+      API.messages(self.current)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 分页
+    currentChange(val) {
+      var self = this;
+      self.current = val;
+      self.loading = true;
+      API.messages(val, self.size)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+    // 每页多少条
+    sizeChange(val) {
+      var self = this;
+      self.size = val;
+      self.loading = true;
+      API.messages(self.current, val)
+        .then((res) => {
+          self.loading = false;
+          self.tableDate = res.data;
+          self.total = res.total;
+        })
+        .catch((err) => {
+          self.loading = false;
+        });
+    },
+
+    // 添加资讯文档
+    addMessageMs() {
+      var self = this;
+      self.dialogMessageMs = true;
+      self.hasNewImage = false;
+      self.form = {
+        id: "",
+        type_id: "",
+        title: "",
+        detail: "",
+        cover: "",
+        is_show: "",
+      };
+      self.imageUrl = "";
+      if (self.$refs.upload) {
+        self.$refs.upload.clearFiles();
+      }
     },
     typeChange(val) {
       this.form.type_id = val;
@@ -272,29 +327,10 @@ export default {
       API.message(self.form).then((res) => {
         self.$message.success("提交成功");
         self.dialogMessageMs = false;
-        self.currentPage = 1;
+        self.current = 1;
         self.getMessages();
         self.form = {};
       });
-    },
-
-    // 添加资讯文档
-    addMessageMs() {
-      var self = this;
-      self.dialogMessageMs = true;
-      self.hasNewImage = false;
-      self.form = {
-        id: "",
-        type_id: "",
-        title: "",
-        detail: "",
-        cover: "",
-        is_show: "",
-      };
-      self.imageUrl = "";
-      if (self.$refs.upload) {
-        self.$refs.upload.clearFiles();
-      }
     },
     handleEdit(index, row) {
       var self = this;
@@ -308,6 +344,7 @@ export default {
         is_show: row.is_show,
       };
     },
+
     handleDelete(index, row) {
       var self = this;
       self.dialogDel = true;
@@ -319,9 +356,10 @@ export default {
         self.$message.success("删除成功");
         self.dialogDel = false;
         self.getMessages();
-        self.currentPage = 1;
+        self.current = 1;
       });
     },
+    
     // 富文本选择图片时的事件
     beforeUpload() {
       // 显示加载动画
@@ -373,20 +411,6 @@ export default {
       self.$message.error("上传图片不能超过1张!");
       self.$refs.upload.clearFiles();
       self.imageUrl = "";
-    },
-
-    // 分页
-    handleCurrentChange(val) {
-      var self = this;
-      self.getMessages();
-    },
-    // 每页多少条
-    handleSizeChange(val) {
-      var self = this;
-      API.messages(self.currentPage, val).then((res) => {
-        self.tableDate = res.data;
-        self.totalPage = res.total;
-      });
     },
   },
 };
