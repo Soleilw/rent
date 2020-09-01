@@ -93,7 +93,7 @@
             max-height="620"
           >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -171,7 +171,7 @@
             max-height="620"
           >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -250,7 +250,7 @@
             max-height="620"
           >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -329,7 +329,7 @@
             max-height="620"
           >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -408,7 +408,7 @@
             max-height="620"
           >
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="room_id" label="房屋编号"></el-table-column>
+            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
