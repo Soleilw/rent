@@ -33,7 +33,6 @@
       empty-text="暂无数据"
       border
       :header-cell-style="{background:'#f0f0f0'}"
-      height="580"
       max-height="620"
     >
       <el-table-column prop="id" label="ID"></el-table-column>

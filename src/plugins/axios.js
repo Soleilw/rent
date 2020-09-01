@@ -11,7 +11,7 @@ var Qs = require('qs')
 const http = {}
 
 const instance = axios.create({
-	timeout: 5000,
+	timeout: 30000,
 	headers: {
 		'Content-Type': 'application/x-www-form-urlencoded'
 	}
