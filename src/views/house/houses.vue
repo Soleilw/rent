@@ -734,7 +734,7 @@
     <!-- 全库推送人脸 -->
     <el-dialog
       :visible.sync="dialogFace"
-      title="开通人脸"
+      title="全库推送人脸"
       width="20%"
       align="center"
       :close-on-click-modal="false"
@@ -872,7 +872,7 @@ export default {
       visitorCurrent: 1, // 分页
       visitorSize: 10,
       visitorTotal: 0,
-      
+
       visitorLogsData: [],
       interviewee_name: "",
       room_id: "",
@@ -1332,8 +1332,15 @@ export default {
     },
     pushFace() {
       var self = this;
+      const loading = this.$loading({
+        lock: true,
+        text: "推送中...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       API.pushAddressFace(self.address_id)
         .then((res) => {
+          loading.close();
           self.$message.success("推送成功");
           self.dialogFace = false;
         })
