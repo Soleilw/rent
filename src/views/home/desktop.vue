@@ -2,8 +2,9 @@
   <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
-        <el-button type="primary" @click="getSstatistics">全部</el-button>
+        <el-button slot="append" icon="el-icon-refresh" @click="refresh"></el-button>
       </div>
+
       <div class="btn" v-if="isAdmin">
         <span>社区：</span>
         <el-select v-model="area" placeholder="请选择社区" @change="changeAreaType">
@@ -34,6 +35,7 @@
       border
       :header-cell-style="{background:'#f0f0f0'}"
       max-height="620"
+      height="580"
     >
       <el-table-column prop="id" label="ID"></el-table-column>
       <el-table-column v-if="lets == ''" prop="name" label="房屋地址"></el-table-column>
@@ -116,6 +118,8 @@ import { log } from "util";
 require("echarts");
 
 export default {
+  inject: ["reload"],
+
   data() {
     return {
       loading: true,
@@ -212,6 +216,10 @@ export default {
     }
   },
   methods: {
+    // 刷新
+    refresh() {
+      this.reload();
+    },
     // 获取统计列表
     getSstatistics() {
       var self = this;
@@ -338,14 +346,19 @@ export default {
       console.log(value);
       self.address_id = value;
       self.loading = true;
-      self.letsCurrent = 1
-      API.statistics(self.letsCurrent, self.letsSize, self.area_id, self.address_id).then(
-        (res) => {
-          self.loading =false
+      self.letsCurrent = 1;
+      API.statistics(
+        self.letsCurrent,
+        self.letsSize,
+        self.area_id,
+        self.address_id
+      )
+        .then((res) => {
+          self.loading = false;
           self.tableData = res.data;
           self.letsTotal = res.total;
-        }
-      ).catch((err) => {
+        })
+        .catch((err) => {
           self.loading = false;
           console.log(err);
         });
@@ -353,15 +366,15 @@ export default {
     // 选择出租屋后 分页
     letsCurrentchange(val) {
       var self = this;
-      self.letsCurrent = val
-      self.loading = true
-      API.statistics(val, self.letsSize, self.area_id, self.address_id).then(
-        (res) => {
-          self.loading = false
+      self.letsCurrent = val;
+      self.loading = true;
+      API.statistics(val, self.letsSize, self.area_id, self.address_id)
+        .then((res) => {
+          self.loading = false;
           self.tableData = res.data;
           self.letsTotal = res.total;
-        }
-      ).catch((err) => {
+        })
+        .catch((err) => {
           self.loading = false;
           console.log(err);
         });
@@ -370,11 +383,13 @@ export default {
       var self = this;
       self.letsSize = val;
       self.loading = true;
-      API.statistics(self.letsCurrent, val, self.area_id, self.address_id).then((res) => {
-        self.loading = false
-        self.tableData = res.data;
-        self.letsTotal = res.total;
-      }).catch((err) => {
+      API.statistics(self.letsCurrent, val, self.area_id, self.address_id)
+        .then((res) => {
+          self.loading = false;
+          self.tableData = res.data;
+          self.letsTotal = res.total;
+        })
+        .catch((err) => {
           self.loading = false;
           console.log(err);
         });
