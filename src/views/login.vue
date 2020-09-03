@@ -2,7 +2,7 @@
 	<div class="login-wrap">
 		<div class="login">
 			<div class="title">
-				出租屋安全后台管理
+				出租屋后台管理
 			</div>
 			<!-- 	<el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="3vw" class="form_info">
 					<el-form-item prop="username" label="账号">

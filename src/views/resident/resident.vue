@@ -463,9 +463,9 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否通过身份验证</div>
+      <div style="font-size: 20px; margin-bottom: 30px;">是否进行身份验证</div>
       <span>
-        <el-button type="primary" @click="verifyID">通过</el-button>
+        <el-button type="primary" @click="verifyID">验证</el-button>
         <el-button type="danger" @click="dialogVerify = false">取消</el-button>
       </span>
     </el-dialog>
@@ -1049,15 +1049,23 @@ export default {
     },
     verifyID() {
       var self = this;
+        const loading = self.$loading({
+          lock: true,
+          text: "验证中...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
       if (self.member_type == 3) {
         API.verifyPerson(self.user_id, self.card_number).then((res) => {
+          loading.close();
           self.dialogVerify = false;
-          self.$message.success("通过成功");
+          self.$message.success("验证成功");
         });
       } else {
         API.verifyPerson(self.user_id, 1).then((res) => {
+          loading.close();
           self.dialogVerify = false;
-          self.$message.success("通过成功");
+          self.$message.success("验证成功");
         });
       }
     },

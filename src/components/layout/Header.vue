@@ -5,7 +5,7 @@
 				<img src="../../assets/image/logo.png" alt="">
 			</div>
 			<div class="title">
-				<span>出租屋安全后台管理</span>
+				<span>出租屋后台管理</span>
 			</div>
 			<!-- 折叠按钮 -->
 			<div class="collapse-btn" @click="collapseChage">

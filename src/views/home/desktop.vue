@@ -29,29 +29,30 @@
       </div>
     </div>
     <!-- 表格数据 -->
-    <el-table
-      :data="tableData"
-      empty-text="暂无数据"
-      border
-      :header-cell-style="{background:'#f0f0f0'}"
-      max-height="620"
-      height="580"
-    >
-      <el-table-column prop="id" label="ID"></el-table-column>
-      <el-table-column v-if="lets == ''" prop="name" label="房屋地址"></el-table-column>
-      <el-table-column v-else prop="name" label="单元编号"></el-table-column>
-      <el-table-column prop="count" label="人口总数"></el-table-column>
-      <el-table-column prop="man" label="男性人数"></el-table-column>
-      <el-table-column prop="woman" label="女性人数"></el-table-column>
-      <el-table-column v-if="lets == ''" prop="wait_state" label="待审核人数"></el-table-column>
-      <el-table-column v-if="lets == ''" prop="already_state" label="审核通过人数"></el-table-column>
-      <el-table-column v-if="lets == ''" prop="no_state" label="审核未通过人数"></el-table-column>
-      <el-table-column label="操作" width="250px" v-if="lets == ''">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="openedPie(scope.$index, scope.row)">查看男女比例</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="table_box">
+      <el-table
+        :data="tableData"
+        empty-text="暂无数据"
+        border
+        :header-cell-style="{background:'#f0f0f0'}"
+        max-height="620"
+      >
+        <el-table-column prop="id" label="ID"></el-table-column>
+        <el-table-column v-if="lets == ''" prop="name" label="房屋地址"></el-table-column>
+        <el-table-column v-else prop="name" label="单元编号"></el-table-column>
+        <el-table-column prop="count" label="人口总数"></el-table-column>
+        <el-table-column prop="man" label="男性人数"></el-table-column>
+        <el-table-column prop="woman" label="女性人数"></el-table-column>
+        <el-table-column v-if="lets == ''" prop="wait_state" label="待审核人数"></el-table-column>
+        <el-table-column v-if="lets == ''" prop="already_state" label="审核通过人数"></el-table-column>
+        <el-table-column v-if="lets == ''" prop="no_state" label="审核未通过人数"></el-table-column>
+        <el-table-column label="操作" width="250px" v-if="lets == ''">
+          <template slot-scope="scope">
+            <el-button type="primary" size="mini" @click="openedPie(scope.$index, scope.row)">查看男女比例</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <!-- 分页 全部-->
     <div class="block" v-if="area == '' && lets == ''">
       <el-pagination
@@ -566,5 +567,10 @@ export default {
 #pie-chart-user {
   width: 800px;
   height: 500px;
+}
+.table_box {
+  width: 100%;
+  height: 620px;
+  box-shadow: 1px 1px 5px #ccc;
 }
 </style>
