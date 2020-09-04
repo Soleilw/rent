@@ -32,7 +32,7 @@
           </el-form-item>
           <div class="submit">
             <el-form-item>
-              <el-button type="primary" @click="newBuy">提交</el-button>
+              <el-button type="primary" @click="newBuy" v-if="isAdd">提交</el-button>
             </el-form-item>
           </div>
         </el-form>
@@ -101,7 +101,7 @@
       <el-table-column prop="updated_at" label="更新时间"></el-table-column>
       <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="handleEdit(scope.$index,scope.row)">编辑服务</el-button>
+          <el-button size="mini" type="primary" @click="handleEdit(scope.$index,scope.row)">查看服务</el-button>
           <el-button size="mini" type="primary" @click="handleOrder(scope.$index,scope.row)">服务订单</el-button>
           <el-button size="mini" type="danger" @click="delService(scope.$index,scope.row)">删除</el-button>
         </template>
@@ -188,6 +188,7 @@ export default {
       product_id: "",
       id: "",
       keyword: "",
+      isAdd: true,
     };
   },
   mounted() {
@@ -271,6 +272,7 @@ export default {
       var self = this;
       self.dialogBuy = true;
       self.checkAll = false;
+      self.isAdd = true;
       self.form = {
         title: "",
         price: "",
@@ -296,6 +298,7 @@ export default {
     handleEdit(index, row) {
       var self = this;
       self.dialogBuy = true;
+      self.isAdd = false
       self.form = row;
       var row_service = [];
       row.service.forEach((item) => {
@@ -305,6 +308,7 @@ export default {
         });
       });
       self.form.service = row_service;
+      self.serviceList = row_service
       row.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
