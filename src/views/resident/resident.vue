@@ -545,7 +545,7 @@ export default {
       logsCurrent: 1, // 分页--进出记录
       logsSize: 10,
       logsTotal: 0,
-      
+
       dialogAudit: false, // 审核
       renter_id: "", // 住户id
       renter_name: "", // 搜索
@@ -1049,12 +1049,12 @@ export default {
     },
     verifyID() {
       var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "验证中...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+      const loading = self.$loading({
+        lock: true,
+        text: "验证中...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       if (self.member_type == 3) {
         API.verifyPerson(self.user_id, self.card_number).then((res) => {
           loading.close();
@@ -1180,8 +1180,9 @@ export default {
       self.dialogOpenedServe = true;
       console.log("openedServe", row);
       self.user_id = row.user_id;
+      self.member_type = row.type;
       self.addresses_id = row.address_id;
-      API.userServes(self.user_id, self.addresses_id).then((res) => {
+      API.userServes(self.user_id, self.addresses_id, self.member_type).then((res) => {
         console.log(res);
         self.serviceList = res;
       });

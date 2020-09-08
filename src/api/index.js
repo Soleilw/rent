@@ -272,10 +272,11 @@ API.setProduct = function (data) {
 }
 
 // 获取开通的服务 
-API.userServes = function (user_id, addresses_id) {
+API.userServes = function (user_id, addresses_id, type) {
 	return axios.get(url.UserServes, {
 		user_id: user_id,
-		addresses_id: addresses_id
+		addresses_id: addresses_id,
+		type: type
 	})
 }
 

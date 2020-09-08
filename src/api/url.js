@@ -1,5 +1,5 @@
 const BaseURL = "https://chu.fengniaotuangou.cn"
-// const BaseURL = "http://192.168.0.106"
+// const BaseURL = "http://192.168.0.104"
 
 const url = {
 	// 登录
