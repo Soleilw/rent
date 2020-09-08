@@ -563,6 +563,7 @@ export default {
         area_id: "",
         product_id: "",
         address_id: "",
+        type: ''
       },
       user_id: "",
       addresses_id: "",
@@ -1163,6 +1164,7 @@ export default {
         areas_id: row.address.area_id,
         product_id: self.product_id,
         addresses_id: row.address_id,
+        type: row.type
       };
       API.buys().then((res) => {
         console.log(res);
@@ -1186,6 +1188,7 @@ export default {
         console.log(res);
         self.serviceList = res;
       });
+      
     },
     toConfirm() {
       var self = this;

@@ -280,6 +280,14 @@ API.userServes = function (user_id, addresses_id, type) {
 	})
 }
 
+// // 获取开通的服务 
+// API.userServes = function (user_id) {
+// 	return axios.get(url.UserServes, {
+// 		user_id: user_id,
+		
+// 	})
+// }
+
 // 删除服务
 API.delServer = function (id) {
 	return axios.del(url.DelServer, {
