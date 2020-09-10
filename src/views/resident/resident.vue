@@ -563,7 +563,8 @@ export default {
         area_id: "",
         product_id: "",
         address_id: "",
-        type: ''
+        type: "",
+        face_id: ''
       },
       user_id: "",
       addresses_id: "",
@@ -675,6 +676,7 @@ export default {
       API.households(self.current, self.size)
         .then((res) => {
           self.loading = false;
+          // console.log('表格数据',res.data[9].expireTime.slice(0, 10));
           res.data.forEach((item) => {
             if (item.expireTime) {
               item.expireTime = item.expireTime.slice(0, 10);
@@ -700,6 +702,11 @@ export default {
             API.searchHousehold(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
+                res.data.forEach((item) => {
+                  if (item.expireTime) {
+                    item.expireTime = item.expireTime.slice(0, 10);
+                  }
+                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -713,7 +720,11 @@ export default {
             API.searchHousehold(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
-
+                res.data.forEach((item) => {
+                  if (item.expireTime) {
+                    item.expireTime = item.expireTime.slice(0, 10);
+                  }
+                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -726,7 +737,11 @@ export default {
         API.households(val, self.size)
           .then((res) => {
             self.loading = false;
-
+            res.data.forEach((item) => {
+              if (item.expireTime) {
+                item.expireTime = item.expireTime.slice(0, 10);
+              }
+            });
             self.tableData = res.data;
             self.total = res.total;
           })
@@ -748,6 +763,11 @@ export default {
             API.searchHousehold(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
+                res.data.forEach((item) => {
+                  if (item.expireTime) {
+                    item.expireTime = item.expireTime.slice(0, 10);
+                  }
+                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -761,6 +781,11 @@ export default {
             API.searchHousehold(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
+                res.data.forEach((item) => {
+                  if (item.expireTime) {
+                    item.expireTime = item.expireTime.slice(0, 10);
+                  }
+                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -773,6 +798,11 @@ export default {
         API.households(self.current, val)
           .then((res) => {
             self.loading = false;
+            res.data.forEach((item) => {
+              if (item.expireTime) {
+                item.expireTime = item.expireTime.slice(0, 10);
+              }
+            });
             self.tableData = res.data;
             self.total = res.total;
           })
@@ -800,6 +830,11 @@ export default {
         var keyword = self.renter_name;
         API.searchHousehold(self.current, self.size, name, keyword).then(
           (res) => {
+            res.data.forEach((item) => {
+              if (item.expireTime) {
+                item.expireTime = item.expireTime.slice(0, 10);
+              }
+            });
             self.tableData = res.data;
             self.total = res.total;
             self.$message.success("搜索成功！");
@@ -810,6 +845,11 @@ export default {
         var name = self.renter_name;
         API.searchHousehold(self.current, self.size, name, keyword).then(
           (res) => {
+            res.data.forEach((item) => {
+              if (item.expireTime) {
+                item.expireTime = item.expireTime.slice(0, 10);
+              }
+            });
             self.tableData = res.data;
             self.total = res.total;
             self.$message.success("搜索成功！");
@@ -1028,13 +1068,21 @@ export default {
     },
     passFace() {
       var self = this;
+      const loading = self.$loading({
+        lock: true,
+        text: "通过中...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       if (self.member_type == 3) {
         API.matchFace(self.user_id, self.card_number).then((res) => {
+          loading.close();
           self.dialogPassFace = false;
           self.$message.success("通过成功");
         });
       } else {
         API.matchFace(self.user_id, 1).then((res) => {
+          loading.close();
           self.dialogPassFace = false;
           self.$message.success("通过成功");
         });
@@ -1079,8 +1127,15 @@ export default {
     },
     pushFace() {
       var self = this;
+      const loading = self.$loading({
+        lock: true,
+        text: "开通中...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       API.pushFace(self.openFace_id).then((res) => {
         self.dialogFace = false;
+        loading.close();
         self.$message.success("开通成功");
       });
     },
@@ -1093,8 +1148,15 @@ export default {
     },
     forbiddenFace() {
       var self = this;
+      const loading = self.$loading({
+        lock: true,
+        text: "禁用中...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       API.failFace(self.forbidden_id).then((res) => {
         self.dialogForbidden = false;
+        loading.close();
         self.$message.success("禁用成功");
       });
     },
@@ -1164,7 +1226,8 @@ export default {
         areas_id: row.address.area_id,
         product_id: self.product_id,
         addresses_id: row.address_id,
-        type: row.type
+        type: row.type,
+        face_id: row.face_id
       };
       API.buys().then((res) => {
         console.log(res);
@@ -1184,17 +1247,27 @@ export default {
       self.user_id = row.user_id;
       self.member_type = row.type;
       self.addresses_id = row.address_id;
-      API.userServes(self.user_id, self.addresses_id, self.member_type).then((res) => {
+      self.face_id = row.face_id;
+      API.userServes(
+        self.user_id,
+        self.face_id
+      ).then((res) => {
         console.log(res);
         self.serviceList = res;
       });
-      
     },
     toConfirm() {
       var self = this;
       console.log(self.serveForm);
+        const loading = self.$loading({
+        lock: true,
+        text: "正在开通...",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
       API.setProduct(self.serveForm).then((res) => {
         console.log("toConfirm", res);
+        loading.close();
         self.$message.success("开通成功！");
         self.dialogOpenServe = false;
         self.title = "";
