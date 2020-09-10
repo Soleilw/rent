@@ -13,7 +13,7 @@
             <div class="service">
               <div v-for="(item,index) in serviceList" :key="index">
                 <el-checkbox-group v-model="form.service" class="service-item">
-                  <el-checkbox :label="item" @change="oneChange">{{item.name}}</el-checkbox>
+                  <el-checkbox :label="item" :true-labe="item.title" @change="oneChange(item.title)">{{item.name}}</el-checkbox>
                 </el-checkbox-group>
               </div>
             </div>
@@ -158,6 +158,7 @@ export default {
         },
       ],
       form: {
+        identifier: '',
         title: "",
         price: "",
         detail: "",
@@ -274,6 +275,7 @@ export default {
       self.checkAll = false;
       self.isAdd = true;
       self.form = {
+        identifier: '',
         title: "",
         price: "",
         detail: "",
@@ -286,9 +288,13 @@ export default {
     handleCheckAllService(val) {
       var self = this;
       self.form.service = val ? self.serviceList : [];
+      self.form.identifier = 'InAndOut'
+      console.log(self.form.identifier);
     },
-    oneChange() {
+    oneChange(title) {
       var self = this;
+      self.form.identifier = title;
+      console.log(title);
       self.form.service.length === 1
         ? (self.checkAll = true)
         : (self.checkAll = false);
