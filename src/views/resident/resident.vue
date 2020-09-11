@@ -1079,12 +1079,16 @@ export default {
           loading.close();
           self.dialogPassFace = false;
           self.$message.success("通过成功");
+        }).catch(err => {
+          loading.close();
         });
       } else {
         API.matchFace(self.user_id, 1).then((res) => {
           loading.close();
           self.dialogPassFace = false;
           self.$message.success("通过成功");
+        }).catch(err => {
+          loading.close();
         });
       }
     },
@@ -1109,12 +1113,16 @@ export default {
           loading.close();
           self.dialogVerify = false;
           self.$message.success("验证成功");
+        }).catch(err => {
+          loading.close();
         });
       } else {
         API.verifyPerson(self.user_id, 1).then((res) => {
           loading.close();
           self.dialogVerify = false;
           self.$message.success("验证成功");
+        }).catch(err => {
+          loading.close();
         });
       }
     },
@@ -1137,7 +1145,9 @@ export default {
         self.dialogFace = false;
         loading.close();
         self.$message.success("开通成功");
-      });
+      }).catch(err => {
+          loading.close();
+        });
     },
     // 禁用人脸
     handleForbidden(index, row) {
@@ -1158,7 +1168,9 @@ export default {
         self.dialogForbidden = false;
         loading.close();
         self.$message.success("禁用成功");
-      });
+      }).catch(err => {
+          loading.close();
+        });
     },
 
     // 审核
@@ -1271,7 +1283,9 @@ export default {
         self.$message.success("开通成功！");
         self.dialogOpenServe = false;
         self.title = "";
-      });
+      }).catch(err => {
+          loading.close();
+        });
     },
 
     // 进出记录
