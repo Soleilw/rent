@@ -39,7 +39,7 @@
               <el-radio :label="2">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="是否开启访客功能">
+          <el-form-item label="选择地址">
             <v-map></v-map>
           </el-form-item>
         </el-form>

@@ -13,7 +13,7 @@
             placeholder="请选择搜索方式"
             @change="changeType"
             slot="prepend"
-            style="width: 150px;"
+            style="width: 150px"
           >
             <el-option
               v-for="item in typeList"
@@ -22,8 +22,16 @@
               :value="item.value"
             ></el-option>
           </el-select>
-          <el-button slot="append" icon="el-icon-search" @click="search(renter_name)"></el-button>
-          <el-button slot="append" icon="el-icon-refresh" @click="refresh"></el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="search(renter_name)"
+          ></el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-refresh"
+            @click="refresh"
+          ></el-button>
         </el-input>
       </div>
       <div class="btn">
@@ -36,7 +44,7 @@
       :data="tableData"
       empty-text="暂无数据"
       border
-      :header-cell-style="{background:'#f0f0f0'}"
+      :header-cell-style="{ background: '#f0f0f0' }"
       max-height="620"
     >
       <el-table-column prop="id" label="ID"></el-table-column>
@@ -46,11 +54,14 @@
         <template slot-scope="scope">
           <div v-if="scope.row.snapshot">
             <el-popover placement="top-start" title trigger="click">
-              <img :src="scope.row.snapshot.href" style="max-width:800px;max-height:800px;" />
+              <img
+                :src="scope.row.snapshot.href"
+                style="max-width: 800px; max-height: 800px"
+              />
               <img
                 slot="reference"
                 :src="scope.row.snapshot.href"
-                style="max-width:180px;max-height:80px;"
+                style="max-width: 180px; max-height: 80px"
               />
             </el-popover>
           </div>
@@ -59,21 +70,41 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="snapshot.phone" label="手机号" width="150px"></el-table-column>
-      <el-table-column prop="snapshot.card_number" label="身份证" width="180px"></el-table-column>
-      <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
-      <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
-      <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
+      <el-table-column
+        prop="snapshot.phone"
+        label="手机号"
+        width="150px"
+      ></el-table-column>
+      <el-table-column
+        prop="snapshot.card_number"
+        label="身份证"
+        width="180px"
+      ></el-table-column>
+      <el-table-column
+        prop="address.address"
+        label="房屋地址"
+        width="250px"
+      ></el-table-column>
+      <el-table-column
+        prop="expireTime"
+        label="进出服务到期时间"
+        width="180px"
+      ></el-table-column>
+      <el-table-column
+        prop="room"
+        width="120px"
+        label="房屋编号"
+      ></el-table-column>
       <el-table-column prop="state" width="120px" label="审核状态">
         <template slot-scope="scope">
           <div v-if="scope.row.state == 1">
             <span>待审核</span>
           </div>
           <div v-if="scope.row.state == 2">
-            <span style="color: green;">已通过</span>
+            <span style="color: green">已通过</span>
           </div>
           <div v-if="scope.row.state == 3">
-            <span style="color: red;">未通过</span>
+            <span style="color: red">未通过</span>
           </div>
         </template>
       </el-table-column>
@@ -90,7 +121,8 @@
                   size="mini"
                   type="primary"
                   @click="handleLogs(scope.$index, scope.row)"
-                >进出记录</el-button>
+                  >进出记录</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
@@ -98,7 +130,8 @@
                   type="primary"
                   v-if="scope.row.state == 1"
                   @click="handleAudit(scope.$index, scope.row)"
-                >审核</el-button>
+                  >审核</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
@@ -106,52 +139,64 @@
                   type="primary"
                   v-if="isShow"
                   @click="openServe(scope.$index, scope.row)"
-                >开通服务</el-button>
+                  >开通服务</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   size="mini"
                   type="primary"
                   @click="openedServe(scope.$index, scope.row)"
-                >已开通的服务</el-button>
+                  >已开通的服务</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   type="primary"
                   size="mini"
                   @click="handleFace(scope.$index, scope.row)"
-                >开通人脸</el-button>
+                  >开通人脸</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   type="danger"
                   size="mini"
                   @click="handleForbidden(scope.$index, scope.row)"
-                >禁用人脸</el-button>
+                  >禁用人脸</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   type="primary"
                   size="mini"
                   @click="handlePassFace(scope.$index, scope.row)"
-                >通过人脸</el-button>
+                  >通过人脸</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   type="primary"
                   size="mini"
                   @click="handleVerifyID(scope.$index, scope.row)"
-                >验证身份证</el-button>
+                  >验证身份证</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button
                   type="primary"
                   size="mini"
                   @click="handleChangeFace(scope.$index, scope.row)"
-                >更换人脸</el-button>
+                  >更换人脸</el-button
+                >
               </el-dropdown-item>
               <el-dropdown-item>
-                <el-button type="danger" size="mini" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                <el-button
+                  type="danger"
+                  size="mini"
+                  @click="handleDel(scope.$index, scope.row)"
+                  >删除</el-button
+                >
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -178,7 +223,7 @@
         <el-table
           :data="logsData"
           border
-          :header-cell-style="{background:'#f0f0f0'}"
+          :header-cell-style="{ background: '#f0f0f0' }"
           max-height="620"
         >
           <el-table-column prop="id" label="ID"></el-table-column>
@@ -194,11 +239,14 @@
             <template slot-scope="scope">
               <div v-if="scope.row.image">
                 <el-popover placement="top-start" title trigger="click">
-                  <img :src="scope.row.image" style="max-width:800px;max-height:800px;" />
+                  <img
+                    :src="scope.row.image"
+                    style="max-width: 800px; max-height: 800px"
+                  />
                   <img
                     slot="reference"
                     :src="scope.row.image"
-                    style="max-width:180px;max-height:80px;"
+                    style="max-width: 180px; max-height: 80px"
                   />
                 </el-popover>
               </div>
@@ -223,8 +271,13 @@
     </el-dialog>
 
     <!-- 审核 -->
-    <el-dialog :visible.sync="dialogAudit" title="审核" width="20%" align="center">
-      <div style="font-size: 20px; margin-bottom: 30px;">是否通过审核</div>
+    <el-dialog
+      :visible.sync="dialogAudit"
+      title="审核"
+      width="20%"
+      align="center"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px">是否通过审核</div>
       <span>
         <el-button type="primary" @click="toAudit">通过</el-button>
         <el-button type="danger" @click="unAudit">不通过</el-button>
@@ -239,7 +292,7 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否删除该住户</div>
+      <div style="font-size: 20px; margin-bottom: 30px">是否删除该住户</div>
       <span>
         <el-button type="primary" @click="toDel">删除</el-button>
         <el-button type="danger" @click="dialogDel = false">取消</el-button>
@@ -254,10 +307,12 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否禁用人脸</div>
+      <div style="font-size: 20px; margin-bottom: 30px">是否禁用人脸</div>
       <span>
         <el-button type="primary" @click="forbiddenFace">禁用</el-button>
-        <el-button type="danger" @click="dialogForbidden = false">取消</el-button>
+        <el-button type="danger" @click="dialogForbidden = false"
+          >取消</el-button
+        >
       </span>
     </el-dialog>
 
@@ -269,7 +324,7 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否开通人脸</div>
+      <div style="font-size: 20px; margin-bottom: 30px">是否开通人脸</div>
       <span>
         <el-button type="primary" @click="pushFace">开通</el-button>
         <el-button type="danger" @click="dialogFace = false">取消</el-button>
@@ -284,8 +339,12 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">
-        <el-select v-model="title" placeholder="请选择需要开通的服务" @change="serveChange">
+      <div style="font-size: 20px; margin-bottom: 30px">
+        <el-select
+          v-model="title"
+          placeholder="请选择需要开通的服务"
+          @change="serveChange"
+        >
           <el-option
             v-for="item in serviceLists"
             :key="item.id"
@@ -297,14 +356,20 @@
 
       <div>
         <el-button type="primary" @click="toConfirm">确定</el-button>
-        <el-button type="danger" @click="dialogOpenServe = false">取消</el-button>
+        <el-button type="danger" @click="dialogOpenServe = false"
+          >取消</el-button
+        >
       </div>
     </el-dialog>
 
     <!-- 已开通服务 -->
     <el-dialog title="已开通服务" :visible.sync="dialogOpenedServe">
       <div class="box">
-        <el-table :data="serviceList" border :header-cell-style="{background:'#f0f0f0'}">
+        <el-table
+          :data="serviceList"
+          border
+          :header-cell-style="{ background: '#f0f0f0' }"
+        >
           <el-table-column prop="id" label="订单ID"></el-table-column>
           <el-table-column prop="name" label="商品名称"></el-table-column>
           <el-table-column prop="time" label="商品有效期(天)"></el-table-column>
@@ -336,14 +401,18 @@
               <el-option
                 v-for="item in userList"
                 :key="item.id"
-                :label=" item.label + '' +item.value"
+                :label="item.label + '' + item.value"
                 :value="item.value"
               ></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item label="选择身份">
-            <el-select v-model="userForm.type" placeholder="请选择身份" @change="roleChange">
+            <el-select
+              v-model="userForm.type"
+              placeholder="请选择身份"
+              @change="roleChange"
+            >
               <el-option
                 v-for="item in rolesList"
                 :key="item.type"
@@ -357,7 +426,7 @@
               v-model="pro_id"
               placeholder="请选择省份"
               @change="proChange"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
             >
               <el-option
                 v-for="item in proList"
@@ -370,7 +439,7 @@
               v-model="city_id"
               placeholder="请选择市级"
               @change="cityChange"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
             >
               <el-option
                 v-for="item in cityList"
@@ -383,7 +452,7 @@
               v-model="areas_id"
               placeholder="请选择区级"
               @change="areasChange"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
             >
               <el-option
                 v-for="item in communityList"
@@ -396,7 +465,7 @@
               v-model="community_id"
               placeholder="请选择社区"
               @change="communityChange"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
             >
               <el-option
                 v-for="item in areaList"
@@ -409,7 +478,7 @@
               v-model="address"
               placeholder="请选择详细地址"
               @change="detailAddressChnage"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
               filterable
             >
               <el-option
@@ -423,7 +492,7 @@
               v-model="room_id"
               placeholder="请选择门牌号"
               @change="roomIdChange"
-              style="margin-right: 10px;"
+              style="margin-right: 10px"
             >
               <el-option
                 v-for="item in roomList"
@@ -449,10 +518,12 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否通过人脸</div>
+      <div style="font-size: 20px; margin-bottom: 30px">是否通过人脸</div>
       <span>
         <el-button type="primary" @click="passFace">通过</el-button>
-        <el-button type="danger" @click="dialogPassFace = false">取消</el-button>
+        <el-button type="danger" @click="dialogPassFace = false"
+          >取消</el-button
+        >
       </span>
     </el-dialog>
     <!-- 验证身份证 -->
@@ -463,7 +534,7 @@
       align="center"
       :close-on-click-modal="false"
     >
-      <div style="font-size: 20px; margin-bottom: 30px;">是否进行身份验证</div>
+      <div style="font-size: 20px; margin-bottom: 30px">是否进行身份验证</div>
       <span>
         <el-button type="primary" @click="verifyID">验证</el-button>
         <el-button type="danger" @click="dialogVerify = false">取消</el-button>
@@ -480,9 +551,7 @@
       <div class="box">
         <el-form :model="familyForm">
           <div class="tips">
-            <p>
-              <span>提示：</span>更换后的人脸照片会覆盖掉原有的人脸照片！
-            </p>
+            <p><span>提示：</span>更换后的人脸照片会覆盖掉原有的人脸照片！</p>
           </div>
           <el-form-item label="更换人脸图片">
             <el-upload
@@ -498,14 +567,20 @@
             >
               <el-button size="small" type="primary">选择图片</el-button>
             </el-upload>
-            <div v-if="hasNewImage" style="color: red; font-size: 12px;">* 点击文件名可删除所选图片</div>
+            <div v-if="hasNewImage" style="color: red; font-size: 12px">
+              * 点击文件名可删除所选图片
+            </div>
 
             <div class="up-img" v-if="old_href">
-              <span style="display: flex;justify-items: center;color: #409eff;">原人脸图片</span>
+              <span style="display: flex; justify-items: center; color: #409eff"
+                >原人脸图片</span
+              >
               <img class="pic-box" :src="old_href" />
             </div>
             <div class="up-img" v-if="familyForm.href">
-              <span style="display: flex;justify-items: center;color: #67C23A;">新人脸图片</span>
+              <span style="display: flex; justify-items: center; color: #67c23a"
+                >新人脸图片</span
+              >
               <img class="pic-box" :src="familyForm.href" />
             </div>
             <div class="up-img" v-else>
@@ -564,7 +639,7 @@ export default {
         product_id: "",
         address_id: "",
         type: "",
-        face_id: ''
+        face_id: "",
       },
       user_id: "",
       addresses_id: "",
@@ -1075,21 +1150,25 @@ export default {
         background: "rgba(0, 0, 0, 0.7)",
       });
       if (self.member_type == 3) {
-        API.matchFace(self.user_id, self.card_number).then((res) => {
-          loading.close();
-          self.dialogPassFace = false;
-          self.$message.success("通过成功");
-        }).catch(err => {
-          loading.close();
-        });
+        API.matchFace(self.user_id, self.card_number)
+          .then((res) => {
+            loading.close();
+            self.dialogPassFace = false;
+            self.$message.success("通过成功");
+          })
+          .catch((err) => {
+            loading.close();
+          });
       } else {
-        API.matchFace(self.user_id, 1).then((res) => {
-          loading.close();
-          self.dialogPassFace = false;
-          self.$message.success("通过成功");
-        }).catch(err => {
-          loading.close();
-        });
+        API.matchFace(self.user_id, 1)
+          .then((res) => {
+            loading.close();
+            self.dialogPassFace = false;
+            self.$message.success("通过成功");
+          })
+          .catch((err) => {
+            loading.close();
+          });
       }
     },
     // 验证身份证
@@ -1109,21 +1188,25 @@ export default {
         background: "rgba(0, 0, 0, 0.7)",
       });
       if (self.member_type == 3) {
-        API.verifyPerson(self.user_id, self.card_number).then((res) => {
-          loading.close();
-          self.dialogVerify = false;
-          self.$message.success("验证成功");
-        }).catch(err => {
-          loading.close();
-        });
+        API.verifyPerson(self.user_id, self.card_number)
+          .then((res) => {
+            loading.close();
+            self.dialogVerify = false;
+            self.$message.success("验证成功");
+          })
+          .catch((err) => {
+            loading.close();
+          });
       } else {
-        API.verifyPerson(self.user_id, 1).then((res) => {
-          loading.close();
-          self.dialogVerify = false;
-          self.$message.success("验证成功");
-        }).catch(err => {
-          loading.close();
-        });
+        API.verifyPerson(self.user_id, 1)
+          .then((res) => {
+            loading.close();
+            self.dialogVerify = false;
+            self.$message.success("验证成功");
+          })
+          .catch((err) => {
+            loading.close();
+          });
       }
     },
 
@@ -1141,11 +1224,13 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)",
       });
-      API.pushFace(self.openFace_id).then((res) => {
-        self.dialogFace = false;
-        loading.close();
-        self.$message.success("开通成功");
-      }).catch(err => {
+      API.pushFace(self.openFace_id)
+        .then((res) => {
+          self.dialogFace = false;
+          loading.close();
+          self.$message.success("开通成功");
+        })
+        .catch((err) => {
           loading.close();
         });
     },
@@ -1164,11 +1249,13 @@ export default {
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)",
       });
-      API.failFace(self.forbidden_id).then((res) => {
-        self.dialogForbidden = false;
-        loading.close();
-        self.$message.success("禁用成功");
-      }).catch(err => {
+      API.failFace(self.forbidden_id)
+        .then((res) => {
+          self.dialogForbidden = false;
+          loading.close();
+          self.$message.success("禁用成功");
+        })
+        .catch((err) => {
           loading.close();
         });
     },
@@ -1239,7 +1326,7 @@ export default {
         product_id: self.product_id,
         addresses_id: row.address_id,
         type: row.type,
-        face_id: row.face_id
+        face_id: row.face_id,
       };
       API.buys().then((res) => {
         console.log(res);
@@ -1260,10 +1347,7 @@ export default {
       self.member_type = row.type;
       self.addresses_id = row.address_id;
       self.face_id = row.face_id;
-      API.userServes(
-        self.user_id,
-        self.face_id
-      ).then((res) => {
+      API.userServes(self.user_id, self.face_id).then((res) => {
         console.log(res);
         self.serviceList = res;
       });
@@ -1271,19 +1355,21 @@ export default {
     toConfirm() {
       var self = this;
       console.log(self.serveForm);
-        const loading = self.$loading({
+      const loading = self.$loading({
         lock: true,
         text: "正在开通...",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.7)",
       });
-      API.setProduct(self.serveForm).then((res) => {
-        console.log("toConfirm", res);
-        loading.close();
-        self.$message.success("开通成功！");
-        self.dialogOpenServe = false;
-        self.title = "";
-      }).catch(err => {
+      API.setProduct(self.serveForm)
+        .then((res) => {
+          console.log("toConfirm", res);
+          loading.close();
+          self.$message.success("开通成功！");
+          self.dialogOpenServe = false;
+          self.title = "";
+        })
+        .catch((err) => {
           loading.close();
         });
     },
@@ -1329,7 +1415,12 @@ export default {
       self.id = row.id;
       self.card_number = row.snapshot.card_number;
       self.member_type = row.type;
-      self.dialogDel = true;
+      self.check = row.check;
+      if (self.check == 0) {
+        self.$message.error('身份未核验, 无法删除!');
+      } else {
+        self.dialogDel = true;
+      }
       console.log(row);
     },
     toDel() {
