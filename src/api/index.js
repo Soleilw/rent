@@ -388,6 +388,60 @@ API.editFace = function (user_id, self, href) {
 		href: href
 	})
 }
+// 获取开关
+API.getConfigs = function () {
+	return axios.get(url.Configs)
+}
 
+// 删除开关
+API.delFaceSwitch = function (id) {
+	return axios.del(url.Configs, {
+		id: id
+	})
+}
+
+// 添加开关
+API.faceSwitch = function (data) {
+	return axios.post(url.Configs, data)
+}
+
+// 获取白名单
+API.withdraws = function (page, limit, name, keyword) {
+	return axios.get(url.Withdraws, {
+		page: page,
+		limit: limit,
+		name: name,
+		keyword: keyword
+	})
+}
+
+// 创建白名单
+API.createRaw = function (data) {
+	return axios.post(url.CreateRaw, data)
+}
+// 手动返现
+API.withdraw = function (id) {
+	return axios.post(url.Withdraw, {
+		id: id
+	})
+}
+// 返现记录
+API.withdrawsRec = function (page, limit, user_id) {
+	return axios.get(url.WithdrawsRec, {
+		page: page,
+		limit: limit,
+		user_id: user_id
+	})
+}
+
+
+// 获取租客
+API.rent = function (page, limit, keyword) {
+	return axios.get(url.Households, {
+		page: page,
+		limit: limit,
+		keyword: keyword,
+	})
+}
 
 export default API

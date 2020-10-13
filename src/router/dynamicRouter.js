@@ -87,6 +87,24 @@ const dynamicRouter = [{
 			icon: 'el-icon-picture'
 		}
 	},
+	{
+		path: '/switch',
+		name: 'switch',
+		component: () => import('@/views/switch/index'),
+		meta: {
+            title: '人脸开关管理',
+            icon: 'el-icon-key',
+        }
+	},
+	{
+		path: '/refund',
+		name: 'refund',
+		component: () => import('@/views/refund/refund'),
+		meta: {
+            title: '用户返现',
+            icon: 'el-icon-coin',
+        }
+	},
 	// {
 	// 	path: '/total',
 	// 	name: 'total',

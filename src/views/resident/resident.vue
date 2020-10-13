@@ -394,9 +394,9 @@
               v-model="name"
               placeholder="请输入用户名"
               filterable
-              @change="userListChange"
               remote
               :remote-method="remoteMethod"
+              @change="userListChange"
             >
               <el-option
                 v-for="item in userList"
