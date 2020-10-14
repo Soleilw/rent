@@ -68,6 +68,7 @@ const url = {
 	'CreateRaw': BaseURL + '/creation/white', // 创建白名单
 	'Withdraw': BaseURL + '/withdraw', // 手动返现
 	'WithdrawsRec': BaseURL + '/withdraws', // 返现记录
+	'DelWhite': BaseURL + '/white', // 删除
 
 }
 

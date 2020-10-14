@@ -283,7 +283,7 @@ API.userServes = function (user_id, face_id) {
 // API.userServes = function (user_id) {
 // 	return axios.get(url.UserServes, {
 // 		user_id: user_id,
-		
+
 // 	})
 // }
 
@@ -433,14 +433,21 @@ API.withdrawsRec = function (page, limit, user_id) {
 		user_id: user_id
 	})
 }
+// 删除
+API.delWhite = function (id) {
+	return axios.del(url.DelWhite, {
+		id: id
+	})
+}
 
 
 // 获取租客
-API.rent = function (page, limit, keyword) {
+API.rent = function (page, limit, keyword, type) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
 		keyword: keyword,
+		type: type
 	})
 }
 

@@ -107,9 +107,9 @@
               <el-dropdown-item>
                 <el-button
                   size="mini"
-                  type="danger"
-                  @click="handleBan(scope.$index, scope.row)"
-                  >禁用</el-button
+                  type="primary"
+                  @click="handleUsing(scope.$index, scope.row)"
+                  >启用返现功能</el-button
                 >
               </el-dropdown-item>
               <el-dropdown-item>
@@ -117,6 +117,14 @@
                   size="mini"
                   type="danger"
                   @click="handleBan(scope.$index, scope.row)"
+                  >禁用返现功能</el-button
+                >
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDel(scope.$index, scope.row)"
                   >删除</el-button
                 >
               </el-dropdown-item>
@@ -137,7 +145,7 @@
       <div class="box">
         <el-form :model="listForm">
           <div v-for="(item, index) in listForm.service" :key="index">
-            <el-form-item>
+            <el-form-item v-if="isAdd">
               <span>选择社区：</span>
               <el-select
                 v-model="item.area_id"
@@ -158,6 +166,7 @@
                 @change="selectSize"
                 filterable
                 placeholder="选择地址"
+                :disabled="isDisabled"
               >
                 <el-option
                   v-for="item in addressList"
@@ -167,23 +176,13 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="选择用户">
-              <el-select
-                v-model="item.user_id"
-                @change="selectUser"
-                placeholder="请选择用户"
-              >
-                <el-option
-                  v-for="item in userList"
-                  :label="`${item.snapshot.name + '/' + item.typeString}`"
-                  :value="`${item.user_id + '/' + item.id}`"
-                  :key="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-
             <el-form-item label="选择身份">
-              <el-select v-model="item.type" placeholder="请选择身份类型">
+              <el-select
+                v-model="item.type"
+                @change="selectType"
+                :disabled="isDisabled"
+                placeholder="请选择身份类型"
+              >
                 <el-option
                   v-for="item in tyList"
                   :label="item.name"
@@ -192,6 +191,22 @@
                 ></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="选择用户">
+              <el-select
+                v-model="item.user_id"
+                @change="selectUser"
+                placeholder="请选择用户"
+                :disabled="isDisabled"
+              >
+                <el-option
+                  v-for="item in userList"
+                  :label="item.snapshot.name"
+                  :value="item.user_id"
+                  :key="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+
             <el-form-item label="输入金额">
               <div class="btn">
                 <el-input
@@ -203,7 +218,11 @@
               </div>
             </el-form-item>
             <el-form-item label="返现状态">
-              <el-select v-model="item.state" placeholder="请选择状态">
+              <el-select
+                v-model="item.state"
+                :disabled="isDisabled"
+                placeholder="请选择状态"
+              >
                 <el-option
                   v-for="item in stateList"
                   :label="item.name"
@@ -213,7 +232,7 @@
               </el-select>
             </el-form-item>
           </div>
-          <el-form-item label="操作">
+          <el-form-item label="操作" v-if="isAdd">
             <el-button type="primary" @click="addopenList">添加</el-button>
             <el-button type="primary" @click="delopenList">删除</el-button>
           </el-form-item>
@@ -227,7 +246,7 @@
     </el-dialog>
 
     <!-- 返现记录 -->
-    <el-dialog title="返现记录" :visible.sync="dialogRec">
+    <el-dialog title="返现记录" :visible.sync="dialogRec" width="80%">
       <el-table
         :data="recordDate"
         empty-text="暂无数据"
@@ -281,6 +300,58 @@
       </span>
     </el-dialog>
 
+    <!-- 删除 -->
+    <el-dialog
+      :visible.sync="dialogDel"
+      title="删除记录"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px">是否删除该记录</div>
+
+      <span>
+        <el-button type="primary" @click="toDel">确定</el-button>
+        <el-button type="danger" @click="dialogDel = false">取消</el-button>
+      </span>
+    </el-dialog>
+    <!-- 禁用 -->
+    <el-dialog
+      :visible.sync="dialogBan"
+      title="禁用返现"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+      @close="closeSet"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px">
+        是否对该用户禁用返现功能
+      </div>
+
+      <span>
+        <el-button type="primary" @click="toBan">确定</el-button>
+        <el-button type="danger" @click="dialogBan = false">取消</el-button>
+      </span>
+    </el-dialog>
+    <!-- 启用 -->
+    <el-dialog
+      :visible.sync="dialogUsing"
+      title="启用返现"
+      width="20%"
+      align="center"
+      :close-on-click-modal="false"
+      @close="closeSet"
+    >
+      <div style="font-size: 20px; margin-bottom: 30px">
+        是否对该用户启用返现功能
+      </div>
+
+      <span>
+        <el-button type="primary" @click="toUsing">确定</el-button>
+        <el-button type="danger" @click="dialogUsing = false">取消</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 分页 -->
     <div class="block">
       <el-pagination
@@ -327,6 +398,9 @@ export default {
       dialogList: false,
       dialogRec: false,
       dialogRefund: false,
+      dialogDel: false,
+      dialogBan: false,
+      dialogUsing: false,
       listForm: {
         service: [],
       },
@@ -341,14 +415,6 @@ export default {
         {
           name: "租客",
           type: 2,
-        },
-        {
-          name: "家庭成员",
-          type: 3,
-        },
-        {
-          name: "物业",
-          type: 4,
         },
       ],
       monList: [],
@@ -374,6 +440,8 @@ export default {
       typeDisabled: true,
       id: "",
       user_id: "",
+      isAdd: true,
+      isDisabled: false,
     };
   },
   mounted() {
@@ -538,7 +606,11 @@ export default {
       });
       console.log(obj);
       self.addressName = obj.label;
-      API.rent(1, 100, self.addressName).then((res) => {
+    },
+    selectType(value) {
+      var self = this;
+      API.rent(1, 100, self.addressName, value).then((res) => {
+        console.log(res);
         self.userList = res.data;
       });
     },
@@ -574,23 +646,12 @@ export default {
     },
 
     selectUser(value) {
-      console.log(value);
       var self = this;
-      var arr = {};
-
-      self.arr = self.userList.map((item) => {
-        return {
-          label: ` ${item.type}`,
-        };
+      let obj = {};
+      obj = this.userList.find((item) => {
+        return item.typeString;
       });
-      console.log(self.type);
-      // let obj = {};
-      // debugger;
-      // obj = this.userList.find((item) => {
-      //   return item;
-      // });
-      // debugger;
-      // console.log(this.obj);
+      console.log(obj);
     },
 
     // 添加白名单
@@ -598,6 +659,10 @@ export default {
       var self = this;
       self.dialogList = true;
       self.addopenList();
+      self.isAdd = true;
+      self.isBan = false;
+      self.isMoney = false;
+      self.isDisabled = false;
       API.areas(1, 100, 3).then((res) => {
         self.areaList = res.data;
       });
@@ -612,6 +677,7 @@ export default {
     },
     closeList() {
       var self = this;
+      self.isAdd;
       self.delopenList();
       self.listForm.service = [];
     },
@@ -620,11 +686,19 @@ export default {
       var self = this;
       self.dialogList = false;
       console.log(self.listForm);
-      API.createRaw(self.listForm).then((res) => {
-        console.log(111);
-        self.$message.success("添加成功！");
-        self.getList();
-      });
+      if (self.isAdd) {
+        API.createRaw(self.listForm).then((res) => {
+          console.log(111);
+          self.$message.success("添加成功！");
+          self.getList();
+        });
+      } else {
+        API.createRaw(self.listForm).then((res) => {
+          console.log(111);
+          self.$message.success("提交成功！");
+          self.getList();
+        });
+      }
     },
 
     // 返现记录
@@ -662,7 +736,11 @@ export default {
     // 手动返现
     handleRefund(index, row) {
       var self = this;
-      self.dialogRefund = true;
+      if (row.state == 1) {
+        self.dialogRefund = true;
+      } else {
+        self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
+      }
       console.log(row);
       self.id = row.id;
     },
@@ -676,15 +754,97 @@ export default {
     },
     // 编辑
     handleEdit(index, row) {
-      var self = this;
+      let self = this;
       self.dialogList = true;
-      // self.listForm.service.push(row)
+      self.listForm.id = row.id;
+      delete row.id;
+      delete row.name;
+      delete row.id;
+      delete row.created_at;
+      delete row.updated_at;
+      delete row.address;
+      self.listForm.service.push(row);
+      console.log(self.listForm.service);
+      self.isAdd = false;
+      self.isDisabled = true;
+    },
 
+    handleDel(index, row) {
+      var self = this;
+      self.dialogDel = true;
+      self.id = row.id;
+    },
+
+    toDel() {
+      var self = this;
+      API.delWhite(self.id).then((res) => {
+        self.$message.success("删除成功！");
+        self.dialogDel = false;
+        self.getList();
+      });
+    },
+
+    handleUsing(index, row) {
+      var self = this;
       console.log(self.listForm);
+      if (row.state == 2) {
+        self.dialogUsing = true;
+      } else {
+        self.$message.warning("该用户已经启用返现功能! ");
+      }
+      self.listForm = {
+        id: row.id,
+        service: [
+          {
+            state: 1,
+          },
+        ],
+      };
+    },
+
+    toUsing() {
+      var self = this;
+
+      API.createRaw(self.listForm).then((res) => {
+        self.$message.success("启用成功！");
+        self.dialogUsing = false;
+        self.getList();
+        self.listForm.service = [];
+      });
     },
 
     // 禁用
-    handleBan() {},
+    handleBan(index, row) {
+      var self = this;
+      console.log(self.listForm);
+      if (row.state == 1) {
+        self.dialogBan = true;
+      } else {
+        self.$message.warning("该用户已经禁用返现功能! ");
+      }
+      self.listForm = {
+        id: row.id,
+        service: [
+          {
+            state: 2,
+          },
+        ],
+      };
+    },
+    toBan() {
+      var self = this;
+      API.createRaw(self.listForm).then((res) => {
+        self.$message.success("禁用成功！");
+        self.dialogBan = false;
+        self.getList();
+        self.listForm.service = [];
+      });
+    },
+
+    closeSet() {
+      var self = this;
+      self.listForm.service = [];
+    },
 
     refresh() {
       this.reload();
