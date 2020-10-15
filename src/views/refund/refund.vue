@@ -194,7 +194,7 @@
             <el-form-item label="选择用户">
               <el-select
                 v-model="item.user_id"
-                @change="selectUser"
+                filterable
                 placeholder="请选择用户"
                 :disabled="isDisabled"
               >
@@ -322,7 +322,6 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-      @close="closeSet"
     >
       <div style="font-size: 20px; margin-bottom: 30px">
         是否对该用户禁用返现功能
@@ -340,7 +339,6 @@
       width="20%"
       align="center"
       :close-on-click-modal="false"
-      @close="closeSet"
     >
       <div style="font-size: 20px; margin-bottom: 30px">
         是否对该用户启用返现功能
@@ -402,6 +400,7 @@ export default {
       dialogBan: false,
       dialogUsing: false,
       listForm: {
+        id: "",
         service: [],
       },
       addressList: [],
@@ -428,15 +427,9 @@ export default {
           value: 2,
         },
       ],
-      price: "",
-      addressName: "",
       name: "",
-      list: [],
-      area: "",
       areaList: [],
-      lets: "",
-      letList: [],
-      // address_id: "",
+      address_id: "",
       typeDisabled: true,
       id: "",
       user_id: "",
@@ -448,6 +441,7 @@ export default {
     this.getList();
   },
   methods: {
+    // 获取白名单
     getList() {
       var self = this;
       API.withdraws(self.current, self.size)
@@ -460,6 +454,7 @@ export default {
           self.loading = false;
         });
     },
+    // 分页
     currentChange(val) {
       var self = this;
       self.current = val;
@@ -471,11 +466,6 @@ export default {
             API.withdraws(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
-                res.data.forEach((item) => {
-                  if (item.expireTime) {
-                    item.expireTime = item.expireTime.slice(0, 10);
-                  }
-                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -489,11 +479,6 @@ export default {
             API.withdraws(val, self.size, name, keyword)
               .then((res) => {
                 self.loading = false;
-                res.data.forEach((item) => {
-                  if (item.expireTime) {
-                    item.expireTime = item.expireTime.slice(0, 10);
-                  }
-                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -506,11 +491,6 @@ export default {
         API.withdraws(val, self.size)
           .then((res) => {
             self.loading = false;
-            res.data.forEach((item) => {
-              if (item.expireTime) {
-                item.expireTime = item.expireTime.slice(0, 10);
-              }
-            });
             self.tableData = res.data;
             self.total = res.total;
           })
@@ -532,11 +512,6 @@ export default {
             API.withdraws(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
-                res.data.forEach((item) => {
-                  if (item.expireTime) {
-                    item.expireTime = item.expireTime.slice(0, 10);
-                  }
-                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -550,11 +525,6 @@ export default {
             API.withdraws(self.current, val, name, keyword)
               .then((res) => {
                 self.loading = false;
-                res.data.forEach((item) => {
-                  if (item.expireTime) {
-                    item.expireTime = item.expireTime.slice(0, 10);
-                  }
-                });
                 self.tableData = res.data;
                 self.total = res.total;
               })
@@ -567,11 +537,6 @@ export default {
         API.withdraws(self.current, val)
           .then((res) => {
             self.loading = false;
-            res.data.forEach((item) => {
-              if (item.expireTime) {
-                item.expireTime = item.expireTime.slice(0, 10);
-              }
-            });
             self.tableData = res.data;
             self.total = res.total;
           })
@@ -580,39 +545,6 @@ export default {
             console.log(err);
           });
       }
-    },
-
-    // 选择社区
-    changeAreaType(value) {
-      var self = this;
-      self.area_id = value;
-      API.addresses(1, 100, self.area_id).then((res) => {
-        self.addressList = res.data;
-        self.list = self.addressList.map((item) => {
-          return {
-            label: ` ${item.address}`,
-          };
-        });
-      });
-    },
-    // 选择地址
-    selectSize(value) {
-      var self = this;
-      console.log(value);
-      // self.address_id = value;
-      let obj = {};
-      obj = this.list.find((item) => {
-        return item;
-      });
-      console.log(obj);
-      self.addressName = obj.label;
-    },
-    selectType(value) {
-      var self = this;
-      API.rent(1, 100, self.addressName, value).then((res) => {
-        console.log(res);
-        self.userList = res.data;
-      });
     },
 
     // 搜索
@@ -645,41 +577,51 @@ export default {
       }
     },
 
-    selectUser(value) {
-      var self = this;
-      let obj = {};
-      obj = this.userList.find((item) => {
-        return item.typeString;
-      });
-      console.log(obj);
-    },
-
     // 添加白名单
     addUser() {
       var self = this;
       self.dialogList = true;
+      self.listForm = {
+        id: "",
+        service: [],
+      };
       self.addopenList();
       self.isAdd = true;
-      self.isBan = false;
-      self.isMoney = false;
       self.isDisabled = false;
       API.areas(1, 100, 3).then((res) => {
         self.areaList = res.data;
       });
     },
+    // 选择社区
+    changeAreaType(value) {
+      var self = this;
+      self.area_id = value;
+      API.addresses(1, 100, self.area_id).then((res) => {
+        self.addressList = res.data;
+      });
+    },
+    // 选择地址
+    selectSize(value) {
+      var self = this;
+      self.address_id = value;
+    },
+    // 选择身份--获取用户
+    selectType(value) {
+      var self = this;
+      API.rent(1, 100, self.address_id, value).then((res) => {
+        console.log(res);
+        self.userList = res.data;
+      });
+    },
+    // 添加
     addopenList() {
       var self = this;
       self.listForm.service.push({});
     },
+    // 删除
     delopenList() {
       var self = this;
       self.listForm.service.pop({});
-    },
-    closeList() {
-      var self = this;
-      self.isAdd;
-      self.delopenList();
-      self.listForm.service = [];
     },
     // 提交
     newList() {
@@ -688,17 +630,26 @@ export default {
       console.log(self.listForm);
       if (self.isAdd) {
         API.createRaw(self.listForm).then((res) => {
-          console.log(111);
           self.$message.success("添加成功！");
           self.getList();
+          self.listForm = {
+            id: "",
+            service: [],
+          };
         });
       } else {
         API.createRaw(self.listForm).then((res) => {
-          console.log(111);
           self.$message.success("提交成功！");
           self.getList();
         });
       }
+    },
+    // 关闭添加白名单
+    closeList() {
+      var self = this;
+      self.isAdd;
+      self.delopenList();
+      self.listForm.service = [];
     },
 
     // 返现记录
@@ -715,6 +666,7 @@ export default {
         }
       );
     },
+    // 分页
     recordCurrentChange(val) {
       var self = this;
       self.recordCurrent = val;
@@ -733,16 +685,16 @@ export default {
         self.recordTotal = res.total;
       });
     },
+
     // 手动返现
     handleRefund(index, row) {
       var self = this;
+      self.id = row.id;
       if (row.state == 1) {
         self.dialogRefund = true;
       } else {
         self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
       }
-      console.log(row);
-      self.id = row.id;
     },
     // 返现
     toRefund() {
@@ -752,29 +704,33 @@ export default {
         self.dialogRefund = false;
       });
     },
+
     // 编辑
     handleEdit(index, row) {
       let self = this;
       self.dialogList = true;
-      self.listForm.id = row.id;
-      delete row.id;
-      delete row.name;
-      delete row.id;
-      delete row.created_at;
-      delete row.updated_at;
-      delete row.address;
-      self.listForm.service.push(row);
-      console.log(self.listForm.service);
+      self.listForm = {
+        id: row.id,
+        service: [
+          {
+            address_id: row.address_id,
+            money: row.money,
+            state: row.state,
+            type: row.type,
+            user_id: row.user_id,
+          },
+        ],
+      };
       self.isAdd = false;
       self.isDisabled = true;
     },
 
+    // 删除
     handleDel(index, row) {
       var self = this;
       self.dialogDel = true;
       self.id = row.id;
     },
-
     toDel() {
       var self = this;
       API.delWhite(self.id).then((res) => {
@@ -784,14 +740,10 @@ export default {
       });
     },
 
+    // 启用返现功能
     handleUsing(index, row) {
       var self = this;
-      console.log(self.listForm);
-      if (row.state == 2) {
-        self.dialogUsing = true;
-      } else {
-        self.$message.warning("该用户已经启用返现功能! ");
-      }
+      console.log(row);
       self.listForm = {
         id: row.id,
         service: [
@@ -800,11 +752,14 @@ export default {
           },
         ],
       };
+      if (row.state == 2) {
+        self.dialogUsing = true;
+      } else {
+        self.$message.warning("该用户已经启用返现功能! ");
+      }
     },
-
     toUsing() {
       var self = this;
-
       API.createRaw(self.listForm).then((res) => {
         self.$message.success("启用成功！");
         self.dialogUsing = false;
@@ -813,15 +768,10 @@ export default {
       });
     },
 
-    // 禁用
+    // 禁用返现功能
     handleBan(index, row) {
       var self = this;
-      console.log(self.listForm);
-      if (row.state == 1) {
-        self.dialogBan = true;
-      } else {
-        self.$message.warning("该用户已经禁用返现功能! ");
-      }
+      console.log(row);
       self.listForm = {
         id: row.id,
         service: [
@@ -830,6 +780,11 @@ export default {
           },
         ],
       };
+      if (row.state == 1) {
+        self.dialogBan = true;
+      } else {
+        self.$message.warning("该用户已经禁用返现功能! ");
+      }
     },
     toBan() {
       var self = this;
@@ -841,11 +796,6 @@ export default {
       });
     },
 
-    closeSet() {
-      var self = this;
-      self.listForm.service = [];
-    },
-
     refresh() {
       this.reload();
     },
@@ -854,9 +804,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.input {
-  margin-bottom: 20px;
-}
 .ipt {
   width: 220px;
 }

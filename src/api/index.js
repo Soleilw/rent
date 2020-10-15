@@ -442,11 +442,11 @@ API.delWhite = function (id) {
 
 
 // 获取租客
-API.rent = function (page, limit, keyword, type) {
+API.rent = function (page, limit, address_id, type) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
-		keyword: keyword,
+		address_id: address_id,
 		type: type
 	})
 }
