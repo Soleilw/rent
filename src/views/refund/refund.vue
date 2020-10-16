@@ -657,8 +657,10 @@ export default {
       var self = this;
       self.dialogRec = true;
       self.user_id = row.user_id;
+      self.address_id = row.address_id;
+      console.log(row);
       self.recordCurrent = 1;
-      API.withdrawsRec(self.recordCurrent, self.recordSize, self.user_id).then(
+      API.withdrawsRec(self.recordCurrent, self.recordSize, self.user_id, self.address_id).then(
         (res) => {
           self.$message.success("获取数据成功！");
           self.recordDate = res.data;
