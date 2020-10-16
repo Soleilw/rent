@@ -427,7 +427,7 @@ API.withdraw = function (id) {
 }
 // 返现记录
 API.withdrawsRec = function (page, limit, user_id, address_id) {
-	return axios.get(url.Withdraw, {
+	return axios.get(url.WithdrawsRec, {
 		page: page,
 		limit: limit,
 		user_id: user_id,
