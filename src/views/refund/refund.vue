@@ -60,8 +60,6 @@
         <template slot-scope="scope">
           <span v-if="scope.row.type == 1">户主</span>
           <span v-else-if="scope.row.type == 2">租客</span>
-          <span v-else-if="scope.row.type == 3">家庭成员</span>
-          <span v-else-if="scope.row.type == 4">物业</span>
         </template>
       </el-table-column>
       <el-table-column prop="state" label="返现状态">
