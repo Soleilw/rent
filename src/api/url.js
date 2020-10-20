@@ -69,7 +69,6 @@ const url = {
 	'Withdraw': BaseURL + '/withdraw', // 手动返现, 返现记录
 	'WithdrawsRec': BaseURL + '/withdraws', // 返现记录
 	'DelWhite': BaseURL + '/white', // 删除
-
 }
 
 module.exports = url;

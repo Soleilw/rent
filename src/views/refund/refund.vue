@@ -449,6 +449,7 @@ export default {
           console.log(res);
           self.loading = false;
           self.tableData = res.data;
+          self.total = res.total
         })
         .catch((err) => {
           self.loading = false;
@@ -484,7 +485,6 @@ export default {
               })
               .catch((err) => {
                 self.loading = false;
-                console.log(err);
               });
         }
       } else {
@@ -496,7 +496,6 @@ export default {
           })
           .catch((err) => {
             self.loading = false;
-            console.log(err);
           });
       }
     },
@@ -530,7 +529,6 @@ export default {
               })
               .catch((err) => {
                 self.loading = false;
-                console.log(err);
               });
         }
       } else {
@@ -542,7 +540,6 @@ export default {
           })
           .catch((err) => {
             self.loading = false;
-            console.log(err);
           });
       }
     },
@@ -658,7 +655,6 @@ export default {
       self.dialogRec = true;
       self.user_id = row.user_id;
       self.address_id = row.address_id;
-      console.log(row);
       self.recordCurrent = 1;
       API.withdrawsRec(self.recordCurrent, self.recordSize, self.user_id, self.address_id).then(
         (res) => {
