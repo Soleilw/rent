@@ -26,12 +26,6 @@
             <el-table-column prop="address_id" label="地址ID"></el-table-column>
             <el-table-column prop="address" label="地址" width="250px"></el-table-column>
             <el-table-column prop="name" label="绑定用户"></el-table-column>
-            <!-- <el-table-column prop="type" label="身份类型">
-        <template slot-scope="scope">
-          <span v-if="scope.row.type == 1">户主</span>
-          <span v-else-if="scope.row.type == 2">租客</span>
-        </template>
-      </el-table-column> -->
             <el-table-column prop="state" label="返现状态">
                 <template slot-scope="scope">
                     <span v-if="scope.row.state == 1">启用返现功能</span>
