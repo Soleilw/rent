@@ -441,7 +441,6 @@ API.delWhite = function (id) {
 	})
 }
 
-
 // 获取租客
 API.rent = function (page, limit, address_id, type) {
 	return axios.get(url.Households, {
@@ -449,6 +448,53 @@ API.rent = function (page, limit, address_id, type) {
 		limit: limit,
 		address_id: address_id,
 		type: type
+	})
+}
+
+// 获取返佣金白名单
+API.commission = function (page, limit, name, keyword) {
+	return axios.get(url.Commission, {
+		page: page,
+		limit: limit,
+		name: name,
+		keyword: keyword
+	})
+}
+
+// 创建返佣金白名单
+API.createCommission = function (data) {
+	return axios.post(url.CreateCommission, data)
+}
+
+// 获取未添加白名单的地址
+API.notCommission = function (area_id) {
+	return axios.get(url.NotCommission, {
+		area_id: area_id
+	})
+}
+
+// 获取返佣记录
+API.commissionRec = function (page, limit, address_id) {
+	return axios.get(url.CommissionRec, {
+		page: page,
+		limit: limit,
+		address_id: address_id
+	})
+}
+
+// 获取佣金来源
+API.commissionRecord = function (page, limit, address_id) {
+	return axios.get(url.CommissionRecord, {
+		page: page,
+		limit: limit,
+		address_id: address_id
+	})
+}
+
+// 删除
+API.delCommission = function (id) {
+	return axios.del(url.DelCommission, {
+		id: id
 	})
 }
 

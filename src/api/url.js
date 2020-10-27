@@ -69,6 +69,15 @@ const url = {
 	'Withdraw': BaseURL + '/withdraw', // 手动返现, 返现记录
 	'WithdrawsRec': BaseURL + '/withdraws', // 返现记录
 	'DelWhite': BaseURL + '/white', // 删除
+
+	// 佣金白名单
+	'Commission': BaseURL + '/commission/white', // 获取佣金白名单
+	'CreateCommission': BaseURL + '/creation/commission/white', // 创建佣金白名单
+	'NotCommission': BaseURL + '/not/commission/addresses', // 获取未添加白名单的地址
+	'CommissionRec': BaseURL + '/commission/withdraws', // 返佣记录
+	'CommissionRecord': BaseURL + '/commission/records', // 获取佣金来源
+	'DelCommission': BaseURL + '/commission', // 删除
+
 }
 
 module.exports = url;
