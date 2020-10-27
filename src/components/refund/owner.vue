@@ -575,7 +575,6 @@
                         address_id: row.address_id,
                         money: row.money,
                         state: row.state,
-                        type: row.type,
                         user_id: row.user_id,
                     }, ],
                 };
