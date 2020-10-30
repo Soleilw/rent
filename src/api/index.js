@@ -498,4 +498,11 @@ API.delCommission = function (id) {
 	})
 }
 
+// 返佣
+API.payCommission = function (address_id) {
+	return axios.post(url.PayCommission, {
+		address_id: address_id
+	})
+}
+
 export default API

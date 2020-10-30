@@ -47,12 +47,16 @@
                                 </el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
-                                <el-button size="mini" type="primary" @click="handleRefund(scope.$index, scope.row)">
+                                <el-button size="mini" type="primary" @click="handleSource(scope.$index, scope.row)">
                                     佣金来源</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
                                 <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑
                                 </el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button size="mini" type="primary" @click="handleRefund(scope.$index, scope.row)">
+                                    手动返现</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
                                 <el-button size="mini" type="primary" v-if="scope.row.state == 2"
@@ -133,7 +137,6 @@
                 <el-table-column prop="address" label="地址"></el-table-column>
                 <el-table-column prop="name" label="绑定用户"></el-table-column>
                 <el-table-column prop="money" label="返现金额"></el-table-column>
-                <!-- <el-table-column prop="remark" label="备注"></el-table-column> -->
                 <el-table-column prop="state" label="返现状态">
                     <template slot-scope="scope">
                         <span v-if="scope.row.state == 1">待返现</span>
@@ -158,6 +161,7 @@
                 max-height="620">
                 <el-table-column prop="id" label="记录ID"></el-table-column>
                 <el-table-column prop="address" label="地址"></el-table-column>
+                <el-table-column prop="order_no" label="订单号"></el-table-column>
                 <el-table-column prop="name" label="绑定用户"></el-table-column>
                 <el-table-column prop="money" label="返现金额"></el-table-column>
                 <el-table-column prop="title" label="服务名称"></el-table-column>
@@ -202,6 +206,17 @@
             <span>
                 <el-button type="primary" @click="toUsing">确定</el-button>
                 <el-button type="danger" @click="dialogUsing = false">取消</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog :visible.sync="dialogRefund" title="返现" width="20%" align="center" :close-on-click-modal="false">
+            <div style="font-size: 20px; margin-bottom: 30px">
+                是否对该用户进行返现
+            </div>
+
+            <span>
+                <el-button type="primary" @click="toRefund">确定</el-button>
+                <el-button type="danger" @click="dialogRefund = false">取消</el-button>
             </span>
         </el-dialog>
 
@@ -528,7 +543,7 @@
             },
 
             // 佣金来源
-            handleRefund(index, row) {
+            handleSource(index, row) {
                 var self = this;
                 self.dialogRec = true;
                 self.address_id = row.address_id;
@@ -584,11 +599,11 @@
             },
             toDel() {
                 var self = this;
-                  API.delCommission(self.id).then((res) => {
+                API.delCommission(self.id).then((res) => {
                     self.$message.success("删除成功！");
                     self.dialogDel = false;
                     self.getList();
-                  });
+                });
             },
 
             // 启用返现功能
@@ -635,6 +650,39 @@
                 });
             },
 
+            // 手动返现
+            handleRefund(index, row) {
+                var self = this;
+                self.address_id = row.address_id;
+                if (row.state == 1) {
+                    self.dialogRefund = true;
+                } else {
+                    self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
+                }
+            },
+            // 返现
+            toRefund() {
+                var self = this;
+                const loading = self.$loading({
+                    lock: true,
+                    text: "返现中...",
+                    spinner: "el-icon-loading",
+                    background: "rgba(0, 0, 0, 0.7)",
+                });
+                API.payCommission(self.address_id)
+                    .then((res) => {
+                        if (res.code == 10004) {
+                            loading.close();
+                        } else {
+                            self.$message.success("返现成功！");
+                            loading.close();
+                            self.dialogRefund = false;
+                        }
+                    })
+                    .catch((err) => {
+                        loading.close();
+                    });
+            },
             refresh() {
                 this.reload();
             },

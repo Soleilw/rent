@@ -77,6 +77,7 @@ const url = {
 	'CommissionRec': BaseURL + '/commission/withdraws', // 返佣记录
 	'CommissionRecord': BaseURL + '/commission/records', // 获取佣金来源
 	'DelCommission': BaseURL + '/commission', // 删除
+	'PayCommission': BaseURL + '/commission/withdraw', // 佣金返现
 
 }
 
