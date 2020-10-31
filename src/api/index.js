@@ -63,6 +63,19 @@ API.pushAddressFace = function (address_id) {
 
 }
 
+// 新增房屋地址
+API.createAddress = function (data) {
+	return axios.post(url.CreateAddress, data)
+}
+
+//	获取可新增房屋地址
+API.gainAddress = function (page, limit) {
+	return axios.get(url.GainAddress, {
+		page: page,
+		limit: limit
+	})
+}
+
 
 API.households = function (page, limit, user_id, address_id, type, state, room_id, name) {
 	return axios.get(url.Households, {

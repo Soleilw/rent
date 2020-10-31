@@ -19,6 +19,8 @@ const url = {
 	'FaceLogs': BaseURL + '/face/logs', // 获取住户进出记录
 	'DelBuilding': BaseURL + '/room', // 删除楼栋
 	'PushAddressFace': BaseURL + '/push/address/face', // 全库推送人脸
+	'CreateAddress': BaseURL + '/create/address', // 添加房屋地址
+	'GainAddress': BaseURL + '/get/address', // 获取可新增的房屋地址
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图
