@@ -20,17 +20,34 @@
           <!-- <div v-for="(item, index) in listForm.service" :key="index"> -->
           <div class="handle-box">
             <!-- <div class="btn"> -->
-            <el-alert title="点击需要添加地址所在行, 进行添加地址" type="info" show-icon :closable="false" effect="dark" center>
+            <el-alert title="添加地址: 选择所在社区 --> 点击地址所在行 --> 提交" type="info" show-icon :closable="false" effect="dark"
+              center>
             </el-alert>
             <!-- </div> -->
-            <!-- <div class="btn">
-              <el-button @click="setCurrent()">取消选择</el-button>
-            </div> -->
+          </div>
+          <div class="handle-box">
+            <div class="btn">
+              <span>选择社区: </span>
+              <el-select v-model="pro_id" placeholder="请选择省份" @change="proChange" style="margin-right: 10px">
+                <el-option v-for="item in proList" :key="item.id" :label="item.title" :value="item.id"></el-option>
+              </el-select>
+              <el-select v-model="city_id" placeholder="请选择市级" @change="cityChange" style="margin-right: 10px">
+                <el-option v-for="item in cityList" :key="item.id" :label="item.title" :value="item.id"></el-option>
+              </el-select>
+              <el-select v-model="areas_id" placeholder="请选择区级" @change="areasChange" style="margin-right: 10px">
+                <el-option v-for="item in communityList" :key="item.id" :label="item.title" :value="item.id">
+                </el-option>
+              </el-select>
+              <el-select v-model="community_id" placeholder="请选择社区" @change="communityChange"
+                style="margin-right: 10px">
+                <el-option v-for="item in areaList" :key="item.id" :label="item.title" :value="item.id"></el-option>
+              </el-select>
+            </div>
           </div>
 
           <el-table :data="addressList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620"
             highlight-current-row @current-change="handleCurrentChange" ref="singleTable">
-            <el-table-column prop="area_id" label="社区ID"></el-table-column>
+            <!-- <el-table-column prop="area_id" label="社区ID"></el-table-column> -->
             <el-table-column prop="groups[0].address_id" label="地址ID"></el-table-column>
             <el-table-column prop="address" label="房屋地址"></el-table-column>
             <el-table-column prop="groups[0].group_name" label="人脸组"></el-table-column>
@@ -673,12 +690,22 @@
           group: '',
           police: ''
         },
-        addressList: ''
+        addressList: '',
+        proList: [], // 省级列表
+        pro_id: "",
+        cityList: [], // 市级列表
+        city_id: "",
+        communityList: [], // 区级列表
+        community_id: "",
+        areaList: [], //  社区列表
+        areas_id: "",
+        isAdd: false
       };
     },
     mounted() {
       this.getnewHouses();
       this.getAddress();
+      this.getPro();
       var permissionList = this.permission.split(",");
       if (permissionList.includes("housesAdd")) {
         this.isShow = true;
@@ -771,6 +798,13 @@
       addHouses() {
         var self = this;
         self.dialogHouses = true;
+        self.pro_id = '';
+        self.city_id = '';
+        self.community_id = '';
+        self.areas_id = '';
+        self.cityList = [];
+        self.communityList = [];
+        self.areaList = [];
       },
       // 获取房屋地址
       getAddress() {
@@ -785,15 +819,66 @@
       //   var self = this;
       //   console.log(val);
       // },
+      getPro() {
+        var self = this;
+
+        API.areas(1, 4000, 0).then((res) => {
+          self.proList = res.data;
+        });
+      },
+      getCity(val) {
+        var self = this;
+        API.areas(1, 4000, val).then((res) => {
+          self.cityList = res.data;
+        });
+      },
+      getCommunity(val) {
+        var self = this;
+        API.areas(1, 100, val).then((res) => {
+          self.communityList = res.data;
+        });
+      },
+      proChange(val) {
+        var self = this;
+        self.getCity(val);
+      },
+      getAreas(val) {
+        var self = this;
+        API.areas(1, 4000, val).then((res) => {
+          console.log("getAreas", res);
+          self.areaList = res.data;
+        });
+      },
+      cityChange(val) {
+        var self = this;
+        self.getCommunity(val);
+      },
+      areasChange(val) {
+        var self = this;
+        self.getAreas(val);
+      },
+      communityChange(val) {
+        var self = this;
+        console.log(val);
+        self.listForm.area_id = val;
+      },
       handleCurrentChange(val) {
         var self = this;
         console.log(val);
-        self.listForm = {
-          area_id: val.area_id,
-          address: val.address,
-          address_id: val.groups[0].address_id,
-          group: val.groups[0].group_name,
-          police: val.stations
+        if (self.listForm.area_id) {
+          if (val.address && val.area_id && val.groups.length != 0 && val.stations) {
+            self.$message.success("选择成功! ");
+            self.listForm.address = val.address;
+            self.listForm.address_id = val.groups[0].address_id;
+            self.listForm.group = val.groups[0].group_name;
+            self.listForm.police = val.stations;
+            self.isAdd = true;
+          } else {
+            self.$message.warning("该地址存在空数据, 无法添加");
+            self.isAdd = false;
+          }
+        } else {
+          self.$message.warning("请先选择社区");
         }
       },
       // setCurrent(row) {
@@ -803,11 +888,23 @@
       newHouses() {
         var self = this;
         console.log(self.listForm);
-        API.createAddress(self.listForm).then(res => {
-          self.$message.success("禁用成功！");
-          self.dialogHouses = false;
-          self.getnewHouses();
-        })
+        if (self.isAdd) {
+          API.createAddress(self.listForm).then(res => {
+            self.$message.success("添加成功! ");
+            self.dialogHouses = false;
+            self.pro_id = '';
+            self.city_id = '';
+            self.community_id = '';
+            self.areas_id = '';
+            self.cityList = [];
+            self.communityList = [];
+            self.areaList = [];
+            this.reload();
+            self.getnewHouses();
+          })
+        } else {
+          self.$message.warning("该地址存在空数据, 无法添加");
+        }
       },
 
       // 楼栋管理
