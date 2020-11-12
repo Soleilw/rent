@@ -821,7 +821,6 @@
       // },
       getPro() {
         var self = this;
-
         API.areas(1, 4000, 0).then((res) => {
           self.proList = res.data;
         });
@@ -881,9 +880,7 @@
           self.$message.warning("请先选择社区");
         }
       },
-      // setCurrent(row) {
-      //   this.$refs.singleTable.setCurrentRow(row);
-      // },
+      
       // 新增房屋地址
       newHouses() {
         var self = this;
