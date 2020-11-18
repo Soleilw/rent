@@ -375,11 +375,8 @@ API.matchFace = function (user_id, self) {
 	})
 }
 // 手动验证身份
-API.verifyPerson = function (user_id, self) {
-	return axios.post(url.VerifyPerson, {
-		user_id: user_id,
-		self: self
-	})
+API.verifyPerson = function (data) {
+	return axios.post(url.VerifyPerson, data)
 }
 // 创建账号
 API.creation = function (data) {

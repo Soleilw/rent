@@ -53,7 +53,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" fixed="right" width="150px">
         <template slot-scope="scope">
           <el-dropdown>
             <el-button type="primary">
@@ -85,7 +85,7 @@
                 <el-button type="primary" size="mini" @click="handlePassFace(scope.$index, scope.row)">通过人脸</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
-                <el-button type="primary" size="mini" @click="handleVerifyID(scope.$index, scope.row)">验证身份证</el-button>
+                <el-button type="primary" size="mini" @click="handleVerifyID(scope.$index, scope.row)">修改信息</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
                 <el-button type="primary" size="mini" @click="handleChangeFace(scope.$index, scope.row)">更换人脸
@@ -260,13 +260,35 @@
         <el-button type="danger" @click="dialogPassFace = false">取消</el-button>
       </span>
     </el-dialog>
-    <!-- 验证身份证 -->
-    <el-dialog :visible.sync="dialogVerify" title="验证身份证" width="20%" align="center" :close-on-click-modal="false">
-      <div style="font-size: 20px; margin-bottom: 30px">是否进行身份验证</div>
+    <!-- 修改信息 -->
+    <el-dialog :visible.sync="dialogVerify" title="修改信息" width="50%" :close-on-click-modal="false">
+      <el-form label-width="80px" :model="changeFrom">
+        <el-form-item label="姓名">
+          <el-input v-model="changeFrom.name"></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-radio-group v-model="changeFrom.sex">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="身份证">
+          <el-input v-model="changeFrom.card_number"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="changeFrom.phone"></el-input>
+        </el-form-item>
+        <div class="submit">
+          <el-form-item>
+            <el-button type="primary" @click="verifyID">提交</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+      <!-- <div style="font-size: 20px; margin-bottom: 30px">是否进行身份验证</div>
       <span>
         <el-button type="primary" @click="verifyID">验证</el-button>
         <el-button type="danger" @click="dialogVerify = false">取消</el-button>
-      </span>
+      </span> -->
     </el-dialog>
 
     <!-- 更换人脸 -->
@@ -445,6 +467,14 @@
         new_file: "",
         name: "",
         detailAddress: "",
+        changeFrom: {
+          user_id: '',
+          self: '',
+          name: '',
+          card_number: '',
+          phone: '',
+          sex: ''
+        }
       };
     },
     mounted() {
@@ -885,40 +915,53 @@
       // 验证身份证
       handleVerifyID(index, row) {
         var self = this;
-        self.dialogVerify = true;
+        console.log(row);
         self.user_id = row.user_id;
         self.member_type = row.type;
         self.card_number = row.snapshot.card_number;
+        if (row.state == 2) {
+          self.$message.warning("该用户已经通过审核, 无法修改信息! ");
+        } else {
+          self.dialogVerify = true;
+          if (self.member_type == 3) {
+            self.changeFrom = {
+              user_id: row.user_id,
+              self: row.snapshot.card_number,
+              name: row.snapshot.name,
+              card_number: row.snapshot.card_number,
+              phone: row.snapshot.phone,
+              sex: row.snapshot.sex
+            }
+          } else {
+            self.changeFrom = {
+              user_id: row.user_id,
+              self: 1,
+              name: row.snapshot.name,
+              card_number: row.snapshot.card_number,
+              phone: row.snapshot.phone,
+              sex: row.snapshot.sex
+            }
+          }
+        }
       },
       verifyID() {
         var self = this;
         const loading = self.$loading({
           lock: true,
-          text: "验证中...",
+          text: "提交中...",
           spinner: "el-icon-loading",
           background: "rgba(0, 0, 0, 0.7)",
         });
-        if (self.member_type == 3) {
-          API.verifyPerson(self.user_id, self.card_number)
-            .then((res) => {
-              loading.close();
-              self.dialogVerify = false;
-              self.$message.success("验证成功");
-            })
-            .catch((err) => {
-              loading.close();
-            });
-        } else {
-          API.verifyPerson(self.user_id, 1)
-            .then((res) => {
-              loading.close();
-              self.dialogVerify = false;
-              self.$message.success("验证成功");
-            })
-            .catch((err) => {
-              loading.close();
-            });
-        }
+        API.verifyPerson(self.changeFrom)
+          .then((res) => {
+            loading.close();
+            self.dialogVerify = false;
+            self.$message.success("提交成功");
+            self.getAllRent();
+          })
+          .catch((err) => {
+            loading.close();
+          });
       },
 
       // 开通人脸
