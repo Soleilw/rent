@@ -35,11 +35,24 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="snapshot.phone" label="手机号" width="150px"></el-table-column>
+      <el-table-column prop="snapshot.phone" label="手机号" width="120px"></el-table-column>
       <el-table-column prop="snapshot.card_number" label="身份证" width="180px"></el-table-column>
       <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
       <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
       <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
+      <el-table-column prop="check" width="120px" label="身份核验状态">
+        <template slot-scope="scope">
+          <div v-if="scope.row.check == 0">
+            <span>身份未核验</span>
+          </div>
+          <div v-if="scope.row.check == 1">
+            <span style="color: green">身份核验通过</span>
+          </div>
+          <div v-if="scope.row.check == 2">
+            <span style="color: red">身份信息错误</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="state" width="120px" label="审核状态">
         <template slot-scope="scope">
           <div v-if="scope.row.state == 1">
@@ -1023,17 +1036,17 @@
         self.card_number = row.snapshot.card_number;
         self.check = row.check;
         self.dialogAudit = true;
-        if (self.check == 0) {
-          self.$message.warning("该用户身份未核验!");
-          self.dialogAudit = false;
-        } else if (self.check == 2) {
-          self.$message.warning("该用户身份信息错误!");
-          self.dialogAudit = false;
-        }
+        // if (self.check == 0) {
+        //   self.$message.warning("该用户身份未核验!");
+        //   self.dialogAudit = false;
+        // } else if (self.check == 2) {
+        //   self.$message.warning("该用户身份信息错误!");
+        //   self.dialogAudit = false;
+        // }
       },
       toAudit() {
         var self = this;
-        if (self.check == 1) {
+        // if (self.check == 1) {
           if (self.member_type == 3) {
             API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
               self.$message.success("提交成功");
@@ -1047,11 +1060,11 @@
               self.getAllRent();
             });
           }
-        }
+        // }
       },
       unAudit() {
         var self = this;
-        if (self.check == 1) {
+        // if (self.check == 1) {
           if (self.member_type == 3) {
             API.audit(self.renter_id, 3, self.card_number).then((res) => {
               self.$message.success("提交成功");
@@ -1065,7 +1078,7 @@
               self.getAllRent();
             });
           }
-        }
+        // }
       },
 
       // 开通服务
