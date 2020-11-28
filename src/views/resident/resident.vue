@@ -297,11 +297,6 @@
           </el-form-item>
         </div>
       </el-form>
-      <!-- <div style="font-size: 20px; margin-bottom: 30px">是否进行身份验证</div>
-      <span>
-        <el-button type="primary" @click="verifyID">验证</el-button>
-        <el-button type="danger" @click="dialogVerify = false">取消</el-button>
-      </span> -->
     </el-dialog>
 
     <!-- 更换人脸 -->
@@ -1036,49 +1031,38 @@
         self.card_number = row.snapshot.card_number;
         self.check = row.check;
         self.dialogAudit = true;
-        // if (self.check == 0) {
-        //   self.$message.warning("该用户身份未核验!");
-        //   self.dialogAudit = false;
-        // } else if (self.check == 2) {
-        //   self.$message.warning("该用户身份信息错误!");
-        //   self.dialogAudit = false;
-        // }
       },
       toAudit() {
         var self = this;
-        // if (self.check == 1) {
-          if (self.member_type == 3) {
-            API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
-              self.$message.success("提交成功");
-              self.dialogAudit = false;
-              self.getAllRent();
-            });
-          } else {
-            API.audit(self.renter_id, 2, 1).then((res) => {
-              self.$message.success("提交成功");
-              self.dialogAudit = false;
-              self.getAllRent();
-            });
-          }
-        // }
+        if (self.member_type == 3) {
+          API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        } else {
+          API.audit(self.renter_id, 2, 1).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        }
       },
       unAudit() {
         var self = this;
-        // if (self.check == 1) {
-          if (self.member_type == 3) {
-            API.audit(self.renter_id, 3, self.card_number).then((res) => {
-              self.$message.success("提交成功");
-              self.dialogAudit = false;
-              self.getAllRent();
-            });
-          } else {
-            API.audit(self.renter_id, 3, 1).then((res) => {
-              self.$message.success("提交成功");
-              self.dialogAudit = false;
-              self.getAllRent();
-            });
-          }
-        // }
+        if (self.member_type == 3) {
+          API.audit(self.renter_id, 3, self.card_number).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        } else {
+          API.audit(self.renter_id, 3, 1).then((res) => {
+            self.$message.success("提交成功");
+            self.dialogAudit = false;
+            self.getAllRent();
+          });
+        }
       },
 
       // 开通服务

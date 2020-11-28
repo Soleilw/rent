@@ -2,12 +2,7 @@
   <div v-loading="loading" element-loading-text="拼命加载中">
     <div class="handle-box">
       <div class="btn">
-        <el-button
-          type="primary"
-          size="medium"
-          icon="el-icon-circle-plus-outline"
-          @click="addSwitch"
-        >添加开关信息</el-button>
+        <el-button type="primary" size="medium" icon="el-icon-circle-plus-outline" @click="addSwitch">添加开关信息</el-button>
       </div>
     </div>
 
@@ -46,13 +41,7 @@
     </el-table>
 
     <!-- 删除提示框 -->
-    <el-dialog
-      :visible.sync="dialogDel"
-      title="删除版本"
-      width="20%"
-      align="center"
-      :close-on-click-modal="false"
-    >
+    <el-dialog :visible.sync="dialogDel" title="删除版本" width="20%" align="center" :close-on-click-modal="false">
       <div style="font-size: 20px; margin-bottom: 30px;">是否删除该版本</div>
       <span>
         <el-button type="primary" @click="toDel">删除</el-button>
@@ -63,102 +52,101 @@
 </template>
 
 <script>
-import API from "@/api/index.js";
+  import API from "@/api/index.js";
 
-export default {
-  name: "gradems",
-  data() {
-    return {
-      loading: true,
-      dialogSwitch: false,
-      dialogDel: false,
-      form: {
-        key: "",
-        version: "",
-        value: "",
+  export default {
+    name: "gradems",
+    data() {
+      return {
+        loading: true,
+        dialogSwitch: false,
+        dialogDel: false,
+        form: {
+          key: "",
+          version: "",
+          value: "",
+          id: "",
+        },
+        tableData: [],
         id: "",
+      };
+    },
+    mounted() {
+      this.getSwitch();
+    },
+    methods: {
+      getSwitch() {
+        var self = this;
+        API.getConfigs()
+          .then((res) => {
+            //   console.log(res);
+            self.loading = false;
+            self.tableData = res;
+          })
+          .catch((err) => {
+            this.loading = false;
+          });
       },
-      tableData: [],
-      id: "",
-    };
-  },
-  mounted() {
-    this.getSwitch();
-  },
-  methods: {
-    getSwitch() {
-      var self = this;
-      API.getConfigs()
-        .then((res) => {
-        //   console.log(res);
-          self.loading = false;
-          self.tableData = res;
-          self.total = res.total;
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
 
-    // 添加新的AIP
-    addSwitch() {
-      var self = this;
-      self.dialogSwitch = true;
-      self.form = {
-        key: "",
-        version: "",
-        value: "",
-        id: "",
-      };
-    },
+      // 添加新的AIP
+      addSwitch() {
+        var self = this;
+        self.dialogSwitch = true;
+        self.form = {
+          key: "",
+          version: "",
+          value: "",
+          id: "",
+        };
+      },
 
-    newSwitch() {
-      var self = this;
-      API.faceSwitch(self.form)
-        .then((res) => {
-          self.dialogSwitch = false;
-          self.$message.success("提交成功");
-          self.getSwitch();
-          self.current = 1;
-          self.form = {};
-        })
-        .catch((err) => {
-          self.dialogSwitch = false;
-        });
+      newSwitch() {
+        var self = this;
+        API.faceSwitch(self.form)
+          .then((res) => {
+            self.dialogSwitch = false;
+            self.$message.success("提交成功");
+            self.getSwitch();
+            self.current = 1;
+            self.form = {};
+          })
+          .catch((err) => {
+            self.dialogSwitch = false;
+          });
+      },
+      // 操作
+      handleDel(index, row) {
+        var self = this;
+        // console.log(row);
+        self.id = row.id;
+        self.dialogDel = true;
+      },
+      toDel() {
+        var self = this;
+        API.delFaceSwitch(self.id)
+          .then((res) => {
+            self.dialogDel = false;
+            self.$message.success("删除成功");
+            self.getSwitch();
+          })
+          .catch((err) => {
+            self.loading = false;
+          });
+      },
+      // 编辑
+      handleEdit(index, row) {
+        let self = this;
+        // console.log(row);
+        self.dialogSwitch = true;
+        self.form = {
+          key: row.config_key,
+          version: row.version,
+          value: row.config_value,
+          id: row.id,
+        };
+      },
     },
-    // 操作
-    handleDel(index, row) {
-      var self = this;
-      console.log(row);
-      self.id = row.id;
-      self.dialogDel = true;
-    },
-    toDel() {
-      var self = this;
-      API.delFaceSwitch(self.id)
-        .then((res) => {
-          self.dialogDel = false;
-          self.$message.success("删除成功");
-          self.getSwitch();
-        })
-        .catch((err) => {
-          self.loading = false;
-        });
-    },
-    // 编辑
-    handleEdit(index, row) {
-      let self = this;
-      console.log(row);
-      self.dialogSwitch = true;
-      self.form = {
-        key: row.config_key,
-        version: row.version,
-        value: row.config_value,
-        id: row.id,
-      };
-    },
-  },
-};
+  };
 </script>
 
 <style>
