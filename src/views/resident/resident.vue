@@ -500,7 +500,6 @@
         API.households(self.current, self.size)
           .then((res) => {
             self.loading = false;
-            // console.log('表格数据',res.data[9].expireTime.slice(0, 10));
             res.data.forEach((item) => {
               if (item.expireTime) {
                 item.expireTime = item.expireTime.slice(0, 10);
