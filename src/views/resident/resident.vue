@@ -510,7 +510,6 @@
           })
           .catch((err) => {
             self.loading = false;
-            console.log(err);
           });
       },
       // 分页
@@ -535,7 +534,6 @@
                 })
                 .catch((err) => {
                   self.loading = false;
-                  console.log(err);
                 });
               break;
             case 2:
@@ -553,7 +551,6 @@
                 })
                 .catch((err) => {
                   self.loading = false;
-                  console.log(err);
                 });
           }
         } else {
@@ -570,7 +567,6 @@
             })
             .catch((err) => {
               self.loading = false;
-              console.log(err);
             });
         }
       },
@@ -596,7 +592,6 @@
                 })
                 .catch((err) => {
                   self.loading = false;
-                  console.log(err);
                 });
               break;
             case 2:
@@ -614,7 +609,6 @@
                 })
                 .catch((err) => {
                   self.loading = false;
-                  console.log(err);
                 });
           }
         } else {
@@ -631,7 +625,6 @@
             })
             .catch((err) => {
               self.loading = false;
-              console.log(err);
             });
         }
       },
@@ -699,7 +692,6 @@
         });
       },
       userListChange(val) {
-        console.log(val);
         var self = this;
         self.userForm.user_id = val;
         self.userForms.user_id = val;
@@ -722,7 +714,6 @@
         var self = this;
         self.userForm.type = value;
         self.userForms.type = value;
-        console.log(value);
       },
       getPro() {
         var self = this;
@@ -740,7 +731,6 @@
       getAreas(val) {
         var self = this;
         API.areas(1, 4000, val).then((res) => {
-          console.log("getAreas", res);
           self.areaList = res.data;
         });
       },
@@ -764,7 +754,6 @@
       },
       proChange(val) {
         var self = this;
-        console.log(self.pro_id);
         let obj = {};
         obj = this.proList.find((item) => {
           return item.id === val;
@@ -804,7 +793,6 @@
       },
       detailAddressChnage(val) {
         var self = this;
-        console.log(val);
         self.userForm.address_id = val;
         self.userForms.address_id = val;
         let obj = {};
@@ -816,13 +804,11 @@
         self.room_id = "";
       },
       roomIdChange(val) {
-        console.log(val);
         var self = this;
         let obj = {};
         obj = this.roomList.find((item) => {
           return item.id === val;
         });
-        console.log(obj);
         self.detailAddress += obj.door_number;
         self.userForm.room_id = val;
       },
@@ -887,7 +873,6 @@
         self.user_id = row.user_id;
         self.member_type = row.type;
         self.card_number = row.snapshot.card_number;
-        console.log(row);
       },
       passFace() {
         var self = this;
@@ -922,7 +907,6 @@
       // 验证身份证
       handleVerifyID(index, row) {
         var self = this;
-        console.log(row);
         self.user_id = row.user_id;
         self.member_type = row.type;
         self.card_number = row.snapshot.card_number;
@@ -998,7 +982,6 @@
       // 禁用人脸
       handleForbidden(index, row) {
         var self = this;
-        console.log(row);
         self.forbidden_id = row.id;
         self.dialogForbidden = true;
       },
@@ -1024,7 +1007,6 @@
       // 审核
       handleAudit(index, row) {
         var self = this;
-        console.log(row);
         self.renter_id = row.id;
         self.member_type = row.type;
         self.card_number = row.snapshot.card_number;
@@ -1067,8 +1049,6 @@
       // 开通服务
       openServe(index, row) {
         var self = this;
-        console.log("openServe", index);
-        console.log("openServe", row);
         self.dialogOpenServe = true;
         self.serveForm = {
           user_id: row.user_id,
@@ -1079,32 +1059,27 @@
           face_id: row.face_id,
         };
         API.buys().then((res) => {
-          console.log(res);
           self.serviceLists = res.data;
         });
       },
       serveChange(val) {
         var self = this;
         self.serveForm.product_id = val;
-        console.log(self.serveForm.product_id);
       },
       // 已开通服务
       openedServe(index, row) {
         var self = this;
         self.dialogOpenedServe = true;
-        console.log("openedServe", row);
         self.user_id = row.user_id;
         self.member_type = row.type;
         self.addresses_id = row.address_id;
         self.face_id = row.face_id;
         API.userServes(self.user_id, self.face_id).then((res) => {
-          console.log(res);
           self.serviceList = res;
         });
       },
       toConfirm() {
         var self = this;
-        console.log(self.serveForm);
         const loading = self.$loading({
           lock: true,
           text: "正在开通...",
@@ -1113,7 +1088,6 @@
         });
         API.setProduct(self.serveForm)
           .then((res) => {
-            console.log("toConfirm", res);
             loading.close();
             self.$message.success("开通成功！");
             self.dialogOpenServe = false;
@@ -1129,7 +1103,6 @@
         var self = this;
         self.dialogLogs = true;
         self.face_id = row.face_id;
-        console.log(row);
         self.getFaceLogs();
       },
       getFaceLogs() {
@@ -1137,7 +1110,6 @@
         self.logsCurrent = 1;
         API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
           (res) => {
-            console.log("getFaceLogs", res);
             self.logsData = res.data;
             self.logsTotal = res.total;
           }
@@ -1171,7 +1143,6 @@
         } else {
           self.dialogDel = true;
         }
-        console.log(row);
       },
       toDel() {
         var self = this;
@@ -1193,12 +1164,13 @@
       // 更换人脸
       handleChangeFace(index, row) {
         var self = this;
+        // console.log(row);
         self.dialogChangeFace = true;
+        self.id = row.id;
         self.user_id = row.user_id;
         self.member_type = row.type;
         self.card_number = row.snapshot.card_number;
         self.old_href = row.snapshot.href;
-        console.log(row);
       },
       changeFace() {
         var self = this;
@@ -1208,7 +1180,8 @@
             API.editFace(
               self.user_id,
               self.card_number,
-              self.familyForm.href
+              self.familyForm.href,
+              self.id
             ).then((res) => {
               self.$message.success("上传成功");
               self.current = 1;
@@ -1217,7 +1190,7 @@
               self.dialogChangeFace = false;
             });
           } else {
-            API.editFace(self.user_id, 1, self.href).then((res) => {
+            API.editFace(self.user_id, 1, self.href, self.id).then((res) => {
               self.$message.success("上传成功");
               self.current = 1;
               self.getAllRent();
@@ -1233,7 +1206,6 @@
       // 人脸信息
       handleChange(file) {
         var self = this;
-        console.log(1, file);
         self.change_href = URL.createObjectURL(file.raw);
         self.hasNewImage = true;
       },
@@ -1251,11 +1223,10 @@
       },
       handleAvatarSuccess(res, file) {
         var self = this;
-        console.log(111, res);
         file.url = `${res.data}`;
         self.familyForm.href = file.url;
         if (self.member_type == 3) {
-          API.editFace(self.user_id, self.card_number, self.familyForm.href).then(
+          API.editFace(self.user_id, self.card_number, self.familyForm.href, self.id).then(
             (res) => {
               self.$message.success("上传成功");
               self.current = 1;
@@ -1270,7 +1241,7 @@
             }
           );
         } else {
-          API.editFace(self.user_id, 1, self.familyForm.href).then((res) => {
+          API.editFace(self.user_id, 1, self.familyForm.href, self.id).then((res) => {
             self.$message.success("上传成功");
             self.current = 1;
             self.getAllRent();

@@ -391,11 +391,12 @@ API.userInfo = function (name) {
 }
 
 // 修改人脸
-API.editFace = function (user_id, self, href) {
+API.editFace = function (user_id, self, href, id) {
 	return axios.post(url.EditFace, {
 		user_id: user_id,
 		self: self,
-		href: href
+		href: href,
+		id: id
 	})
 }
 // 获取开关
