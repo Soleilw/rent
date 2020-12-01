@@ -115,6 +115,9 @@
     log
   } from "util";
   import date from "../../utils/date";
+  import {
+    setInterval
+  } from 'timers';
 
   export default {
     data() {
@@ -146,16 +149,15 @@
     },
 
     mounted() {
-      this.getDangerFace();
+      this.getDangerFace(this.current, this.size);
     },
     methods: {
       // 获取可疑人物
-      getDangerFace() {
+      getDangerFace(cur, list) {
         var self = this;
-        API.dangerFace(self.current, self.size)
+        API.dangerFace(cur, list)
           .then((res) => {
             self.loading = false;
-            console.log("getDangerFace", res.data.data);
             self.tableData = res.data.data;
             self.total = res.data.total;
           })
@@ -166,34 +168,17 @@
       // 分页
       currentChange(val) {
         var self = this;
-        console.log(val);
         self.current = val;
         self.loading = true;
-        API.dangerFace(val, self.size)
-          .then((res) => {
-            self.loading = false;
-            self.tableData = res.data.data;
-            self.total = res.data.total;
-          })
-          .catch((err) => {
-            self.loading = false;
-          });
+        self.getDangerFace(val, self.size);
       },
       // 每页条数
       sizeChange(val) {
         var self = this;
-        console.log(val);
         self.size = val;
         self.loading = true;
-        API.dangerFace(self.current, val)
-          .then((res) => {
-            self.loading = false;
-            self.tableData = res.data.data;
-            self.total = res.data.total;
-          })
-          .catch((err) => {
-            self.loading = false;
-          });
+        self.getDangerFace(1, val);
+        self.current = 1;
       },
 
       // 添加可以人物
@@ -208,15 +193,15 @@
         self.dialogLogs = true;
         self.danger_id = row.danger_id;
         self.logsCurrent = 1;
-        self.getFaceLogs();
+        self.getFaceLogs(self.logsCurrent, self.logsSize);
       },
-      getFaceLogs() {
+      getFaceLogs(cur, list) {
         var self = this;
-        API.dangerLog(self.logsCurrent, self.logsSize, self.danger_id).then(
+        API.dangerLog(cur, list, self.danger_id).then(
           (res) => {
-            console.log("getFaceLogs", res.data.data);
+            this.$message.success('获取数据成功');
             self.logsData = res.data.data;
-            self.logTlogsTotal = res.data.total;
+            self.logsTotal = res.data.total;
             self.logsData.forEach((item) => {
               item.log.timestamp = date.formatTime(
                 item.log.timestamp,
@@ -230,28 +215,13 @@
       logsCurrentChange(val) {
         var self = this;
         self.logsCurrent = val;
-        API.dangerLog(val, self.logsSize, self.danger_id).then((res) => {
-          self.logsData = res.data.data;
-          self.logsData.forEach((item) => {
-            item.log.timestamp = date.formatTime(
-              item.log.timestamp,
-              "Y-M-D h:m:s"
-            );
-          });
-        });
+        self.getFaceLogs(val, self.logsSize);
       },
       logsSizeChange(val) {
         var self = this;
         self.logsSize = val;
-        API.dangerLog(self.logsCurrent, val, self.danger_id).then((res) => {
-          self.logsData = res.data.data;
-          self.logsData.forEach((item) => {
-            item.log.timestamp = date.formatTime(
-              item.log.timestamp,
-              "Y-M-D h:m:s"
-            );
-          });
-        });
+        self.getFaceLogs(1, val);
+        self.logsCurrent = 1;
       },
 
       handleRemove(file, fileList) {
@@ -276,8 +246,7 @@
       handleAvatarSuccess(res, file) {
         //图片上传成功
         var self = this;
-        file.url = res.data;
-        self.form.href = file.url;
+        self.form.href = res.data;
         // 手机加 '+86'
         var phones = self.notify_user.split(",");
         var arr = [];
@@ -288,8 +257,7 @@
         self.form.notify_user = arr.toString();
         API.addDangerFace(self.form).then((res) => {
           self.$message.success("上传成功");
-          self.current = 1;
-          self.getDangerFace();
+          self.getDangerFace(self.current, self.size);
           self.$refs.upload.clearFiles();
           self.form = {
             name: "",

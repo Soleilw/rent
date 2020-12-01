@@ -82,7 +82,8 @@
                   @click="handleAudit(scope.$index, scope.row)">审核</el-button>
               </el-dropdown-item>
               <el-dropdown-item>
-                <el-button size="mini" type="primary" v-if="isShow" @click="openServe(scope.$index, scope.row)">开通服务
+                <el-button size="mini" type="primary" v-if="username == 'admin'"
+                  @click="openServe(scope.$index, scope.row)">开通服务
                 </el-button>
               </el-dropdown-item>
               <el-dropdown-item>
@@ -218,7 +219,7 @@
     </el-dialog>
 
     <!-- 添加身份 -->
-    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false" @close="closeUser">
+    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false">
       <div class="box">
         <el-form :model="userForm" label-width="80px">
           <el-form-item label="姓名">
@@ -388,7 +389,6 @@
         addresses_id: "",
         face_id: "",
         username: localStorage.getItem("username"),
-        isShow: false,
         type: 2, // 选中的搜索方式
         typeList: [{
             value: 1,
@@ -486,18 +486,15 @@
       };
     },
     mounted() {
-      this.getAllRent();
+      this.getAllRent(this.current, this.size);
       this.getPro();
       this.getUser();
-      if (this.username == "admin") {
-        this.isShow = true;
-      }
     },
     methods: {
       // 表格数据
-      getAllRent() {
+      getAllRent(cur, list) {
         var self = this;
-        API.households(self.current, self.size)
+        API.households(cur, list)
           .then((res) => {
             self.loading = false;
             res.data.forEach((item) => {
@@ -521,112 +518,36 @@
           switch (self.type) {
             case 1:
               var keyword = self.renter_name;
-              API.searchHousehold(val, self.size, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  res.data.forEach((item) => {
-                    if (item.expireTime) {
-                      item.expireTime = item.expireTime.slice(0, 10);
-                    }
-                  });
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(val, self.size, name, keyword)
               break;
             case 2:
               var name = self.renter_name;
-              API.searchHousehold(val, self.size, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  res.data.forEach((item) => {
-                    if (item.expireTime) {
-                      item.expireTime = item.expireTime.slice(0, 10);
-                    }
-                  });
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(val, self.size, name, keyword)
           }
         } else {
-          API.households(val, self.size)
-            .then((res) => {
-              self.loading = false;
-              res.data.forEach((item) => {
-                if (item.expireTime) {
-                  item.expireTime = item.expireTime.slice(0, 10);
-                }
-              });
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getAllRent(val, self.size);
         }
       },
       // 每页几条
       sizeChange(val) {
         var self = this;
+        debugger
         self.size = val;
         self.loading = true;
         if (self.renter_name) {
           switch (self.type) {
             case 1:
               var keyword = self.renter_name;
-              API.searchHousehold(self.current, val, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  res.data.forEach((item) => {
-                    if (item.expireTime) {
-                      item.expireTime = item.expireTime.slice(0, 10);
-                    }
-                  });
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(1, val, name, keyword);
               break;
             case 2:
               var name = self.renter_name;
-              API.searchHousehold(self.current, val, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  res.data.forEach((item) => {
-                    if (item.expireTime) {
-                      item.expireTime = item.expireTime.slice(0, 10);
-                    }
-                  });
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(1, val, name, keyword);
           }
         } else {
-          API.households(self.current, val)
-            .then((res) => {
-              self.loading = false;
-              res.data.forEach((item) => {
-                if (item.expireTime) {
-                  item.expireTime = item.expireTime.slice(0, 10);
-                }
-              });
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getAllRent(1, val);
         }
+        self.current = 1;
       },
 
       // 搜索方式
@@ -635,7 +556,25 @@
         self.typeDisabled = true;
         self.renter_name = "";
         self.current = 1;
-        self.getAllRent();
+        self.getAllRent(self.current, self.size);
+      },
+
+      // 搜索封装
+      fucSearch(cur, list, name, keyword) {
+        var self = this;
+        API.searchHousehold(cur, list, name, keyword).then(
+          (res) => {
+            self.loading = false;
+            res.data.forEach((item) => {
+              if (item.expireTime) {
+                item.expireTime = item.expireTime.slice(0, 10);
+              }
+            });
+            self.tableData = res.data;
+            self.total = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
       },
       // 搜索
       search() {
@@ -644,33 +583,11 @@
         self.size = 10;
         if (self.type == 1) {
           var keyword = self.renter_name;
-          API.searchHousehold(self.current, self.size, name, keyword).then(
-            (res) => {
-              res.data.forEach((item) => {
-                if (item.expireTime) {
-                  item.expireTime = item.expireTime.slice(0, 10);
-                }
-              });
-              self.tableData = res.data;
-              self.total = res.total;
-              self.$message.success("搜索成功！");
-            }
-          );
+          self.fucSearch(self.current, self.size, name, keyword)
         }
         if (self.type == 2) {
           var name = self.renter_name;
-          API.searchHousehold(self.current, self.size, name, keyword).then(
-            (res) => {
-              res.data.forEach((item) => {
-                if (item.expireTime) {
-                  item.expireTime = item.expireTime.slice(0, 10);
-                }
-              });
-              self.tableData = res.data;
-              self.total = res.total;
-              self.$message.success("搜索成功！");
-            }
-          );
+          self.fucSearch(self.current, self.size, name, keyword)
         }
       },
       // 刷新
@@ -717,7 +634,6 @@
       },
       getPro() {
         var self = this;
-
         API.areas(1, 4000, 0).then((res) => {
           self.proList = res.data;
         });
@@ -752,42 +668,34 @@
           self.roomList = res.data;
         });
       },
-      proChange(val) {
+      funTitle(arr, val) {
         var self = this;
         let obj = {};
-        obj = this.proList.find((item) => {
+        obj = arr.find((item) => {
           return item.id === val;
         });
-        self.detailAddress = obj.title;
+        self.detailAddress += obj.title;
+      },
+      proChange(val) {
+        var self = this;
+        self.funTitle(self.proList, val);
         self.getCity(val);
       },
       cityChange(val) {
         var self = this;
-        let obj = {};
-        obj = this.cityList.find((item) => {
-          return item.id === val;
-        });
-        self.detailAddress += obj.title;
+        self.funTitle(self.cityList, val);
         self.getCommunity(val);
       },
       areasChange(val) {
         var self = this;
-        let obj = {};
-        obj = this.communityList.find((item) => {
-          return item.id === val;
-        });
-        self.detailAddress += obj.title;
+        self.funTitle(self.communityList, val);
         self.getAreas(val);
       },
       communityChange(val) {
         var self = this;
         self.userForm.areas_id = val;
         self.userForms.areas_id = val;
-        let obj = {};
-        obj = this.areaList.find((item) => {
-          return item.id === val;
-        });
-        self.detailAddress += obj.title;
+        self.funTitle(self.areaList, val);
         self.getDetailAddress(val);
         self.address = "";
       },
@@ -816,9 +724,6 @@
       addUser(index, row) {
         var self = this;
         self.dialogUser = true;
-      },
-      closeUser() {
-        var self = this;
         self.pro_id = "";
         self.city_id = "";
         self.community_id = "";
@@ -829,6 +734,7 @@
         self.name = "";
         self.userForm = {};
       },
+
       newUser() {
         var self = this;
         self.userForm.address = self.detailAddress;
@@ -837,7 +743,7 @@
           API.creation(self.userForm).then((res) => {
             self.dialogUser = false;
             self.$message.success("添加成功");
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
             self.userForm = {
               user_id: "",
               areas_id: "",
@@ -852,7 +758,7 @@
           API.creation(self.userForms).then((res) => {
             self.dialogUser = false;
             self.$message.success("添加成功");
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
             self.userForms = {
               user_id: "",
               areas_id: "",
@@ -948,7 +854,7 @@
             loading.close();
             self.dialogVerify = false;
             self.$message.success("提交成功");
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           })
           .catch((err) => {
             loading.close();
@@ -1019,13 +925,13 @@
           API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
             self.$message.success("提交成功");
             self.dialogAudit = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         } else {
           API.audit(self.renter_id, 2, 1).then((res) => {
             self.$message.success("提交成功");
             self.dialogAudit = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         }
       },
@@ -1035,13 +941,13 @@
           API.audit(self.renter_id, 3, self.card_number).then((res) => {
             self.$message.success("提交成功");
             self.dialogAudit = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         } else {
           API.audit(self.renter_id, 3, 1).then((res) => {
             self.$message.success("提交成功");
             self.dialogAudit = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         }
       },
@@ -1103,12 +1009,12 @@
         var self = this;
         self.dialogLogs = true;
         self.face_id = row.face_id;
-        self.getFaceLogs();
-      },
-      getFaceLogs() {
-        var self = this;
         self.logsCurrent = 1;
-        API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
+        self.getFaceLogs(self.logsCurrent, self.logsSize);
+      },
+      getFaceLogs(cur, list) {
+        var self = this;
+        API.faceLogs(cur, list, self.face_id).then(
           (res) => {
             self.logsData = res.data;
             self.logsTotal = res.total;
@@ -1119,16 +1025,13 @@
       logsCurrentChange(val) {
         var self = this;
         self.logsCurrent = val;
-        API.faceLogs(val, self.logsSize, self.face_id).then((res) => {
-          self.logsData = res.data;
-        });
+        self.getFaceLogs(val, self.logsSize);
       },
       logsSizeChange(val) {
         var self = this;
         self.logsSize = val;
-        API.faceLogs(self.logsCurrent, val, self.face_id).then((res) => {
-          self.logsData = res.data;
-        });
+        self.getFaceLogs(1, val);
+        self.logsCurrent = 1;
       },
 
       // 删除
@@ -1150,13 +1053,13 @@
           API.delHousehold(self.id, self.card_number).then((res) => {
             self.$message.success("删除成功");
             self.dialogDel = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         } else {
           API.delHousehold(self.id, 1).then((res) => {
             self.$message.success("删除成功");
             self.dialogDel = false;
-            self.getAllRent();
+            self.getAllRent(self.current, self.size);
           });
         }
       },
@@ -1174,29 +1077,33 @@
       },
       changeFace() {
         var self = this;
+        // this.$refs.upload.submit();
+
         if (self.change_href === "") {
           self.familyForm.href = self.old_href;
           if (self.member_type == 3) {
-            API.editFace(
-              self.user_id,
-              self.card_number,
-              self.familyForm.href,
-              self.id
-            ).then((res) => {
-              self.$message.success("上传成功");
-              self.current = 1;
-              self.getAllRent();
-              self.familyForm.href = "";
-              self.dialogChangeFace = false;
-            });
+            self.fucEditFace(self.card_number);
+            // API.editFace(
+            //   self.user_id,
+            //   self.card_number,
+            //   self.familyForm.href,
+            //   self.id
+            // ).then((res) => {
+            //   self.$message.success("上传成功");
+            //   self.current = 1;
+            //   self.getAllRent(self.current, self.size);
+            //   self.familyForm.href = "";
+            //   self.dialogChangeFace = false;
+            // });
           } else {
-            API.editFace(self.user_id, 1, self.href, self.id).then((res) => {
-              self.$message.success("上传成功");
-              self.current = 1;
-              self.getAllRent();
-              self.familyForm.href = "";
-              self.dialogChangeFace = false;
-            });
+            self.fucEditFace(1);
+            // API.editFace(self.user_id, 1, self.href, self.id).then((res) => {
+            //   self.$message.success("上传成功");
+            //   self.current = 1;
+            //   self.getAllRent(self.current, self.size);
+            //   self.familyForm.href = "";
+            //   self.dialogChangeFace = false;
+            // });
           }
         } else {
           this.$refs.upload.submit();
@@ -1204,6 +1111,23 @@
       },
 
       // 人脸信息
+      fucEditFace(card_number) {
+        var self = this;
+        API.editFace(self.user_id, card_number, self.familyForm.href, self.id).then(
+          (res) => {
+            self.$message.success("上传成功");
+            self.current = 1;
+            self.getAllRent(self.current, self.size);
+            self.$refs.upload.clearFiles();
+            self.familyForm.href = "";
+            self.change_href = "";
+            self.old_href = "";
+            self.imgData.key = "";
+            self.familyForm.user_id = "";
+            self.dialogChangeFace = false;
+          }
+        );
+      },
       handleChange(file) {
         var self = this;
         self.change_href = URL.createObjectURL(file.raw);
@@ -1226,33 +1150,35 @@
         file.url = `${res.data}`;
         self.familyForm.href = file.url;
         if (self.member_type == 3) {
-          API.editFace(self.user_id, self.card_number, self.familyForm.href, self.id).then(
-            (res) => {
-              self.$message.success("上传成功");
-              self.current = 1;
-              self.getAllRent();
-              self.$refs.upload.clearFiles();
-              self.familyForm.href = "";
-              self.change_href = "";
-              self.old_href = "";
-              self.imgData.key = "";
-              self.familyForm.user_id = "";
-              self.dialogChangeFace = false;
-            }
-          );
+          self.fucEditFace(self.card_number);
+          // API.editFace(self.user_id, self.card_number, self.familyForm.href, self.id).then(
+          //   (res) => {
+          //     self.$message.success("上传成功");
+          //     self.current = 1;
+          //     self.getAllRent(self.current, self.size);
+          //     self.$refs.upload.clearFiles();
+          //     self.familyForm.href = "";
+          //     self.change_href = "";
+          //     self.old_href = "";
+          //     self.imgData.key = "";
+          //     self.familyForm.user_id = "";
+          //     self.dialogChangeFace = false;
+          //   }
+          // );
         } else {
-          API.editFace(self.user_id, 1, self.familyForm.href, self.id).then((res) => {
-            self.$message.success("上传成功");
-            self.current = 1;
-            self.getAllRent();
-            self.$refs.upload.clearFiles();
-            self.familyForm.href = "";
-            self.change_href = "";
-            self.old_href = "";
-            self.imgData.key = "";
-            self.familyForm.user_id = "";
-            self.dialogChangeFace = false;
-          });
+          self.fucEditFace(1);
+          // API.editFace(self.user_id, 1, self.familyForm.href, self.id).then((res) => {
+          //   self.$message.success("上传成功");
+          //   self.current = 1;
+          //   self.getAllRent(self.current, self.size);
+          //   self.$refs.upload.clearFiles();
+          //   self.familyForm.href = "";
+          //   self.change_href = "";
+          //   self.old_href = "";
+          //   self.imgData.key = "";
+          //   self.familyForm.user_id = "";
+          //   self.dialogChangeFace = false;
+          // });
         }
       },
       handleExceed(file, fileList) {
