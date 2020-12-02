@@ -280,15 +280,14 @@
       };
     },
     mounted() {
-      this.getList();
+      this.getList(this.current, this.size);
     },
     methods: {
       // 获取白名单
-      getList() {
+      getList(cur, list) {
         var self = this;
-        API.withdraws(self.current, self.size)
+        API.withdraws(cur, list)
           .then((res) => {
-            console.log(res);
             self.loading = false;
             self.tableData = res.data;
             self.total = res.total;
@@ -306,39 +305,14 @@
           switch (self.type) {
             case 1:
               var keyword = self.renter_name;
-              API.withdraws(val, self.size, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                  console.log(err);
-                });
+              self.fucSearch(val, self.size, name, keyword);
               break;
             case 2:
               var name = self.renter_name;
-              API.withdraws(val, self.size, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(val, self.size, name, keyword);
           }
         } else {
-          API.withdraws(val, self.size)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getList(val, self.size);
         }
       },
       // 每页几条
@@ -350,40 +324,16 @@
           switch (self.type) {
             case 1:
               var keyword = self.renter_name;
-              API.withdraws(self.current, val, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                  console.log(err);
-                });
+              self.fucSearch(1, val, name, keyword);
               break;
             case 2:
               var name = self.renter_name;
-              API.withdraws(self.current, val, name, keyword)
-                .then((res) => {
-                  self.loading = false;
-                  self.tableData = res.data;
-                  self.total = res.total;
-                })
-                .catch((err) => {
-                  self.loading = false;
-                });
+              self.fucSearch(1, val, name, keyword);
           }
         } else {
-          API.withdraws(self.current, val)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getList(1, val);
         }
+        self.current = 1;
       },
 
       // 搜索
@@ -392,7 +342,18 @@
         self.typeDisabled = true;
         self.renter_name = "";
         self.current = 1;
-        self.getList();
+        self.getList(self.current, self.size);
+      },
+      fucSearch(cur, list, name, keyword) {
+        var self = this;
+        API.withdraws(cur, list, name, keyword).then(
+          (res) => {
+            self.loading = false;
+            self.tableData = res.data;
+            self.total = res.total;
+            self.$message.success("搜索成功！");
+          }
+        );
       },
       search() {
         var self = this;
@@ -400,19 +361,11 @@
         self.size = 10;
         if (self.type == 1) {
           var keyword = self.renter_name;
-          API.withdraws(self.current, self.size, name, keyword).then((res) => {
-            self.tableData = res.data;
-            self.total = res.total;
-            self.$message.success("搜索成功！");
-          });
+          self.fucSearch(self.current, self.size, name, keyword);
         }
         if (self.type == 2) {
           var name = self.renter_name;
-          API.withdraws(self.current, self.size, name, keyword).then((res) => {
-            self.tableData = res.data;
-            self.total = res.total;
-            self.$message.success("搜索成功！");
-          });
+          self.fucSearch(self.current, self.size, name, keyword);
         }
       },
 
@@ -470,7 +423,7 @@
         if (self.isAdd) {
           API.createRaw(self.listForm).then((res) => {
             self.$message.success("添加成功！");
-            self.getList();
+            self.getList(self.current, self.size);
             self.listForm = {
               id: "",
               service: [],
@@ -479,7 +432,7 @@
         } else {
           API.createRaw(self.listForm).then((res) => {
             self.$message.success("提交成功！");
-            self.getList();
+            self.getList(self.current, self.size);
           });
         }
       },
@@ -598,7 +551,7 @@
         API.delWhite(self.id).then((res) => {
           self.$message.success("删除成功！");
           self.dialogDel = false;
-          self.getList();
+          self.getList(self.current, self.size);
         });
       },
 
@@ -619,7 +572,7 @@
         API.createRaw(self.listForm).then((res) => {
           self.$message.success("启用成功！");
           self.dialogUsing = false;
-          self.getList();
+          self.getList(self.current, self.size);
           self.listForm.service = [];
         });
       },
@@ -641,7 +594,7 @@
         API.createRaw(self.listForm).then((res) => {
           self.$message.success("禁用成功！");
           self.dialogBan = false;
-          self.getList();
+          self.getList(self.current, self.size);
           self.listForm.service = [];
         });
       },
