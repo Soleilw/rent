@@ -14,16 +14,13 @@
       </div>
     </div>
 
-    <el-dialog title="添加房屋" :visible.sync="dialogHouses" width="80%">
+    <el-dialog title="添加房屋" :visible.sync="dialogHouses" width="80%" @close="close">
       <div class="box">
         <el-form :model="listForm">
-          <!-- <div v-for="(item, index) in listForm.service" :key="index"> -->
           <div class="handle-box">
-            <!-- <div class="btn"> -->
             <el-alert title="添加地址: 选择所在社区 --> 点击地址所在行 --> 提交" type="info" show-icon :closable="false" effect="dark"
               center>
             </el-alert>
-            <!-- </div> -->
           </div>
           <div class="handle-box">
             <div class="btn">
@@ -47,16 +44,12 @@
 
           <el-table :data="addressList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620"
             highlight-current-row @current-change="handleCurrentChange" ref="singleTable">
-            <!-- <el-table-column prop="area_id" label="社区ID"></el-table-column> -->
             <el-table-column prop="groups[0].address_id" label="地址ID"></el-table-column>
             <el-table-column prop="address" label="房屋地址"></el-table-column>
             <el-table-column prop="groups[0].group_name" label="人脸组"></el-table-column>
             <el-table-column prop="stations" label="派出所"></el-table-column>
           </el-table>
           <div class="submit">
-            <!-- <el-form-item>
-              <el-button type="primary" @click="setCurrent()">取消选择</el-button>
-            </el-form-item> -->
             <el-form-item>
               <el-button type="primary" @click="newHouses">提交</el-button>
             </el-form-item>
@@ -64,7 +57,6 @@
         </el-form>
       </div>
     </el-dialog>
-    <!-- :disabled="isDisabled" -->
     <!-- 表格数据 -->
     <el-table :data="tableData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <el-table-column prop="id" label="ID"></el-table-column>
@@ -93,7 +85,6 @@
         <template v-if="user == '全部'">
           <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -149,7 +140,6 @@
         <template v-if="user == '户主'">
           <el-table :data="houseOwnerList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
             <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
             <el-table-column prop="name" label="真实姓名"></el-table-column>
             <el-table-column prop="type" label="用户身份">
               <template slot-scope="scope">
@@ -198,9 +188,9 @@
             </el-table-column>
           </el-table>
           <div class="block">
-            <el-pagination @current-change="HouseOwnerCurrentChange" :current-page.sync="houseOwnerCurrent"
+            <el-pagination @current-change="houseOwnerCurrentChange" :current-page.sync="houseOwnerCurrent"
               :page-sizes="[10, 20, 30, 40, 50]" :page-size="houseOwnerSize" layout="sizes, prev, pager, next, jumper"
-              :total="houseOwnerTotal" @size-change="HouseOwnerSizeChange"></el-pagination>
+              :total="houseOwnerTotal" @size-change="houseOwnerSizeChange"></el-pagination>
           </div>
         </template>
         <template v-if="user == '租客'">
@@ -255,7 +245,7 @@
             </el-table-column>
           </el-table>
           <div class="block">
-            <el-pagination @current-change="RenterCurrentChange" :current-page.sync="renterCurrent"
+            <el-pagination @current-change="renterCurrentChange" :current-page.sync="renterCurrent"
               :page-sizes="[10, 20, 30, 40, 50]" :page-size="renterSize" layout="sizes, prev, pager, next, jumper"
               :total="renterTotal" @size-change="renterSizeChange"></el-pagination>
           </div>
@@ -416,7 +406,7 @@
       <div class="box">
         <div class="handle-box">
           <div class="btn">
-            <el-button type="primary" @click="HandleAddBuild">添加房屋编号</el-button>
+            <el-button type="primary" @click="handleAddBuild">添加房屋编号</el-button>
           </div>
         </div>
         <el-table :data="buildingList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
@@ -703,7 +693,7 @@
       };
     },
     mounted() {
-      this.getnewHouses();
+      this.getnewHouses(this.current, this.size);
       this.getAddress();
       this.getPro();
       var permissionList = this.permission.split(",");
@@ -713,9 +703,9 @@
     },
     methods: {
       // 获取房屋列表
-      getnewHouses() {
+      getnewHouses(cur, list) {
         var self = this;
-        API.addresses(self.current, self.size)
+        API.addresses(cur, list)
           .then((res) => {
             self.loading = false;
             self.tableData = res.data;
@@ -731,25 +721,9 @@
         self.current = val;
         self.loading = true;
         if (self.house_id == "") {
-          API.addresses(val, self.size)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getnewHouses(val, self.size);
         } else {
-          API.addresses(val, self.size, 0, self.house_id)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.funSearch(val, self.size);
         }
       },
       // 每页几条
@@ -758,37 +732,27 @@
         self.size = val;
         self.loading = true;
         if (self.house_id == "") {
-          API.addresses(self.current, val)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.getnewHouses(1, val);
         } else {
-          API.addresses(self.current, val, 0, self.house_id)
-            .then((res) => {
-              self.loading = false;
-              self.tableData = res.data;
-              self.total = res.total;
-            })
-            .catch((err) => {
-              self.loading = false;
-            });
+          self.funSearch(1, val);
         }
+        self.current = 1;
       },
 
       // 搜索
-      search() {
+      funSearch(cur, list) {
         var self = this;
-        API.addresses(self.current, self.size, 0, self.house_id).then((res) => {
+        API.addresses(cur, list, 0, self.house_id).then((res) => {
+          self.loading = false;
           self.tableData = res.data;
           self.total = res.total;
-          // self.house_id = "";
           self.$message.success("搜索成功！");
         });
+      },
+      search() {
+        var self = this;
+        self.current = 1;
+        self.funSearch(self.current, self.size);
       },
       // 刷新
       refresh() {
@@ -798,6 +762,9 @@
       addHouses() {
         var self = this;
         self.dialogHouses = true;
+      },
+      close() {
+        var self = this;
         self.pro_id = '';
         self.city_id = '';
         self.community_id = '';
@@ -810,15 +777,9 @@
       getAddress() {
         var self = this;
         API.gainAddress(1, 100).then(res => {
-          // console.log(res);
           self.addressList = res.data;
         })
       },
-      // 选择地址
-      // selectSize(val) {
-      //   var self = this;
-      //   console.log(val);
-      // },
       getPro() {
         var self = this;
         API.areas(1, 4000, 0).then((res) => {
@@ -844,7 +805,6 @@
       getAreas(val) {
         var self = this;
         API.areas(1, 4000, val).then((res) => {
-          console.log("getAreas", res);
           self.areaList = res.data;
         });
       },
@@ -858,12 +818,10 @@
       },
       communityChange(val) {
         var self = this;
-        console.log(val);
         self.listForm.area_id = val;
       },
       handleCurrentChange(val) {
         var self = this;
-        console.log(val);
         if (self.listForm.area_id) {
           if (val.address && val.area_id && val.groups.length != 0 && val.stations) {
             self.$message.success("选择成功! ");
@@ -880,24 +838,14 @@
           self.$message.warning("请先选择社区");
         }
       },
-      
       // 新增房屋地址
       newHouses() {
         var self = this;
-        console.log(self.listForm);
         if (self.isAdd) {
           API.createAddress(self.listForm).then(res => {
             self.$message.success("添加成功! ");
             self.dialogHouses = false;
-            self.pro_id = '';
-            self.city_id = '';
-            self.community_id = '';
-            self.areas_id = '';
-            self.cityList = [];
-            self.communityList = [];
-            self.areaList = [];
-            this.reload();
-            self.getnewHouses();
+            self.reload();
           })
         } else {
           self.$message.warning("该地址存在空数据, 无法添加");
@@ -911,20 +859,18 @@
         self.buildForm.address_id = row.id;
         self.address_id = row.id;
         self.buildingCurrent = 1;
-        self.getBuilding();
+        self.getBuilding(self.buildingCurrent, self.buildingSize);
       },
-      HandleAddBuild(index, row) {
-        var self = this;
-        self.dialogAddBuild = true;
-      },
+
       // 获取楼栋信息
-      getBuilding() {
+      getBuilding(cur, list) {
         var self = this;
         API.gainRooms(
-          self.buildingCurrent,
-          self.buildingSize,
+          cur,
+          list,
           self.address_id
         ).then((res) => {
+          self.$message.success("获取数据成功");
           self.buildingList = res.data;
           self.buildingTotal = res.total;
         });
@@ -933,63 +879,55 @@
       buildingCurrentChange(val) {
         var self = this;
         self.buildingCurrent = val;
-        API.gainRooms(val, self.buildingSize, self.address_id).then((res) => {
-          self.buildingList = res.data;
-          self.buildingTotal = res.total;
-        });
+        self.getBuilding(val, self.buildingSize);
       },
       buildingSizeChange(val) {
         var self = this;
         self.buildingSize = val;
-        API.gainRooms(self.buildingCurrent, val, self.address_id).then((res) => {
-          self.buildingList = res.data;
-          self.buildingTotal = res.total;
-        });
+        self.getBuilding(1, val);
+        self.buildingCurrent = 1;
       },
 
       // 访客
+      funVisitor(cur, list) {
+        var self = this;
+        API.visitors(
+          cur,
+          list,
+          self.address_id,
+          self.room_id
+        ).then((res) => {
+          self.$message.success("获取数据成功");
+          self.visitorList = res.data;
+          self.visitorTotal = res.total;
+        });
+      },
       handleVistor(index, row) {
         var self = this;
         self.dialogVisitor = true;
         self.address_id = row.address_id;
         self.room_id = row.id;
         self.visitorCurrent = 1;
-        API.visitors(
-          self.visitorCurrent,
-          self.visitorSize,
-          self.address_id,
-          self.room_id
-        ).then((res) => {
-          self.visitorList = res.data;
-          self.visitorTotal = res.total;
-        });
+        self.funVisitor(self.visitorCurrent, self.visitorSize);
       },
       // 访客分页
       visitorCurrentChange(val) {
         var self = this;
         self.visitorCurrent = val;
-        API.visitors(val, self.visitorSize, self.address_id, self.room_id).then(
-          (res) => {
-            self.visitorList = res.data;
-            self.visitorTotal = res.total;
-          }
-        );
+        self.funVisitor(val, self.visitorSize);
       },
       visitorSizeChange(val) {
         var self = this;
         self.visitorSize = val;
-        API.visitors(
-          self.visitorCurrent,
-          val,
-          self.address_id,
-          self.room_id
-        ).then((res) => {
-          self.visitorList = res.data;
-          self.visitorTotal = res.total;
-        });
+        self.funVisitor(1, val);
+        self.visitorCurrent = 1;
       },
 
       // 房屋编号操作
+      handleAddBuild(index, row) {
+        var self = this;
+        self.dialogAddBuild = true;
+      },
       addRooms() {
         var self = this;
         self.buildForm.rooms.push("");
@@ -1005,25 +943,54 @@
           self.dialogAddBuild = false;
           self.buildForm.rooms = [];
           self.rooms = "";
-          self.getBuilding();
+          self.getBuilding(self.buildingCurrent, self.buildingSize);
         });
       },
 
       // 查看住户
+      fucAllUser(cur, list) {
+        var self = this;
+        API.addressResidents(cur, list, self.address_id).then((res) => {
+          self.residentData = res.data;
+          self.residentTotal = res.total;
+        });
+      },
+      fucOwner(cur, list, type) {
+        var self = this;
+        API.addressResidents(cur, list, self.address_id, type).then((res) => {
+          self.houseOwnerList = res.data;
+          self.houseOwnerTotal = res.total;
+        });
+      },
+      fucRenter(cur, list, type) {
+        var self = this;
+        API.addressResidents(cur, list, self.address_id, type).then((res) => {
+          self.renterList = res.data;
+          self.renterTotal = res.total;
+        });
+      },
+      fucManage(cur, list, type) {
+        var self = this;
+        API.addressResidents(cur, list, self.address_id, type).then((res) => {
+          self.managementList = res.data;
+          self.managementTotal = res.total;
+        });
+
+      },
+      fucFamily(cur, list, type) {
+        var self = this;
+        API.addressResidents(cur, list, self.address_id, type).then((res) => {
+          self.familyList = res.data;
+          self.familyTotal = res.total;
+        });
+      },
       handleResident(index, row) {
         var self = this;
         self.dialogResident = true;
         self.address_id = row.id;
         self.user = "全部";
         self.rensidentCurrent = 1;
-        API.addressResidents(
-          self.rensidentCurrent,
-          self.residentSize,
-          self.address_id
-        ).then((res) => {
-          self.residentData = res.data;
-          self.residentTotal = res.total;
-        });
+        self.fucAllUser(self.rensidentCurrent, self.residentSize);
       },
       handleUser(value) {
         var self = this;
@@ -1033,14 +1000,7 @@
               self.rensidentCurrent = 1;
               self.residentSize = 10;
               self.user = "全部";
-              API.addressResidents(
-                self.rensidentCurrent,
-                self.residentSize,
-                self.address_id
-              ).then((res) => {
-                self.residentData = res.data;
-                self.residentTotal = res.total;
-              });
+              self.fucAllUser(self.rensidentCurrent, self.residentSize);
             });
             break;
           case 1:
@@ -1048,16 +1008,7 @@
               self.houseOwnerCurrent = 1;
               self.houseOwnerSize = 10;
               self.user = "户主";
-              API.addressResidents(
-                self.houseOwnerCurrent,
-                self.houseOwnerSize,
-                self.address_id,
-                1
-              ).then((res) => {
-                console.log("户主", res);
-                self.houseOwnerList = res.data;
-                self.houseOwnerTotal = res.total;
-              });
+              self.fucOwner(self.houseOwnerCurrent, self.houseOwnerSize, 1);
             });
             break;
           case 2:
@@ -1065,15 +1016,7 @@
               self.renterCurrent = 1;
               self.renterSize = 10;
               self.user = "租客";
-              API.addressResidents(
-                self.renterCurrent,
-                self.renterSize,
-                self.address_id,
-                2
-              ).then((res) => {
-                self.renterList = res.data;
-                self.renterTotal = res.total;
-              });
+              self.fucRenter(self.renterCurrent, self.renterSize, 2);
             });
             break;
           case 3:
@@ -1081,15 +1024,7 @@
               self.managementCurrent = 1;
               self.managementSize = 10;
               self.user = "物业";
-              API.addressResidents(
-                self.managementCurrent,
-                self.managementSize,
-                self.address_id,
-                4
-              ).then((res) => {
-                self.managementList = res.data;
-                self.managementTotal = res.total;
-              });
+              self.fucManage(self.managementCurrent, self.managementSize, 4);
             });
             break;
           case 4:
@@ -1097,15 +1032,7 @@
               self.familyCurrent = 1;
               self.familySize = 10;
               self.user = "家庭成员";
-              API.addressResidents(
-                self.familyCurrent,
-                self.familySize,
-                self.address_id,
-                3
-              ).then((res) => {
-                self.familyList = res.data;
-                self.familyTotal = res.total;
-              });
+              self.fucFamily(self.familyCurrent, self.familySize, 3);
             });
             break;
         }
@@ -1114,103 +1041,61 @@
       residentCurrentChange(val) {
         var self = this;
         self.rensidentCurrent = val;
-        API.addressResidents(val, self.residentSize, self.address_id).then(
-          (res) => {
-            self.residentData = res.data;
-          }
-        );
+        self.fucAllUser(val, self.residentSize);
       },
       residentSizeChange(val) {
         var self = this;
         self.residentSize = val;
-        API.addressResidents(self.rensidentCurrent, val, self.address_id).then(
-          (res) => {
-            self.residentData = res.data;
-          }
-        );
+        self.fucAllUser(1, val);
+        self.rensidentCurrent = 1;
       },
       // 户主分页
-      HouseOwnerCurrentChange(val) {
+      houseOwnerCurrentChange(val) {
         var self = this;
         self.houseOwnerCurrent = val;
-        API.addressResidents(val, self.houseOwnerSize, self.address_id, 1).then(
-          (res) => {
-            self.houseOwnerList = res.data;
-          }
-        );
+        self.fucOwner(val, self.houseOwnerSize, 1);
       },
-      HouseOwnerSizeChange(val) {
+      houseOwnerSizeChange(val) {
         var self = this;
         self.houseOwnerSize = val;
-        API.addressResidents(
-          self.houseOwnerCurrent,
-          val,
-          self.address_id,
-          1
-        ).then((res) => {
-          self.houseOwnerList = res.data;
-        });
+        self.fucOwner(1, val, 1);
+        self.houseOwnerCurrent = 1;
       },
       // 租客分页
-      RenterCurrentChange(val) {
+      renterCurrentChange(val) {
         var self = this;
         self.renterCurrent = val;
-        API.addressResidents(val, self.renterSize, self.address_id, 2).then(
-          (res) => {
-            self.renterList = res.data;
-          }
-        );
+        self.fucRenter(val, self.renterSize, 2);
       },
       renterSizeChange(val) {
         var self = this;
         self.renterSize = val;
-        API.addressResidents(self.renterCurrent, val, self.address_id, 2).then(
-          (res) => {
-            self.renterList = res.data;
-          }
-        );
+        self.fucRenter(1, val, 2);
+        self.renterCurrent = 1;
       },
       // 物业分页
       managementCurrntChange(val) {
         var self = this;
         self.managementCurrent = val;
-        API.addressResidents(val, self.managementSize, self.address_id, 4).then(
-          (res) => {
-            self.managementList = res.data;
-          }
-        );
+        self.fucManage(val, self.managementSize, 4);
       },
       managementSizeChange(val) {
         var self = this;
         self.managementSize = val;
-        API.addressResidents(
-          self.managementCurrent,
-          val,
-          self.address_id,
-          4
-        ).then((res) => {
-          self.managementList = res.data;
-        });
+        self.fucManage(1, val, 4);
+        self.managementCurrent = 1;
       },
       // 家庭成员分头
       familyCurrentChange(val) {
         var self = this;
         self.familyCurrent = val;
-        API.addressResidents(val, self.familySize, self.address_id, 3).then(
-          (res) => {
-            self.familyList = res.data;
-          }
-        );
+        self.fucFamily(val, self.familySize, 3);
       },
       familySizeChange(val) {
         var self = this;
         self.familySize = val;
-        API.addressResidents(self.familyCurrent, val, self.address_id, 3).then(
-          (res) => {
-            self.familyList = res.data;
-            self.familyTotal = res.total;
-          }
-        );
+        self.fucFamily(1, val, 3);
+        self.familyCurrent = 1;
       },
 
       // 进出记录
@@ -1219,13 +1104,12 @@
         self.dialogLogs = true;
         self.face_id = row.face_id;
         self.logsCurrent = 1;
-        self.getFaceLogs();
+        self.getFaceLogs(self.logsCurrent, self.logsSize);
       },
-      getFaceLogs() {
+      getFaceLogs(cur, list) {
         var self = this;
-        API.faceLogs(self.logsCurrent, self.logsSize, self.face_id).then(
+        API.faceLogs(cur, list, self.face_id).then(
           (res) => {
-            console.log("getFaceLogs", res);
             self.logsData = res.data;
             self.logsTotal = res.total;
           }
@@ -1235,23 +1119,19 @@
       logsCurrentChange(val) {
         var self = this;
         self.logsCurrent = val;
-        API.faceLogs(val, self.logsSize, self.face_id).then((res) => {
-          self.logsData = res.data;
-        });
+        self.getFaceLogs(val, self.logsSize);
       },
       logsSizeChange(val) {
         var self = this;
         self.logsSize = val;
-        API.faceLogs(self.logsCurrent, val, self.face_id).then((res) => {
-          self.logsData = res.data;
-        });
+        self.getFaceLogs(1, val);
+        self.logsCurrent = 1;
       },
 
       // 全库推送人脸
       handleFace(index, row) {
         var self = this;
         self.dialogFace = true;
-        console.log(row);
         self.address_id = row.id;
       },
       pushFace() {
@@ -1279,153 +1159,46 @@
         self.id = row.id;
         self.familyType = row.type;
         self.card_number = row.card_number;
-        console.log(row);
         self.dialogDel = true;
+      },
+      fucDel(value) {
+        var self = this;
+        API.delHousehold(self.id, value).then((res) => {
+          switch (self.user) {
+            case "全部":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              self.fucAllUser(self.rensidentCurrent, self.residentSize);
+              break;
+            case "户主":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              self.fucOwner(self.houseOwnerCurrent, self.houseOwnerSize, 1);
+              break;
+            case "租客":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              self.fucRenter(self.renterCurrent, self.renterSize, 2);
+              break;
+            case "物业":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              self.fucManage(self.managementCurrent, self.managementSize, 4);
+              break;
+            case "家庭成员":
+              self.$message.success("删除成功");
+              self.dialogDel = false;
+              self.fucFamily(self.familyCurrent, self.familySize, 3);
+              break;
+          }
+        });
       },
       toDel() {
         var self = this;
         if (self.familyType == 3) {
-          API.delHousehold(self.id, self.card_number).then((res) => {
-            switch (self.user) {
-              case "全部":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.rensidentCurrent,
-                  self.residentSize,
-                  self.address_id
-                ).then((res) => {
-                  console.log("所有", res);
-                  self.residentData = res.data;
-                  self.residentTotal = res.total;
-                });
-                break;
-              case "户主":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.houseOwnerCurrent,
-                  self.houseOwnerSize,
-                  self.address_id,
-                  1
-                ).then((res) => {
-                  console.log("户主", res);
-                  self.houseOwnerList = res.data;
-                  self.houseOwnerTotal = res.total;
-                });
-                break;
-              case "租客":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.renterCurrent,
-                  self.renterSize,
-                  self.address_id,
-                  2
-                ).then((res) => {
-                  self.renterList = res.data;
-                  self.renterTotal = res.total;
-                });
-                break;
-              case "物业":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.managementCurrent,
-                  self.managementSize,
-                  self.address_id,
-                  4
-                ).then((res) => {
-                  self.managementList = res.data;
-                  self.managementTotal = res.total;
-                });
-                break;
-              case "家庭成员":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.familyCurrent,
-                  self.familySize,
-                  self.address_id,
-                  3
-                ).then((res) => {
-                  self.familyList = res.data;
-                  self.familyTotal = res.total;
-                });
-                break;
-            }
-          });
+          self.fucDel(self.card_number);
         } else {
-          API.delHousehold(self.id, 1).then((res) => {
-            switch (self.user) {
-              case "全部":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.rensidentCurrent,
-                  self.residentSize,
-                  self.address_id
-                ).then((res) => {
-                  console.log("所有", res);
-                  self.residentData = res.data;
-                  self.residentTotal = res.total;
-                });
-                break;
-              case "户主":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.houseOwnerCurrent,
-                  self.houseOwnerSize,
-                  self.address_id,
-                  1
-                ).then((res) => {
-                  console.log("户主", res);
-                  self.houseOwnerList = res.data;
-                  self.houseOwnerTotal = res.total;
-                });
-                break;
-              case "租客":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.renterCurrent,
-                  self.renterSize,
-                  self.address_id,
-                  2
-                ).then((res) => {
-                  self.renterList = res.data;
-                  self.renterTotal = res.total;
-                });
-                break;
-              case "物业":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.managementCurrent,
-                  self.managementSize,
-                  self.address_id,
-                  4
-                ).then((res) => {
-                  self.managementList = res.data;
-                  self.managementTotal = res.total;
-                });
-                break;
-              case "家庭成员":
-                self.$message.success("删除成功");
-                self.dialogDel = false;
-                API.addressResidents(
-                  self.familyCurrent,
-                  self.familySize,
-                  self.address_id,
-                  3
-                ).then((res) => {
-                  self.familyList = res.data;
-                  self.familyTotal = res.total;
-                });
-                break;
-            }
-          });
+          self.fucDel(1);
         }
       },
 
@@ -1440,7 +1213,7 @@
         API.delBuilding(self.building_id).then((res) => {
           self.dialogDelBuild = false;
           self.$message.success("删除成功");
-          self.getBuilding();
+          self.getBuilding(self.buildingCurrent, self.buildingSize);
         });
       },
     },
