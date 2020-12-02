@@ -219,11 +219,10 @@
     </el-dialog>
 
     <!-- 添加身份 -->
-    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false">
+    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false" @close="close">
       <div class="box">
         <el-form :model="userForm" label-width="80px">
           <el-form-item label="姓名">
-            <!-- <el-input v-model="form.username" placeholder="请输入姓名"></el-input> -->
             <el-select v-model="name" placeholder="请输入用户名" filterable remote :remote-method="remoteMethod"
               @change="userListChange">
               <el-option v-for="item in userList" :key="item.id" :label="item.label + '' + item.value"
@@ -459,10 +458,6 @@
         dialogPassFace: false,
         dialogVerify: false,
         dialogChangeFace: false,
-        imgData: {
-          key: "",
-          token: "",
-        },
         qiniuaddr: "https://tu.fengniaotuangou.cn", // 七牛云图片外链地址
         familyForm: {
           href: "",
@@ -558,7 +553,6 @@
         self.current = 1;
         self.getAllRent(self.current, self.size);
       },
-
       // 搜索封装
       fucSearch(cur, list, name, keyword) {
         var self = this;
@@ -593,6 +587,20 @@
       // 刷新
       refresh() {
         this.reload();
+      },
+
+      // 加载
+      openFullScreen() {
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        return loading;
+      },
+      closeFullScreen(loading) {
+        loading.close();
       },
 
       // 获取用户
@@ -724,6 +732,9 @@
       addUser(index, row) {
         var self = this;
         self.dialogUser = true;
+      },
+      close() {
+        var self = this;
         self.pro_id = "";
         self.city_id = "";
         self.community_id = "";
@@ -732,42 +743,40 @@
         self.address = "";
         self.room_id = "";
         self.name = "";
-        self.userForm = {};
+        self.userForm = {
+          user_id: "",
+          areas_id: "",
+          type: "",
+          address_id: "",
+          address: "",
+          room_id: "",
+          self: 1,
+        };
+        self.userForms = {
+          user_id: "",
+          areas_id: "",
+          type: "",
+          address_id: "",
+          address: "",
+          self: 1,
+        };
       },
-
+      fucUser(form) {
+        var self = this;
+        API.creation(form).then((res) => {
+          self.dialogUser = false;
+          self.$message.success("添加成功");
+          self.getAllRent(self.current, self.size);
+        });
+      },
       newUser() {
         var self = this;
         self.userForm.address = self.detailAddress;
         self.userForms.address = self.detailAddress;
         if (self.userForm.room_id) {
-          API.creation(self.userForm).then((res) => {
-            self.dialogUser = false;
-            self.$message.success("添加成功");
-            self.getAllRent(self.current, self.size);
-            self.userForm = {
-              user_id: "",
-              areas_id: "",
-              type: "",
-              address_id: "",
-              address: "",
-              room_id: "",
-              self: 1,
-            };
-          });
+          self.fucUser(self.userForm);
         } else {
-          API.creation(self.userForms).then((res) => {
-            self.dialogUser = false;
-            self.$message.success("添加成功");
-            self.getAllRent(self.current, self.size);
-            self.userForms = {
-              user_id: "",
-              areas_id: "",
-              type: "",
-              address_id: "",
-              address: "",
-              self: 1,
-            };
-          });
+          self.fucUser(self.userForms);
         }
       },
 
@@ -782,82 +791,61 @@
       },
       passFace() {
         var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "通过中...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+        self.openFullScreen();
         if (self.member_type == 3) {
           API.matchFace(self.user_id, self.card_number)
             .then((res) => {
-              loading.close();
+              self.closeFullScreen(self.openFullScreen());
               self.dialogPassFace = false;
               self.$message.success("通过成功");
             })
             .catch((err) => {
-              loading.close();
+              self.closeFullScreen(self.openFullScreen());
             });
         } else {
           API.matchFace(self.user_id, 1)
             .then((res) => {
-              loading.close();
+              self.closeFullScreen(self.openFullScreen());
               self.dialogPassFace = false;
               self.$message.success("通过成功");
             })
             .catch((err) => {
-              loading.close();
+              self.closeFullScreen(self.openFullScreen());
             });
         }
       },
       // 验证身份证
       handleVerifyID(index, row) {
-        var self = this;
-        self.user_id = row.user_id;
-        self.member_type = row.type;
-        self.card_number = row.snapshot.card_number;
+        var that = this;
+        that.user_id = row.user_id;
+        that.member_type = row.type;
+        that.card_number = row.snapshot.card_number;
         if (row.state == 2) {
-          self.$message.warning("该用户已经通过审核, 无法修改信息! ");
+          that.$message.warning("该用户已经通过审核, 无法修改信息! ");
         } else {
-          self.dialogVerify = true;
-          if (self.member_type == 3) {
-            self.changeFrom = {
-              user_id: row.user_id,
-              self: row.snapshot.card_number,
-              name: row.snapshot.name,
-              card_number: row.snapshot.card_number,
-              phone: row.snapshot.phone,
-              sex: row.snapshot.sex
-            }
-          } else {
-            self.changeFrom = {
-              user_id: row.user_id,
-              self: 1,
-              name: row.snapshot.name,
-              card_number: row.snapshot.card_number,
-              phone: row.snapshot.phone,
-              sex: row.snapshot.sex
-            }
+          that.dialogVerify = true;
+          that.changeFrom = {
+            user_id: row.user_id,
+            self: that.member_type == 3 ? row.snapshot.card_number : 1,
+            name: row.snapshot.name,
+            card_number: row.snapshot.card_number,
+            phone: row.snapshot.phone,
+            sex: row.snapshot.sex
           }
         }
       },
       verifyID() {
         var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "提交中...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+        self.openFullScreen();
         API.verifyPerson(self.changeFrom)
           .then((res) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
             self.dialogVerify = false;
             self.$message.success("提交成功");
             self.getAllRent(self.current, self.size);
           })
           .catch((err) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
           });
       },
 
@@ -869,20 +857,15 @@
       },
       pushFace() {
         var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "开通中...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+        self.openFullScreen()
         API.pushFace(self.openFace_id)
           .then((res) => {
             self.dialogFace = false;
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
             self.$message.success("开通成功");
           })
           .catch((err) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
           });
       },
       // 禁用人脸
@@ -893,20 +876,15 @@
       },
       forbiddenFace() {
         var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "禁用中...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+        self.openFullScreen();
         API.failFace(self.forbidden_id)
           .then((res) => {
             self.dialogForbidden = false;
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
             self.$message.success("禁用成功");
           })
           .catch((err) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
           });
       },
 
@@ -919,36 +897,28 @@
         self.check = row.check;
         self.dialogAudit = true;
       },
+      fucAudit(val, num) {
+        var self = this;
+        API.audit(self.renter_id, val, num).then((res) => {
+          self.$message.success("提交成功");
+          self.getAllRent(self.current, self.size);
+          self.dialogAudit = false;
+        });
+      },
       toAudit() {
         var self = this;
         if (self.member_type == 3) {
-          API.auditFamily(self.renter_id, 2, self.card_number).then((res) => {
-            self.$message.success("提交成功");
-            self.dialogAudit = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucAudit(2, self.card_number);
         } else {
-          API.audit(self.renter_id, 2, 1).then((res) => {
-            self.$message.success("提交成功");
-            self.dialogAudit = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucAudit(2, 1);
         }
       },
       unAudit() {
         var self = this;
         if (self.member_type == 3) {
-          API.audit(self.renter_id, 3, self.card_number).then((res) => {
-            self.$message.success("提交成功");
-            self.dialogAudit = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucAudit(3, self.card_number);
         } else {
-          API.audit(self.renter_id, 3, 1).then((res) => {
-            self.$message.success("提交成功");
-            self.dialogAudit = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucAudit(3, 1);
         }
       },
 
@@ -986,21 +956,16 @@
       },
       toConfirm() {
         var self = this;
-        const loading = self.$loading({
-          lock: true,
-          text: "正在开通...",
-          spinner: "el-icon-loading",
-          background: "rgba(0, 0, 0, 0.7)",
-        });
+        self.openFullScreen()
         API.setProduct(self.serveForm)
           .then((res) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
             self.$message.success("开通成功！");
             self.dialogOpenServe = false;
             self.title = "";
           })
           .catch((err) => {
-            loading.close();
+            self.closeFullScreen(self.openFullScreen());
           });
       },
 
@@ -1041,33 +1006,28 @@
         self.card_number = row.snapshot.card_number;
         self.member_type = row.type;
         self.check = row.check;
-        if (self.check == 0) {
-          self.$message.error('身份未核验, 无法删除!');
-        } else {
-          self.dialogDel = true;
-        }
+        self.dialogDel = true;
+      },
+      fucDel(num) {
+        var self = this;
+        API.delHousehold(self.id, num).then((res) => {
+          self.$message.success("删除成功");
+          self.dialogDel = false;
+          self.getAllRent(self.current, self.size);
+        });
       },
       toDel() {
         var self = this;
         if (self.member_type == 3) {
-          API.delHousehold(self.id, self.card_number).then((res) => {
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucDel(self.card_number);
         } else {
-          API.delHousehold(self.id, 1).then((res) => {
-            self.$message.success("删除成功");
-            self.dialogDel = false;
-            self.getAllRent(self.current, self.size);
-          });
+          self.fucDel(1);
         }
       },
 
       // 更换人脸
       handleChangeFace(index, row) {
         var self = this;
-        // console.log(row);
         self.dialogChangeFace = true;
         self.id = row.id;
         self.user_id = row.user_id;
@@ -1075,41 +1035,6 @@
         self.card_number = row.snapshot.card_number;
         self.old_href = row.snapshot.href;
       },
-      changeFace() {
-        var self = this;
-        // this.$refs.upload.submit();
-
-        if (self.change_href === "") {
-          self.familyForm.href = self.old_href;
-          if (self.member_type == 3) {
-            self.fucEditFace(self.card_number);
-            // API.editFace(
-            //   self.user_id,
-            //   self.card_number,
-            //   self.familyForm.href,
-            //   self.id
-            // ).then((res) => {
-            //   self.$message.success("上传成功");
-            //   self.current = 1;
-            //   self.getAllRent(self.current, self.size);
-            //   self.familyForm.href = "";
-            //   self.dialogChangeFace = false;
-            // });
-          } else {
-            self.fucEditFace(1);
-            // API.editFace(self.user_id, 1, self.href, self.id).then((res) => {
-            //   self.$message.success("上传成功");
-            //   self.current = 1;
-            //   self.getAllRent(self.current, self.size);
-            //   self.familyForm.href = "";
-            //   self.dialogChangeFace = false;
-            // });
-          }
-        } else {
-          this.$refs.upload.submit();
-        }
-      },
-
       // 人脸信息
       fucEditFace(card_number) {
         var self = this;
@@ -1122,12 +1047,25 @@
             self.familyForm.href = "";
             self.change_href = "";
             self.old_href = "";
-            self.imgData.key = "";
             self.familyForm.user_id = "";
             self.dialogChangeFace = false;
           }
         );
       },
+      changeFace() {
+        var self = this;
+        if (self.change_href === "") {
+          self.familyForm.href = self.old_href;
+          if (self.member_type == 3) {
+            self.fucEditFace(self.card_number);
+          } else {
+            self.fucEditFace(1);
+          }
+        } else {
+          this.$refs.upload.submit();
+        }
+      },
+
       handleChange(file) {
         var self = this;
         self.change_href = URL.createObjectURL(file.raw);
@@ -1151,43 +1089,16 @@
         self.familyForm.href = file.url;
         if (self.member_type == 3) {
           self.fucEditFace(self.card_number);
-          // API.editFace(self.user_id, self.card_number, self.familyForm.href, self.id).then(
-          //   (res) => {
-          //     self.$message.success("上传成功");
-          //     self.current = 1;
-          //     self.getAllRent(self.current, self.size);
-          //     self.$refs.upload.clearFiles();
-          //     self.familyForm.href = "";
-          //     self.change_href = "";
-          //     self.old_href = "";
-          //     self.imgData.key = "";
-          //     self.familyForm.user_id = "";
-          //     self.dialogChangeFace = false;
-          //   }
-          // );
         } else {
           self.fucEditFace(1);
-          // API.editFace(self.user_id, 1, self.familyForm.href, self.id).then((res) => {
-          //   self.$message.success("上传成功");
-          //   self.current = 1;
-          //   self.getAllRent(self.current, self.size);
-          //   self.$refs.upload.clearFiles();
-          //   self.familyForm.href = "";
-          //   self.change_href = "";
-          //   self.old_href = "";
-          //   self.imgData.key = "";
-          //   self.familyForm.user_id = "";
-          //   self.dialogChangeFace = false;
-          // });
         }
       },
       handleExceed(file, fileList) {
         //图片上传超过数量限制
         var self = this;
         self.$message.error("上传图片不能超过1张!重新上传");
-        self.$refs.upload.clearFiles();
+        // self.$refs.upload.clearFiles();
         self.familyForm.href = "";
-        self.imgData.key = "";
         self.familyForm.user_id = "";
       },
       getQiniuToken() {
