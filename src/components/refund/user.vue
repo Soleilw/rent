@@ -359,6 +359,7 @@
         var self = this;
         self.current = 1;
         self.size = 10;
+        self.loading = true;
         if (self.type == 1) {
           var keyword = self.renter_name;
           self.fucSearch(self.current, self.size, name, keyword);
@@ -401,7 +402,6 @@
       selectType(value) {
         var self = this;
         API.rent(1, 100, self.address_id, value).then((res) => {
-          console.log(res);
           self.userList = res.data;
         });
       },
@@ -445,18 +445,9 @@
       },
 
       // 返现记录
-      handleRec(index, row) {
+      gatWithdrawsRec(cur, list) {
         var self = this;
-        self.dialogRec = true;
-        self.user_id = row.user_id;
-        self.address_id = row.address_id;
-        self.recordCurrent = 1;
-        API.withdrawsRec(
-          self.recordCurrent,
-          self.recordSize,
-          self.user_id,
-          self.address_id
-        ).then((res) => {
+        API.withdrawsRec(cur, list, self.user_id, self.address_id).then((res) => {
           self.$message.success("获取数据成功！");
           self.recordDate = res.data;
           self.recordTotal = res.total;
@@ -466,41 +457,28 @@
       recordCurrentChange(val) {
         var self = this;
         self.recordCurrent = val;
-        API.withdrawsRec(
-          val,
-          self.recordSize,
-          self.user_id,
-          self.address_id
-        ).then((res) => {
-          console.log(res);
-          self.recordDate = res.data;
-          self.recordTotal = res.total;
-        });
+        self.gatWithdrawsRec(val, self.recordSize);
       },
       recordSizeChange(val) {
         var self = this;
         self.recordSize = val;
-        API.withdrawsRec(
-          self.recordCurrent,
-          val,
-          self.user_id,
-          self.address_id
-        ).then((res) => {
-          console.log(res);
-          self.recordDate = res.data;
-          self.recordTotal = res.total;
-        });
+        self.gatWithdrawsRec(1, val);
+        self.recordCurrent = 1;
+      },
+      handleRec(index, row) {
+        var self = this;
+        self.dialogRec = true;
+        self.user_id = row.user_id;
+        self.address_id = row.address_id;
+        self.recordCurrent = 1;
+        self.gatWithdrawsRec(self.recordCurrent, self.recordSize);
       },
 
       // 手动返现
       handleRefund(index, row) {
         var self = this;
         self.id = row.id;
-        if (row.state == 1) {
-          self.dialogRefund = true;
-        } else {
-          self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
-        }
+        row.state == 1 ? self.dialogRefund = true : self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
       },
       // 返现
       toRefund() {
@@ -534,7 +512,7 @@
             state: row.state,
             type: row.type,
             user_id: row.user_id,
-          }, ],
+          }],
         };
         self.isAdd = false;
         self.isDisabled = true;
@@ -563,7 +541,7 @@
           id: row.id,
           service: [{
             state: 1,
-          }, ],
+          }],
         };
         self.dialogUsing = true;
       },
@@ -585,7 +563,7 @@
           id: row.id,
           service: [{
             state: 2,
-          }, ],
+          }],
         };
         self.dialogBan = true;
       },

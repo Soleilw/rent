@@ -32,10 +32,10 @@
 					
 				}
 				if(this.activeName === 'user') {
-					API.getRole(1).then(res => {
-					})
-					API.users(1).then(res => {
-					})
+					// API.getRole(1, 100).then(res => {
+					// })
+					// API.users(1, 10).then(res => {
+					// })
 				}
 			}
 		}

@@ -179,7 +179,6 @@
         <!-- 删除 -->
         <el-dialog :visible.sync="dialogDel" title="删除记录" width="20%" align="center" :close-on-click-modal="false">
             <div style="font-size: 20px; margin-bottom: 30px">是否删除该记录</div>
-
             <span>
                 <el-button type="primary" @click="toDel">确定</el-button>
                 <el-button type="danger" @click="dialogDel = false">取消</el-button>
@@ -191,7 +190,6 @@
             <div style="font-size: 20px; margin-bottom: 30px">
                 是否对该用户禁用返现功能
             </div>
-
             <span>
                 <el-button type="primary" @click="toBan">确定</el-button>
                 <el-button type="danger" @click="dialogBan = false">取消</el-button>
@@ -202,7 +200,6 @@
             <div style="font-size: 20px; margin-bottom: 30px">
                 是否对该用户启用返现功能
             </div>
-
             <span>
                 <el-button type="primary" @click="toUsing">确定</el-button>
                 <el-button type="danger" @click="dialogUsing = false">取消</el-button>
@@ -213,7 +210,6 @@
             <div style="font-size: 20px; margin-bottom: 30px">
                 是否对该用户进行返现
             </div>
-
             <span>
                 <el-button type="primary" @click="toRefund">确定</el-button>
                 <el-button type="danger" @click="dialogRefund = false">取消</el-button>
@@ -297,13 +293,13 @@
             };
         },
         mounted() {
-            this.getList();
+            this.getList(this.current, this.size);
         },
         methods: {
             // 获取白名单
-            getList() {
+            getList(cur, list) {
                 var self = this;
-                API.commission(self.current, self.size)
+                API.commission(cur, list)
                     .then((res) => {
                         self.loading = false;
                         self.tableData = res.data;
@@ -322,39 +318,15 @@
                     switch (self.type) {
                         case 1:
                             var keyword = self.renter_name;
-                            API.commission(val, self.size, name, keyword)
-                                .then((res) => {
-                                    self.loading = false;
-                                    self.tableData = res.data;
-                                    self.total = res.total;
-                                })
-                                .catch((err) => {
-                                    self.loading = false;
-                                    console.log(err);
-                                });
+                            self.fucSearch(val, self.size, name, keyword);
                             break;
                         case 2:
                             var name = self.renter_name;
-                            API.commission(val, self.size, name, keyword)
-                                .then((res) => {
-                                    self.loading = false;
-                                    self.tableData = res.data;
-                                    self.total = res.total;
-                                })
-                                .catch((err) => {
-                                    self.loading = false;
-                                });
+                            self.fucSearch(val, self.size, name, keyword);
+                            break;
                     }
                 } else {
-                    API.commission(val, self.size)
-                        .then((res) => {
-                            self.loading = false;
-                            self.tableData = res.data;
-                            self.total = res.total;
-                        })
-                        .catch((err) => {
-                            self.loading = false;
-                        });
+                    self.getList(val, self.size);
                 }
             },
             // 每页几条
@@ -366,40 +338,16 @@
                     switch (self.type) {
                         case 1:
                             var keyword = self.renter_name;
-                            API.commission(self.current, val, name, keyword)
-                                .then((res) => {
-                                    self.loading = false;
-                                    self.tableData = res.data;
-                                    self.total = res.total;
-                                })
-                                .catch((err) => {
-                                    self.loading = false;
-                                    console.log(err);
-                                });
+                            self.fucSearch(1, val, name, keyword);
                             break;
                         case 2:
                             var name = self.renter_name;
-                            API.commission(self.current, val, name, keyword)
-                                .then((res) => {
-                                    self.loading = false;
-                                    self.tableData = res.data;
-                                    self.total = res.total;
-                                })
-                                .catch((err) => {
-                                    self.loading = false;
-                                });
+                            self.fucSearch(1, val, name, keyword);
                     }
                 } else {
-                    API.commission(self.current, val)
-                        .then((res) => {
-                            self.loading = false;
-                            self.tableData = res.data;
-                            self.total = res.total;
-                        })
-                        .catch((err) => {
-                            self.loading = false;
-                        });
+                    self.getList(1, val);
                 }
+                self.current = 1;
             },
 
             // 搜索
@@ -408,27 +356,31 @@
                 self.typeDisabled = true;
                 self.renter_name = "";
                 self.current = 1;
-                self.getList();
+                self.getList(self.current, self.size);
+            },
+            fucSearch(cur, list, name, keyword) {
+                var self = this;
+                API.commission(cur, list, name, keyword).then(
+                    (res) => {
+                        self.loading = false;
+                        self.tableData = res.data;
+                        self.total = res.total;
+                        self.$message.success("搜索成功！");
+                    }
+                );
             },
             search() {
                 var self = this;
                 self.current = 1;
                 self.size = 10;
+                self.loading = true;
                 if (self.type == 1) {
                     var keyword = self.renter_name;
-                    API.commission(self.current, self.size, name, keyword).then((res) => {
-                        self.tableData = res.data;
-                        self.total = res.total;
-                        self.$message.success("搜索成功！");
-                    });
+                    self.fucSearch(self.current, self.size, name, keyword);
                 }
                 if (self.type == 2) {
                     var name = self.renter_name;
-                    API.commission(self.current, self.size, name, keyword).then((res) => {
-                        self.tableData = res.data;
-                        self.total = res.total;
-                        self.$message.success("搜索成功！");
-                    });
+                    self.fucSearch(self.current, self.size, name, keyword);
                 }
             },
 
@@ -460,7 +412,6 @@
                 var self = this;
                 self.address_id = value;
                 API.rent(1, 100, self.address_id, 1).then((res) => {
-                    console.log(res);
                     self.userList = res.data;
                 });
             },
@@ -482,7 +433,7 @@
                 if (self.isAdd) {
                     API.createCommission(self.listForm).then((res) => {
                         self.$message.success("添加成功！");
-                        self.getList();
+                        self.getList(self.current, self.size);
                         self.listForm = {
                             id: "",
                             service: [],
@@ -491,7 +442,7 @@
                 } else {
                     API.createCommission(self.listForm).then((res) => {
                         self.$message.success("提交成功！");
-                        self.getList();
+                        self.getList(self.current, self.size);
                     });
                 }
             },
@@ -504,76 +455,66 @@
             },
 
             // 返佣记录
+            getCommissionRec(cur, list) {
+                var self = this;
+                API.commissionRec(cur, list, self.address_id).then((res) => {
+                    self.$message.success("获取数据成功！");
+                    self.recordDate = res.data;
+                    self.recordTotal = res.total;
+                });
+            },
             handleRec(index, row) {
                 var self = this;
                 self.dialogRecord = true;
                 //   self.user_id = row.user_id;
                 self.address_id = row.address_id;
                 self.recordCurrent = 1;
-                API.commissionRec(
-                    self.recordCurrent,
-                    self.recordSize,
-                    self.address_id
-                ).then((res) => {
-                    self.$message.success("获取数据成功！");
-                    self.recordDate = res.data;
-                    self.recordTotal = res.total;
-                });
+                self.getCommissionRec(self.recordCurrent, self.recordSize);
             },
             // 分页
             recordCurrentChange(val) {
                 var self = this;
                 self.recordCurrent = val;
-                API.commissionRec(val, self.recordSize, self.address_id).then((res) => {
-                    console.log(res);
-                    self.recordDate = res.data;
-                    self.recordTotal = res.total;
-                });
+                self.getCommissionRec(val, self.recordSize);
             },
             recordSizeChange(val) {
                 var self = this;
                 self.recordSize = val;
-                API.commissionRec(self.recordCurrent, val, self.address_id).then(
-                    (res) => {
-                        console.log(res);
-                        self.recordDate = res.data;
-                        self.recordTotal = res.total;
-                    }
-                );
+                self.getCommissionRec(1, val);
+                self.recordCurrent = 1;
             },
 
             // 佣金来源
-            handleSource(index, row) {
+            getCommissionRecord(cur, list) {
                 var self = this;
-                self.dialogRec = true;
-                self.address_id = row.address_id;
-                self.recCurrent = 1;
-                API.commissionRecord(self.recCurrent, self.recSize, self.address_id).then(
+                API.commissionRecord(cur, list, self.address_id).then(
                     (res) => {
                         self.$message.success("获取数据成功！");
                         self.recDate = res.data;
                         self.recTotal = res.total;
                     }
                 );
+
+            },
+            handleSource(index, row) {
+                var self = this;
+                self.dialogRec = true;
+                self.address_id = row.address_id;
+                self.recCurrent = 1;
+                self.getCommissionRecord(self.recCurrent, self.recSize);
             },
             recCurrentChange(val) {
                 var self = this;
                 self.recCurrent = val;
-                API.commissionRecord(val, self.recSize, self.address_id).then((res) => {
-                    self.recDate = res.data;
-                    self.recTotal = res.total;
-                });
+                self.getCommissionRecord(val, self.recSize);
             },
             recSizeChange(val) {
                 var self = this;
                 self.recSize = val;
-                API.commissionRecord(self.recCurrent, val, self.address_id).then(
-                    (res) => {
-                        self.recDate = res.data;
-                        self.recTotal = res.total;
-                    }
-                );
+                self.getCommissionRecord(1, val);
+                self.recCurrent = 1;
             },
+
             // 编辑
             handleEdit(index, row) {
                 let self = this;
@@ -585,7 +526,7 @@
                         money: row.money,
                         state: row.state,
                         user_id: row.user_id,
-                    }, ],
+                    }],
                 };
                 self.isAdd = false;
                 self.isDisabled = true;
@@ -602,7 +543,7 @@
                 API.delCommission(self.id).then((res) => {
                     self.$message.success("删除成功！");
                     self.dialogDel = false;
-                    self.getList();
+                    self.getList(self.current, self.size);
                 });
             },
 
@@ -614,7 +555,7 @@
                     id: row.id,
                     service: [{
                         state: 1,
-                    }, ],
+                    }],
                 };
                 self.dialogUsing = true;
             },
@@ -623,7 +564,7 @@
                 API.createCommission(self.listForm).then((res) => {
                     self.$message.success("启用成功！");
                     self.dialogUsing = false;
-                    self.getList();
+                    self.getList(self.current, self.size);
                     self.listForm.service = [];
                 });
             },
@@ -636,7 +577,7 @@
                     id: row.id,
                     service: [{
                         state: 2,
-                    }, ],
+                    }],
                 };
                 self.dialogBan = true;
             },
@@ -645,7 +586,7 @@
                 API.createCommission(self.listForm).then((res) => {
                     self.$message.success("禁用成功！");
                     self.dialogBan = false;
-                    self.getList();
+                    self.getList(self.current, self.size);
                     self.listForm.service = [];
                 });
             },
@@ -654,11 +595,7 @@
             handleRefund(index, row) {
                 var self = this;
                 self.address_id = row.address_id;
-                if (row.state == 1) {
-                    self.dialogRefund = true;
-                } else {
-                    self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
-                }
+                row.state == 1 ? self.dialogRefund = true : self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
             },
             // 返现
             toRefund() {
