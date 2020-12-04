@@ -122,7 +122,7 @@
     </div>
 
     <!-- 进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogLogs">
+    <el-dialog title="进出记录" :visible.sync="dialogLogs" width="80%">
       <div class="box">
         <el-table :data="logsData" border :header-cell-style="{ background: '#f0f0f0' }" max-height="620">
           <el-table-column prop="id" label="ID"></el-table-column>
@@ -207,7 +207,7 @@
     </el-dialog>
 
     <!-- 已开通服务 -->
-    <el-dialog title="已开通服务" :visible.sync="dialogOpenedServe">
+    <el-dialog title="已开通服务" :visible.sync="dialogOpenedServe" width="80%">
       <div class="box">
         <el-table :data="serviceList" border :header-cell-style="{ background: '#f0f0f0' }">
           <el-table-column prop="id" label="订单ID"></el-table-column>
@@ -219,7 +219,7 @@
     </el-dialog>
 
     <!-- 添加身份 -->
-    <el-dialog title="添加用户" :visible.sync="dialogUser" width="60%" :close-on-click-modal="false" @close="close">
+    <el-dialog title="添加用户" :visible.sync="dialogUser" :close-on-click-modal="false" @close="close" width="80%">
       <div class="box">
         <el-form :model="userForm" label-width="80px">
           <el-form-item label="姓名">
@@ -820,18 +820,14 @@
         that.user_id = row.user_id;
         that.member_type = row.type;
         that.card_number = row.snapshot.card_number;
-        if (row.state == 2) {
-          that.$message.warning("该用户已经通过审核, 无法修改信息! ");
-        } else {
-          that.dialogVerify = true;
-          that.changeFrom = {
-            user_id: row.user_id,
-            self: that.member_type == 3 ? row.snapshot.card_number : 1,
-            name: row.snapshot.name,
-            card_number: row.snapshot.card_number,
-            phone: row.snapshot.phone,
-            sex: row.snapshot.sex
-          }
+        that.dialogVerify = true;
+        that.changeFrom = {
+          user_id: row.user_id,
+          self: that.member_type == 3 ? row.snapshot.card_number : 1,
+          name: row.snapshot.name,
+          card_number: row.snapshot.card_number,
+          phone: row.snapshot.phone,
+          sex: row.snapshot.sex
         }
       },
       verifyID() {

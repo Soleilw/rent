@@ -46,7 +46,6 @@
 
     <el-table :data="tableData" empty-text="暂无数据" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
       <el-table-column prop="id" label="ID"></el-table-column>
-      <el-table-column prop label="设备ID"></el-table-column>
       <el-table-column prop="name" label="名称"></el-table-column>
       <el-table-column prop="created_at" label="时间"></el-table-column>
       <el-table-column prop="number" label="人脸证件号"></el-table-column>
@@ -71,17 +70,14 @@
     </el-table>
 
     <!-- 进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogLogs">
+    <el-dialog title="进出记录" :visible.sync="dialogLogs" width="80%">
       <div class="box">
         <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="danger.name" label="姓名"></el-table-column>
-          <el-table-column prop="address" label="地址"></el-table-column>
           <el-table-column prop="danger.number" label="证件号"></el-table-column>
-          <!-- <el-table-column prop="score" label="相似度"></el-table-column> -->
-          <el-table-column prop="log.timestamp" label="时间"></el-table-column>
           <el-table-column prop="danger.href" label="人脸照片">
             <template slot-scope="scope">
-              <div v-if="scope.row.danger.href">
+              <div v-if="scope.row.danger">
                 <el-popover placement="top-start" title trigger="click">
                   <img :src="scope.row.danger.href" style="max-width:800px;max-height:800px;" />
                   <img slot="reference" :src="scope.row.danger.href" style="max-width:180px;max-height:80px;" />
@@ -92,6 +88,22 @@
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="score" label="相似度"></el-table-column>
+          <el-table-column prop="log.image" label="抓拍照片">
+            <template slot-scope="scope">
+              <div v-if="scope.row.log">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.log.image" style="max-width:800px;max-height:800px;" />
+                  <img slot="reference" :src="scope.row.log.image" style="max-width:180px;max-height:80px;" />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="log.timestamp" label="抓拍时间"></el-table-column>
+          <el-table-column prop="address" label="抓拍地址"></el-table-column>
         </el-table>
       </div>
       <div class="block">

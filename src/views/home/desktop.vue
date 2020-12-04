@@ -67,7 +67,7 @@
       <div id="bar-chart"></div>
     </div>
     <!-- 男女比例图 -->
-    <el-dialog title="男女比例图" :visible.sync="dialogLogs" width="50%">
+    <el-dialog title="男女比例图" :visible.sync="dialogLogs" center width="50%">
       <div id="pie-chart-user" ref="chart"></div>
     </el-dialog>
   </div>

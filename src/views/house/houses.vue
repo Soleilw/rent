@@ -366,7 +366,7 @@
       </div>
     </el-dialog>
     <!-- 访客 -->
-    <el-dialog title="访客记录" :visible.sync="dialogVisitor">
+    <el-dialog title="访客记录" :visible.sync="dialogVisitor" width="80%">
       <div class="box">
         <el-table :data="visitorList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="name" label="真实姓名"></el-table-column>
@@ -458,7 +458,7 @@
     </el-dialog>
 
     <!-- 进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogLogs">
+    <el-dialog title="进出记录" :visible.sync="dialogLogs" width="80%">
       <div class="box">
         <el-table :data="logsData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="id" label="用户ID"></el-table-column>
@@ -493,7 +493,7 @@
     </el-dialog>
 
     <!-- 访客进出记录 -->
-    <el-dialog title="进出记录" :visible.sync="dialogVisitorLogs">
+    <el-dialog title="进出记录" :visible.sync="dialogVisitorLogs" width="80%">
       <div class="box">
         <el-table :data="visitorLogsData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="id" label="用户ID"></el-table-column>
