@@ -54,10 +54,10 @@
                                 <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑
                                 </el-button>
                             </el-dropdown-item>
-                            <el-dropdown-item>
+                            <!-- <el-dropdown-item>
                                 <el-button size="mini" type="primary" @click="handleRefund(scope.$index, scope.row)">
                                     手动返现</el-button>
-                            </el-dropdown-item>
+                            </el-dropdown-item> -->
                             <el-dropdown-item>
                                 <el-button size="mini" type="primary" v-if="scope.row.state == 2"
                                     @click="handleUsing(scope.$index, scope.row)">启用返现功能</el-button>
@@ -145,6 +145,14 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="created_at" label="创建时间"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-dropdown-item>
+                            <el-button v-if="scope.row.state != 2" size="mini" type="primary" @click="handleRefund(scope.$index, scope.row)">
+                                手动返现</el-button>
+                        </el-dropdown-item>
+                    </template>
+                </el-table-column>
             </el-table>
 
             <!-- 分页 -->
@@ -209,6 +217,8 @@
         <el-dialog :visible.sync="dialogRefund" title="返现" width="20%" align="center" :close-on-click-modal="false">
             <div style="font-size: 20px; margin-bottom: 30px">
                 是否对该用户进行返现
+                <br>
+                <span style="font-size: 15px; color: red">(如返现失败请稍后重试！)</span>
             </div>
             <span>
                 <el-button type="primary" @click="toRefund">确定</el-button>
@@ -290,6 +300,8 @@
                 area_id: "",
                 typeUser: "",
                 recDate: [],
+                payId: '', 
+                refundState: ''
             };
         },
         mounted() {
@@ -468,6 +480,8 @@
                 self.dialogRecord = true;
                 //   self.user_id = row.user_id;
                 self.address_id = row.address_id;
+                self.refundState = row.state;
+                // row.state == 1 ? self.dialogRefund = true : self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
                 self.recordCurrent = 1;
                 self.getCommissionRec(self.recordCurrent, self.recordSize);
             },
@@ -594,8 +608,8 @@
             // 手动返现
             handleRefund(index, row) {
                 var self = this;
-                self.address_id = row.address_id;
-                row.state == 1 ? self.dialogRefund = true : self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
+                self.payId = row.id;
+                self.refundState == 1 ? self.dialogRefund = true : self.$message.warning("该用户已经被禁用返现功能, 请先开启功能! ");
             },
             // 返现
             toRefund() {
@@ -606,7 +620,7 @@
                     spinner: "el-icon-loading",
                     background: "rgba(0, 0, 0, 0.7)",
                 });
-                API.payCommission(self.address_id)
+                API.payCommission(self.payId)
                     .then((res) => {
                         if (res.code == 10004) {
                             loading.close();
