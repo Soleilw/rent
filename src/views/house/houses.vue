@@ -903,11 +903,7 @@
       // 获取楼栋信息
       getBuilding(cur, list) {
         var self = this;
-        API.gainRooms(
-          cur,
-          list,
-          self.address_id
-        ).then((res) => {
+        API.gainRooms(cur, list, self.address_id).then((res) => {
           self.$message.success("获取数据成功");
           self.buildingList = res.data;
           self.buildingTotal = res.total;
@@ -929,12 +925,7 @@
       // 访客
       funVisitor(cur, list) {
         var self = this;
-        API.visitors(
-          cur,
-          list,
-          self.address_id,
-          self.room_id
-        ).then((res) => {
+        API.visitors(cur, list, self.address_id, self.room_id).then((res) => {
           self.$message.success("获取数据成功");
           self.visitorList = res.data;
           self.visitorTotal = res.total;
