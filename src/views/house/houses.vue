@@ -63,6 +63,13 @@
       <el-table-column prop="address" label="房屋地址"></el-table-column>
       <el-table-column prop="room_count" label="单元总数"></el-table-column>
       <el-table-column prop="room_resident" label="租客总数"></el-table-column>
+      <el-table-column prop="state" label="是否收费">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.state" active-color="#2a9f93"
+            @change="notifyChange(scope.row.state, scope.$index, scope.row)">
+          </el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="400px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
@@ -689,7 +696,8 @@
         community_id: "",
         areaList: [], //  社区列表
         areas_id: "",
-        isAdd: false
+        isAdd: false,
+        state: false
       };
     },
     mounted() {
@@ -710,6 +718,9 @@
             self.loading = false;
             self.tableData = res.data;
             self.total = res.total;
+            res.data.forEach(item => {
+              item.state == 1 ? item.state = true : item.state = false;
+            })
           })
           .catch((err) => {
             self.loading = false;
@@ -746,6 +757,9 @@
           self.loading = false;
           self.tableData = res.data;
           self.total = res.total;
+          res.data.forEach(item => {
+            item.state == 1 ? item.state = true : item.state = false;
+          })
           self.$message.success("搜索成功！");
         });
       },
@@ -757,6 +771,30 @@
       // 刷新
       refresh() {
         this.reload();
+      },
+
+      notifyChange(val, index, row) {
+        var self = this;
+        let notifyData = {}
+        if (val == true) {
+          notifyData = {
+            id: row.id,
+            state: 1
+          }
+          API.addressState(notifyData).then(res => {
+            self.$message.success("提交成功");
+            self.getnewHouses(self.current, self.size);
+          })
+        } else {
+          notifyData = {
+            id: row.id,
+            state: 2
+          }
+          API.addressState(notifyData).then(res => {
+            self.$message.success("提交成功");
+            self.getnewHouses(self.current, self.size);
+          })
+        }
       },
 
       addHouses() {

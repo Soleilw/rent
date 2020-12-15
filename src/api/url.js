@@ -21,6 +21,7 @@ const url = {
 	'PushAddressFace': BaseURL + '/push/address/face', // 全库推送人脸
 	'CreateAddress': BaseURL + '/create/address', // 添加房屋地址
 	'GainAddress': BaseURL + '/get/address', // 获取可新增的房屋地址
+	'AddressState': BaseURL + '/address/state', // 编辑出租屋是否收费按钮
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图

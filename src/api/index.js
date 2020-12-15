@@ -60,7 +60,6 @@ API.pushAddressFace = function (address_id) {
 	return axios.post(url.PushAddressFace, {
 		address_id: address_id
 	})
-
 }
 
 // 新增房屋地址
@@ -74,6 +73,10 @@ API.gainAddress = function (page, limit) {
 		page: page,
 		limit: limit
 	})
+}
+//	编辑出租屋是否收费按钮
+API.addressState = function (data) {
+	return axios.post(url.AddressState, data)
 }
 
 
