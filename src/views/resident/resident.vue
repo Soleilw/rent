@@ -37,6 +37,22 @@
       </el-table-column>
       <el-table-column prop="snapshot.phone" label="手机号" width="120px"></el-table-column>
       <el-table-column prop="snapshot.card_number" label="身份证" width="180px"></el-table-column>
+      <el-table-column prop="snapshot.number_type" label="证件类型" width="180px">
+        <template slot-scope="scope">
+          <div v-if="scope.row.snapshot.number_type == 1">
+            <span>中国居民身份证</span>
+          </div>
+          <div v-if="scope.row.snapshot.number_type == 2">
+            <span>外国人永久居留身份证</span>
+          </div>
+          <div v-if="scope.row.snapshot.number_type == 3">
+            <span>港澳居民居住证</span>
+          </div>
+          <div v-if="scope.row.snapshot.number_type == 4">
+            <span>护照</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
       <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
       <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
