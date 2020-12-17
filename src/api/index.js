@@ -19,14 +19,6 @@ API.audit = function (id, state, self) {
 		self: self
 	})
 }
-// 审核家庭成员
-// API.auditFamily = function (id, state, self) {
-// 	return axios.post(url.CheckManagers, {
-// 		id: id,
-// 		state: state,
-// 		self: self
-// 	})
-// }
 
 API.addresses = function (page, limit, area_id, address) {
 	return axios.get(url.Addresses, {
