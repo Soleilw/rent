@@ -70,11 +70,12 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="400px">
+      <el-table-column label="操作" width="500px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
           <el-button type="primary" size="mini" @click="handleResident(scope.$index, scope.row)">查看住户信息</el-button>
           <el-button type="primary" size="mini" @click="handleFace(scope.$index, scope.row)">全库推送人脸</el-button>
+          <el-button type="primary" size="mini" @click="handleRental(scope.$index, scope.row)">修改出租屋</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -552,6 +553,44 @@
       </span>
     </el-dialog>
 
+    <!-- 修改出租屋 -->
+    <el-dialog :visible.sync="dialogRental" title="修改出租屋" width="50%" :close-on-click-modal="false">
+      <el-form label-width="80px" :model="listForm">
+        <el-form-item label="社区ID">
+          <el-input v-model="listForm.area_id" :disabled="isDisabled"></el-input>
+        </el-form-item>
+        <el-form-item label="地址ID">
+          <el-input v-model="listForm.address_id" :disabled="isDisabled"></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="listForm.address"></el-input>
+        </el-form-item>
+        <el-form-item label="派出所">
+          <el-input v-model="listForm.police" :disabled="isDisabled"></el-input>
+        </el-form-item>
+        <el-form-item label="人脸组">
+          <el-input v-model="listForm.group" :disabled="isDisabled"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="地址">
+          <el-radio-group v-model="changeFrom.sex">
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-form-item> -->
+        <!-- <el-form-item label="身份证">
+          <el-input v-model="changeFrom.card_number"></el-input>
+        </el-form-item> -->
+        <!-- <el-form-item label="手机号">
+          <el-input v-model="changeFrom.phone"></el-input>
+        </el-form-item> -->
+        <div class="submit">
+          <el-form-item>
+            <el-button type="primary" @click="verifyID">提交</el-button>
+          </el-form-item>
+        </div>
+      </el-form>
+    </el-dialog>
+
     <!-- 分页 -->
     <div class="block">
       <el-pagination @current-change="currentChange" :current-page.sync="current" :page-sizes="[10, 20, 30, 40, 50]"
@@ -598,6 +637,7 @@
         residentTotal: 0,
         dialogBuild: false, // 房屋编号
         dialogVisitor: false,
+        dialogRental: false,
 
         buildForm: {
           address_id: "",
@@ -685,7 +725,8 @@
           address: '',
           address_id: '',
           group: '',
-          police: ''
+          police: '',
+          id: ''
         },
         addressList: '',
         proList: [], // 省级列表
@@ -697,7 +738,8 @@
         areaList: [], //  社区列表
         areas_id: "",
         isAdd: false,
-        state: false
+        state: false,
+        isDisabled: false
       };
     },
     mounted() {
@@ -888,6 +930,31 @@
         } else {
           self.$message.warning("该地址存在空数据, 无法添加");
         }
+      },
+
+      // 修改出租屋
+      handleRental(index, row) {
+        var self = this;
+        self.dialogRental = true;
+        console.log(row);
+        self.listForm = {
+            area_id: row.area_id,
+            address: row.address,
+            address_id: row.address_id,
+            group: row.group,
+            police: row.police,
+            id: row.id
+          },
+          self.isDisabled = true;
+      },
+
+      verifyID() {
+        var self = this;
+        API.createAddress(self.listForm).then(res => {
+          self.$message.success("修改成功! ");
+          self.dialogRental = false;
+          self.getnewHouses(self.current, self.size);
+        })
       },
 
       // 楼栋管理
