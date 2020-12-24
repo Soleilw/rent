@@ -70,6 +70,13 @@
           </el-switch>
         </template>
       </el-table-column>
+      <el-table-column prop="is_visitor_code" label="是否开启访客码">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.is_visitor_code" active-color="#2a9f93"
+            @change="visitorCodeChange(scope.row.is_visitor_code, scope.$index, scope.row)">
+          </el-switch>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="500px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
@@ -739,7 +746,8 @@
         areas_id: "",
         isAdd: false,
         state: false,
-        isDisabled: false
+        isDisabled: false,
+        is_visitor_code: false
       };
     },
     mounted() {
@@ -757,11 +765,14 @@
         var self = this;
         API.addresses(cur, list)
           .then((res) => {
+            // console.log(res.data);
             self.loading = false;
             self.tableData = res.data;
             self.total = res.total;
             res.data.forEach(item => {
+              // console.log(item);
               item.state == 1 ? item.state = true : item.state = false;
+              item.is_visitor_code == 1 ? item.is_visitor_code = true : item.is_visitor_code = false;
             })
           })
           .catch((err) => {
@@ -801,6 +812,7 @@
           self.total = res.total;
           res.data.forEach(item => {
             item.state == 1 ? item.state = true : item.state = false;
+            item.is_visitor_code == 1 ? item.is_visitor_code = true : item.is_visitor_code = false;
           })
           self.$message.success("搜索成功！");
         });
@@ -833,6 +845,30 @@
             state: 2
           }
           API.addressState(notifyData).then(res => {
+            self.$message.success("提交成功");
+            self.getnewHouses(self.current, self.size);
+          })
+        }
+      },
+      visitorCodeChange(val, index, row) {
+        var self = this;
+        let notifyData = {}
+        console.log(val);
+        if (val == true) {
+          notifyData = {
+            id: row.id,
+            is_visitor_code: 1
+          }
+          API.visitorCode(notifyData).then(res => {
+            self.$message.success("提交成功");
+            self.getnewHouses(self.current, self.size);
+          })
+        } else {
+          notifyData = {
+            id: row.id,
+            is_visitor_code: 2
+          }
+          API.visitorCode(notifyData).then(res => {
             self.$message.success("提交成功");
             self.getnewHouses(self.current, self.size);
           })

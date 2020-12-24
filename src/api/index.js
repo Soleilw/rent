@@ -71,6 +71,11 @@ API.addressState = function (data) {
 	return axios.post(url.AddressState, data)
 }
 
+//	是否开启访客码
+API.visitorCode = function (data) {
+	return axios.post(url.VisitorCode, data)
+}
+
 
 API.households = function (page, limit, user_id, address_id, type, state, room_id, name) {
 	return axios.get(url.Households, {

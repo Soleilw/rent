@@ -22,6 +22,7 @@ const url = {
 	'CreateAddress': BaseURL + '/create/address', // 添加房屋地址
 	'GainAddress': BaseURL + '/get/address', // 获取可新增的房屋地址
 	'AddressState': BaseURL + '/address/state', // 编辑出租屋是否收费按钮
+	'VisitorCode': BaseURL + '/address/visitor/code', // 是否开启访客码
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图
