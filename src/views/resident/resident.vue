@@ -53,19 +53,13 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
-      <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
-      <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
-      <el-table-column prop="check" width="120px" label="身份核验状态">
+      <el-table-column prop="address.is_visitor_code" label="是否已授权" width="180px">
         <template slot-scope="scope">
-          <div v-if="scope.row.check == 0">
-            <span>身份未核验</span>
+          <div v-if="scope.row.address.is_visitor_code == 1">
+            <span>是</span>
           </div>
-          <div v-if="scope.row.check == 1">
-            <span style="color: green">身份核验通过</span>
-          </div>
-          <div v-if="scope.row.check == 2">
-            <span style="color: red">身份信息错误</span>
+          <div v-if="scope.row.address.is_visitor_code == 2">
+            <span>否</span>
           </div>
         </template>
       </el-table-column>
@@ -79,6 +73,22 @@
           </div>
           <div v-if="scope.row.state == 3">
             <span style="color: red">未通过</span>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="address.address" label="房屋地址" width="250px"></el-table-column>
+      <el-table-column prop="expireTime" label="进出服务到期时间" width="180px"></el-table-column>
+      <el-table-column prop="room" width="120px" label="房屋编号"></el-table-column>
+      <el-table-column prop="check" width="120px" label="身份核验状态">
+        <template slot-scope="scope">
+          <div v-if="scope.row.check == 0">
+            <span>身份未核验</span>
+          </div>
+          <div v-if="scope.row.check == 1">
+            <span style="color: green">身份核验通过</span>
+          </div>
+          <div v-if="scope.row.check == 2">
+            <span style="color: red">身份信息错误</span>
           </div>
         </template>
       </el-table-column>
