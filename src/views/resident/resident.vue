@@ -53,12 +53,12 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="address.is_visitor_code" label="是否已授权" width="180px">
+      <el-table-column prop="is_authorization" label="是否已授权" width="180px">
         <template slot-scope="scope">
-          <div v-if="scope.row.address.is_visitor_code == 1">
+          <div v-if="scope.row.is_authorization == 1">
             <span>是</span>
           </div>
-          <div v-if="scope.row.address.is_visitor_code == 2">
+          <div v-if="scope.row.is_authorization == 2">
             <span>否</span>
           </div>
         </template>
