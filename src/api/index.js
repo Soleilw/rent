@@ -516,4 +516,10 @@ API.payCommission = function (id) {
 	})
 }
 
+API.passLose = function (addresses_id) {
+	return axios.post(url.PassLose, {
+		addresses_id: addresses_id
+	})
+}
+
 export default API

@@ -77,12 +77,33 @@
           </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="500px">
+      <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
-          <el-button type="primary" size="mini" @click="handleResident(scope.$index, scope.row)">查看住户信息</el-button>
-          <el-button type="primary" size="mini" @click="handleFace(scope.$index, scope.row)">全库推送人脸</el-button>
-          <el-button type="primary" size="mini" @click="handleRental(scope.$index, scope.row)">修改出租屋</el-button>
+          <el-dropdown>
+            <el-button type="primary">
+              操作
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>
+                <el-button size="mini" type="primary" @click="handleBuild(scope.$index, scope.row)">楼栋管理</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button size="mini" type="primary" @click="handleResident(scope.$index, scope.row)">查看住户信息
+                </el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button size="mini" type="primary" @click="handleFace(scope.$index, scope.row)">全库推送人脸</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button size="mini" type="primary" @click="handleRental(scope.$index, scope.row)">修改出租屋</el-button>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                <el-button size="mini" type="primary" @click="handleLoseFace(scope.$index, scope.row)">失效过期人脸
+                </el-button>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -560,6 +581,15 @@
       </span>
     </el-dialog>
 
+    <!-- 失效过期人脸 -->
+    <el-dialog :visible.sync="dialogLose" title="失效过期人脸" width="20%" align="center" :close-on-click-modal="false">
+      <div style="font-size: 20px; margin-bottom: 30px;">是否失效该地址过期人脸</div>
+      <span>
+        <el-button type="primary" @click="toLose">确定</el-button>
+        <el-button type="danger" @click="dialogLose = false">取消</el-button>
+      </span>
+    </el-dialog>
+
     <!-- 修改出租屋 -->
     <el-dialog :visible.sync="dialogRental" title="修改出租屋" width="50%" :close-on-click-modal="false">
       <el-form label-width="80px" :model="listForm">
@@ -747,7 +777,8 @@
         isAdd: false,
         state: false,
         isDisabled: false,
-        is_visitor_code: false
+        is_visitor_code: false,
+        dialogLose: false,
       };
     },
     mounted() {
@@ -1347,6 +1378,25 @@
           self.$message.success("删除成功");
           self.getBuilding(self.buildingCurrent, self.buildingSize);
         });
+      },
+
+      handleLoseFace(index, row) {
+        var self = this;
+        self.address_id = row.id;
+        if (row.state) {
+          self.dialogLose = true;
+        } else {
+          self.$message.warning("无法操作");
+        }
+      },
+
+      toLose() {
+        var self = this;
+        API.passLose(self.address_id).then(res => {
+          self.$message.success("成功");
+          self.dialogLose = false;
+          self.getnewHouses(self.current, self.size);
+        })
       },
     },
   };
