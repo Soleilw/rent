@@ -449,6 +449,7 @@
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
+              <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
               <el-button type="danger" size="mini" @click="HandledelBuilding(scope.$index, scope.row)">删除</el-button>
             </template>
@@ -476,14 +477,20 @@
       <div class="box">
         <el-form :model="buildForm" label-width="100px">
           <div v-for="(item,index) in buildForm.rooms" :key="index">
-            <el-form-item label="房屋编号">
-              <el-input v-model="buildForm.rooms[index]" placeholder="请输入房屋编号"></el-input>
-            </el-form-item>
+            <div>
+              <el-form-item label="房屋编号">
+                <el-input v-model="buildForm.rooms[index].room" placeholder="请输入房屋编号"></el-input>
+              </el-form-item>
+              <el-form-item label="uuid">
+                <el-input v-model="buildForm.rooms[index].uuid" placeholder="请输入uuid"></el-input>
+              </el-form-item>
+            </div>
           </div>
-          <el-form-item label="操作">
+          <el-form-item label="操作"  v-if="isAdd">
             <el-button type="primary" @click="addRooms">添加房屋编号</el-button>
             <el-button type="primary" @click="delRooms">删除房屋编号</el-button>
           </el-form-item>
+
           <div class="submit">
             <el-form-item>
               <el-button type="primary" @click="newRooms">提交</el-button>
@@ -492,6 +499,7 @@
         </el-form>
       </div>
     </el-dialog>
+
 
     <!-- 进出记录 -->
     <el-dialog title="进出记录" :visible.sync="dialogLogs" width="80%">
@@ -640,6 +648,10 @@
 <script>
   import API from "@/api/index.js";
   import vMap from "./map.vue";
+  // import axios from '@/plugins/axios'
+  import axios from 'axios'
+
+
   import {
     log
   } from "util";
@@ -678,7 +690,10 @@
 
         buildForm: {
           address_id: "",
-          rooms: [],
+          rooms: [{
+            room: '',
+            uuid: ''
+          }],
         },
         id: "",
         house_id: "", // 搜索
@@ -779,6 +794,7 @@
         isDisabled: false,
         is_visitor_code: false,
         dialogLose: false,
+        isAdd: false
       };
     },
     mounted() {
@@ -1089,25 +1105,60 @@
       // 房屋编号操作
       handleAddBuild(index, row) {
         var self = this;
+        self.isAdd = true;
         self.dialogAddBuild = true;
+        self.buildForm = {
+          address_id: self.address_id,
+          rooms: [{
+            room: '',
+            uuid: ''
+          }],
+        };
       },
       addRooms() {
         var self = this;
-        self.buildForm.rooms.push("");
+        self.buildForm.rooms.push({
+          room: '',
+          uuid: ''
+        });
       },
       delRooms() {
         var self = this;
-        self.buildForm.rooms.pop("");
+        self.buildForm.rooms.pop('');
       },
       newRooms() {
         var self = this;
-        API.rooms(self.buildForm).then((res) => {
-          self.$message.success("提交成功");
+        console.log(self.buildForm.rooms);
+        axios({
+          method: 'POST',
+          url: 'https://chu.fengniaotuangou.cn/rooms',
+          data: {
+            address_id: self.address_id,
+            rooms: self.buildForm.rooms
+          },
+          headers: {
+            'token': localStorage.getItem('token')
+          }
+        }).then(result => {
+          console.log(result);
           self.dialogAddBuild = false;
           self.buildForm.rooms = [];
           self.rooms = "";
           self.getBuilding(self.buildingCurrent, self.buildingSize);
-        });
+        })
+      },
+
+      handleBuildEdit(index, row) {
+        var self = this;
+        console.log(row);
+        self.isAdd = false;
+        self.dialogAddBuild = true;
+        self.buildForm.address_id = self.address_id;
+        self.buildForm.rooms = [{
+          room: row.door_number,
+          uuid: row.uuid
+        }]
+        console.log(self.buildForm.rooms);
       },
 
       // 查看住户
