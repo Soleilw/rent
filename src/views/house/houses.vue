@@ -473,15 +473,15 @@
     </el-dialog>
 
     <!-- 添加房屋编号 -->
-    <el-dialog title="添加房屋编号" :visible.sync="dialogAddBuild">
+    <el-dialog title="添加房屋编号" :visible.sync="dialogAddBuild" width="50%">
       <div class="box">
-        <el-form :model="buildForm" label-width="100px">
+        <el-form :model="buildForm" label-width="150px">
           <div v-for="(item,index) in buildForm.rooms" :key="index">
             <div>
-              <el-form-item label="房屋编号">
+              <el-form-item label="房屋编号(必填)">
                 <el-input v-model="buildForm.rooms[index].room" placeholder="请输入房屋编号"></el-input>
               </el-form-item>
-              <el-form-item label="uuid">
+              <el-form-item label="uuid(必填)">
                 <el-input v-model="buildForm.rooms[index].uuid" placeholder="请输入uuid"></el-input>
               </el-form-item>
             </div>
