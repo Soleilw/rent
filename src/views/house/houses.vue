@@ -449,7 +449,7 @@
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑</el-button>
+              <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑uuid</el-button>
               <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
               <el-button type="danger" size="mini" @click="HandledelBuilding(scope.$index, scope.row)">删除</el-button>
             </template>
@@ -481,12 +481,12 @@
               <el-form-item label="房屋编号(必填)">
                 <el-input v-model="buildForm.rooms[index].room" placeholder="请输入房屋编号"></el-input>
               </el-form-item>
-              <el-form-item label="uuid(必填)">
+              <el-form-item label="uuid">
                 <el-input v-model="buildForm.rooms[index].uuid" placeholder="请输入uuid"></el-input>
               </el-form-item>
             </div>
           </div>
-          <el-form-item label="操作"  v-if="isAdd">
+          <el-form-item label="操作" v-if="isAdd">
             <el-button type="primary" @click="addRooms">添加房屋编号</el-button>
             <el-button type="primary" @click="delRooms">删除房屋编号</el-button>
           </el-form-item>
@@ -1129,18 +1129,8 @@
       newRooms() {
         var self = this;
         console.log(self.buildForm.rooms);
-        axios({
-          method: 'POST',
-          url: 'https://chu.fengniaotuangou.cn/rooms',
-          data: {
-            address_id: self.address_id,
-            rooms: self.buildForm.rooms
-          },
-          headers: {
-            'token': localStorage.getItem('token')
-          }
-        }).then(result => {
-          console.log(result);
+        API.rooms(self.buildForm).then(res => {
+          console.log('添加成功');
           self.dialogAddBuild = false;
           self.buildForm.rooms = [];
           self.rooms = "";
