@@ -12,6 +12,17 @@
         </el-input>
       </div>
       <div class="btn">
+        <el-select v-model="typeStatus" placeholder="请选择身份类型" @change="typeChange">
+          <el-option v-for="item in userTypeList" :key="item.type" :label="item.name" :value="item.type">
+          </el-option>
+        </el-select>
+        <el-select v-model="stateStatus" placeholder="请选择审核状态" @change="stateChange">
+          <el-option v-for="item in statusList" :key="item.type" :label="item.name" :value="item.type">
+          </el-option>
+        </el-select>
+        <el-button slot="append" icon="el-icon-search" @click="searchChange"></el-button>
+      </div>
+      <div class="btn">
         <el-button type="primary" @click="addUser">添加身份</el-button>
       </div>
     </div>
@@ -503,7 +514,41 @@
           card_number: '',
           phone: '',
           sex: ''
-        }
+        },
+        typeStatus: '',
+        userTypeList: [{
+            name: "户主",
+            type: 1,
+          },
+          {
+            name: "租客",
+            type: 2,
+          },
+          {
+            name: "家庭成员",
+            type: 3,
+          },
+          {
+            name: "物业",
+            type: 4,
+          },
+        ],
+        stateStatus: '',
+        statusList: [{
+            name: "待审核",
+            type: 1,
+          },
+          {
+            name: "已通过",
+            type: 2,
+          },
+          {
+            name: "未通过",
+            type: 3,
+          },
+        ],
+        userType: '',
+        userState: ''
       };
     },
     mounted() {
@@ -545,6 +590,8 @@
               var name = self.renter_name;
               self.fucSearch(val, self.size, name, keyword)
           }
+        } else if (self.userState || self.userType) {
+          self.fucSearch(val, self.size, '', '', self.userType, self.userState)
         } else {
           self.getAllRent(val, self.size);
         }
@@ -552,7 +599,6 @@
       // 每页几条
       sizeChange(val) {
         var self = this;
-        debugger
         self.size = val;
         self.loading = true;
         if (self.renter_name) {
@@ -565,6 +611,8 @@
               var name = self.renter_name;
               self.fucSearch(1, val, name, keyword);
           }
+        } else if (self.userState || self.userType) {
+          self.fucSearch(1, val, '', '', self.userType, self.userState);
         } else {
           self.getAllRent(1, val);
         }
@@ -579,10 +627,16 @@
         self.current = 1;
         self.getAllRent(self.current, self.size);
       },
+      typeChange(val) {
+        this.userType = val;
+      },
+      stateChange(val) {
+        this.userState = val;
+      },
       // 搜索封装
-      fucSearch(cur, list, name, keyword) {
+      fucSearch(cur, list, name, keyword, type, state) {
         var self = this;
-        API.searchHousehold(cur, list, name, keyword).then(
+        API.searchHousehold(cur, list, name, keyword, type, state).then(
           (res) => {
             self.loading = false;
             res.data.forEach((item) => {
@@ -599,8 +653,11 @@
       // 搜索
       search() {
         var self = this;
+        self.loading = true;
         self.current = 1;
         self.size = 10;
+        self.typeStatus = '';
+        self.stateStatus = '';
         if (self.type == 1) {
           var keyword = self.renter_name;
           self.fucSearch(self.current, self.size, name, keyword)
@@ -609,6 +666,13 @@
           var name = self.renter_name;
           self.fucSearch(self.current, self.size, name, keyword)
         }
+      },
+      searchChange() {
+        var self = this;
+        self.renter_name = '';
+        self.current = 1;
+        self.loading = true;
+        self.fucSearch(self.current, self.size, '', '', self.userType, self.userState)
       },
       // 刷新
       refresh() {

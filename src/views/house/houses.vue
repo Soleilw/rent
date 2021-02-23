@@ -130,6 +130,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
+            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸照片">
@@ -186,6 +187,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
+            <!-- <el-table-column prop="room.door_number" label="门牌号"></el-table-column> -->
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸照片">
@@ -243,6 +245,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
+            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸照片">
@@ -300,6 +303,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
+            <!-- <el-table-column prop="room.door_number" label="门牌号"></el-table-column> -->
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸图片">
@@ -356,6 +360,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
+            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>\
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸图片">
@@ -451,6 +456,7 @@
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑uuid</el-button>
               <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
+              <el-button type="primary" size="mini" @click="handleMember(scope.$index, scope.row)">房间成员</el-button>
               <el-button type="danger" size="mini" @click="HandledelBuilding(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -498,6 +504,32 @@
           </div>
         </el-form>
       </div>
+    </el-dialog>
+
+    <!-- 房间成员信息 -->
+    <el-dialog title="成员信息" :visible.sync="dialogMember" width="80%">
+      <div class="box">
+        <el-table :data="memberData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
+          <el-table-column prop="user_id" label="用户ID"></el-table-column>
+          <el-table-column prop="typeString" label="用户身份"></el-table-column>
+          <el-table-column prop="snapshot.name" label="用户姓名"></el-table-column>
+          <el-table-column prop="snapshot.card_number" label="用户证件号"></el-table-column>
+          <el-table-column prop="snapshot.href" label="人脸照片">
+            <template slot-scope="scope">
+              <div v-if="scope.row.snapshot.href">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.snapshot.href" style="max-width:800px;max-height:800px;" />
+                  <img slot="reference" :src="scope.row.snapshot.href" style="max-width:180px;max-height:80px;" />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
     </el-dialog>
 
 
@@ -794,7 +826,9 @@
         isDisabled: false,
         is_visitor_code: false,
         dialogLose: false,
-        isAdd: false
+        isAdd: false,
+        dialogMember: false,
+        memberData: []
       };
     },
     mounted() {
@@ -1100,6 +1134,15 @@
         self.visitorSize = val;
         self.funVisitor(1, val);
         self.visitorCurrent = 1;
+      },
+
+      // 查看房间成员
+      handleMember(index, row) {
+        var self = this;
+        API.roomMenber(self.address_id, row.id).then(res => {
+          self.dialogMember = true;
+          self.memberData = res;
+        })
       },
 
       // 房屋编号操作

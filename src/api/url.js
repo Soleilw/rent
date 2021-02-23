@@ -24,6 +24,7 @@ const url = {
 	'AddressState': BaseURL + '/address/state', // 编辑出租屋是否收费按钮
 	'VisitorCode': BaseURL + '/address/visitor/code', // 是否开启访客码
 	'PassLose': BaseURL + '/past/lose', // 是否开启访客码
+	'RoomMenber': BaseURL + '/room/tenant', // 查看房间成员
 
 	// 轮播图管理
 	'Banner': BaseURL + '/banner', // 上传轮播图

@@ -109,12 +109,14 @@ API.faceLogs = function (page, limit, face_id) {
 
 
 // 搜索住户
-API.searchHousehold = function (page, limit, name, keyword) {
+API.searchHousehold = function (page, limit, name, keyword, type, state) {
 	return axios.get(url.Households, {
 		page: page,
 		limit: limit,
 		name: name,
-		keyword: keyword
+		keyword: keyword,
+		type: type,
+		state: state
 	})
 }
 
@@ -519,6 +521,14 @@ API.payCommission = function (id) {
 API.passLose = function (addresses_id) {
 	return axios.post(url.PassLose, {
 		addresses_id: addresses_id
+	})
+}
+
+// 查看房间成员
+API.roomMenber = function (address_id, room_id) {
+	return axios.get(url.RoomMenber, {
+		address_id: address_id,
+		room_id: room_id
 	})
 }
 
