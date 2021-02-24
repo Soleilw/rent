@@ -152,4 +152,172 @@
 		height: 40rem;
 		border: solid 1px #ccc;
 	}
+	.ipt {
+    width: 220px;
+  }
+
+  #tooles {
+    height: 40px;
+    background: #5688cb;
+    position: relative;
+    z-index: 100;
+    color: white;
+    width: 900px;
+    margin-top: 10px;
+  }
+
+  #bside_left {
+    width: 260px;
+    height: 530px;
+    border: 1px solid #ccc;
+    float: left;
+    overflow: auto;
+    padding-left: 5px;
+  }
+
+  #cur_city,
+  #no_value {
+    height: 20px;
+    position: absolute;
+    top: 3px;
+    left: 10px;
+  }
+
+  #cur_city .change_city {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  #level {
+    margin-left: 20px;
+  }
+
+  .logo_img {
+    width: 172px;
+    height: 23px;
+  }
+
+  .poi {
+    width: 570px;
+    height: 41;
+    padding-top: 12px;
+    float: left;
+    position: relative;
+  }
+
+  .poi_note {
+    width: 63px;
+    line-height: 26px;
+    float: left;
+  }
+
+  .already {
+    width: 52px;
+    line-height: 26px;
+    padding-left: 5px;
+    float: left;
+    color: red;
+    display: none;
+  }
+
+  .info_list {
+    margin-bottom: 5px;
+    clear: both;
+    cursor: pointer;
+  }
+
+  #txt_pannel {
+    height: 500px;
+  }
+
+  #city {
+    width: 356px;
+    height: 433px;
+    padding: 10px;
+    border: 2px solid #d6d6d6;
+    position: absolute;
+    left: 44px;
+    top: 20px;
+    z-index: 999;
+    background: #fff;
+    overflow: auto;
+    color: black;
+  }
+
+  #city .city_class {
+    font-size: 12px;
+    background: #fff;
+    margin: 1px 0;
+  }
+
+  #city .city_container {
+    margin-top: 10px;
+    /*margin-bottom: 50px;*/
+    background: #fff;
+  }
+
+  #city .city_container_left {
+    width: 48px;
+    float: left;
+  }
+
+  #city .style_color {
+    color: #000;
+    font-weight: 600;
+  }
+
+  #city .city_container_right {
+    width: 289px;
+    float: left;
+  }
+
+  #city .close {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    /* float: right; */
+    font-size: 20px;
+    font-weight: normal;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+  }
+
+  #city .city_name {
+    line-height: 20px;
+    height: 20px;
+    margin-left: 5px;
+    color: #2f82c4;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+  }
+
+  #curCity {
+    margin-right: 5px;
+  }
+
+  .hide {
+    display: none;
+  }
+
+  #bside_rgiht {
+    width: 631px;
+    height: 530px;
+    border: 1px solid #ccc;
+    float: left;
+    font-size: 12px;
+  }
+
+  #containers {
+    width: 621px;
+    height: 520px;
+    border: 5px solid #fff;
+  }
+
+  #no_value {
+    color: red;
+    position: relative;
+    width: 200px;
+  }
 </style>

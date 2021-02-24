@@ -124,292 +124,60 @@
             </el-input>
           </div>
         </div>
-        <template v-if="user == '全部'">
-          <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
-            <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="name" label="真实姓名"></el-table-column>
-            <el-table-column prop="type" label="用户身份">
-              <template slot-scope="scope">
-                <span v-if="scope.row.type == 1">户主</span>
-                <span v-else-if="scope.row.type == 2">租客</span>
-                <span v-else-if="scope.row.type == 3">家庭成员</span>
-                <span v-else-if="scope.row.type == 4">物业</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
-            <el-table-column prop="card_number" label="身份证号"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column prop="href" label="人脸照片">
-              <template slot-scope="scope">
-                <div v-if="scope.row.href">
-                  <el-popover placement="top-start" title trigger="click">
-                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
-                    <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
-                  </el-popover>
-                </div>
-                <div v-else>
-                  <span>--暂无图片--</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template slot-scope="scope">
-                <el-dropdown>
-                  <el-button type="primary">
-                    操作
-                    <i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
-                      </el-button>
-                    </el-dropdown-item>
+        <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
+          <el-table-column prop="user_id" label="用户ID"></el-table-column>
+          <el-table-column prop="name" label="真实姓名"></el-table-column>
+          <el-table-column prop="type" label="用户身份">
+            <template slot-scope="scope">
+              <span v-if="scope.row.type == 1">户主</span>
+              <span v-else-if="scope.row.type == 2">租客</span>
+              <span v-else-if="scope.row.type == 3">家庭成员</span>
+              <span v-else-if="scope.row.type == 4">物业</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
+          <el-table-column prop="card_number" label="身份证号"></el-table-column>
+          <el-table-column prop="phone" label="手机号"></el-table-column>
+          <el-table-column prop="href" label="人脸照片">
+            <template slot-scope="scope">
+              <div v-if="scope.row.href">
+                <el-popover placement="top-start" title trigger="click">
+                  <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
+                  <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
+                </el-popover>
+              </div>
+              <div v-else>
+                <span>--暂无图片--</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-dropdown>
+                <el-button type="primary">
+                  操作
+                  <i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
+                    </el-button>
+                  </el-dropdown-item>
 
-                    <el-dropdown-item>
-                      <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="block">
-            <el-pagination @current-change="residentCurrentChange" :current-page.sync="rensidentCurrent"
-              :page-sizes="[10, 20, 30, 40, 50]" :page-size="residentSize" layout="sizes, prev, pager, next, jumper"
-              :total="residentTotal" @size-change="residentSizeChange"></el-pagination>
-          </div>
-        </template>
-        <template v-if="user == '户主'">
-          <el-table :data="houseOwnerList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
-            <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <el-table-column prop="name" label="真实姓名"></el-table-column>
-            <el-table-column prop="type" label="用户身份">
-              <template slot-scope="scope">
-                <span v-if="scope.row.type == 1">户主</span>
-                <span v-else-if="scope.row.type == 2">租客</span>
-                <span v-else-if="scope.row.type == 3">家庭成员</span>
-
-                <span v-else-if="scope.row.type == 4">物业</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
-            <el-table-column prop="card_number" label="身份证号"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column prop="href" label="人脸照片">
-              <template slot-scope="scope">
-                <div v-if="scope.row.href">
-                  <el-popover placement="top-start" title trigger="click">
-                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
-                    <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
-                  </el-popover>
-                </div>
-                <div v-else>
-                  <span>--暂无图片--</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template slot-scope="scope">
-                <el-dropdown>
-                  <el-button type="primary">
-                    操作
-                    <i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
-                      </el-button>
-                    </el-dropdown-item>
-
-                    <el-dropdown-item>
-                      <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="block">
-            <el-pagination @current-change="houseOwnerCurrentChange" :current-page.sync="houseOwnerCurrent"
-              :page-sizes="[10, 20, 30, 40, 50]" :page-size="houseOwnerSize" layout="sizes, prev, pager, next, jumper"
-              :total="houseOwnerTotal" @size-change="houseOwnerSizeChange"></el-pagination>
-          </div>
-        </template>
-        <template v-if="user == '租客'">
-          <el-table :data="renterList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
-            <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
-            <el-table-column prop="name" label="真实姓名"></el-table-column>
-            <el-table-column prop="type" label="用户身份">
-              <template slot-scope="scope">
-                <span v-if="scope.row.type == 1">户主</span>
-                <span v-else-if="scope.row.type == 2">租客</span>
-                <span v-else-if="scope.row.type == 3">家庭成员</span>
-
-                <span v-else-if="scope.row.type == 4">物业</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
-            <el-table-column prop="card_number" label="身份证号"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column prop="href" label="人脸照片">
-              <template slot-scope="scope">
-                <div v-if="scope.row.href">
-                  <el-popover placement="top-start" title trigger="click">
-                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
-                    <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
-                  </el-popover>
-                </div>
-                <div v-else>
-                  <span>--暂无图片--</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template slot-scope="scope">
-                <el-dropdown>
-                  <el-button type="primary">
-                    操作
-                    <i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
-                      </el-button>
-                    </el-dropdown-item>
-
-                    <el-dropdown-item>
-                      <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="block">
-            <el-pagination @current-change="renterCurrentChange" :current-page.sync="renterCurrent"
-              :page-sizes="[10, 20, 30, 40, 50]" :page-size="renterSize" layout="sizes, prev, pager, next, jumper"
-              :total="renterTotal" @size-change="renterSizeChange"></el-pagination>
-          </div>
-        </template>
-        <template v-if="user == '物业'">
-          <el-table :data="managementList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
-            <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
-            <el-table-column prop="name" label="真实姓名"></el-table-column>
-            <el-table-column prop="type" label="用户身份">
-              <template slot-scope="scope">
-                <span v-if="scope.row.type == 1">户主</span>
-                <span v-else-if="scope.row.type == 2">租客</span>
-                <span v-else-if="scope.row.type == 3">家庭成员</span>
-
-                <span v-else-if="scope.row.type == 4">物业</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
-            <el-table-column prop="card_number" label="身份证号"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column prop="href" label="人脸图片">
-              <template slot-scope="scope">
-                <div v-if="scope.row.href">
-                  <el-popover placement="top-start" title trigger="click">
-                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
-                    <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
-                  </el-popover>
-                </div>
-                <div v-else>
-                  <span>--暂无图片--</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template slot-scope="scope">
-                <el-dropdown>
-                  <el-button type="primary">
-                    操作
-                    <i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
-                      </el-button>
-                    </el-dropdown-item>
-
-                    <el-dropdown-item>
-                      <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="block">
-            <el-pagination @current-change="managementCurrntChange" :current-page.sync="managementCurrent"
-              :page-sizes="[10, 20, 30, 40, 50]" :page-size="managementSize" layout="sizes, prev, pager, next, jumper"
-              :total="managementTotal" @size-change="managementSizeChange"></el-pagination>
-          </div>
-        </template>
-        <template v-if="user == '家庭成员'">
-          <el-table :data="familyList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
-            <el-table-column prop="user_id" label="用户ID"></el-table-column>
-            <!-- <el-table-column prop="room_id" label="房屋编号"></el-table-column> -->
-            <el-table-column prop="name" label="真实姓名"></el-table-column>
-            <el-table-column prop="type" label="用户身份">
-              <template slot-scope="scope">
-                <span v-if="scope.row.type == 1">户主</span>
-                <span v-else-if="scope.row.type == 2">租客</span>
-                <span v-else-if="scope.row.type == 3">家庭成员</span>
-                <span v-else-if="scope.row.type == 4">物业</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>\
-            <el-table-column prop="card_number" label="身份证号"></el-table-column>
-            <el-table-column prop="phone" label="手机号"></el-table-column>
-            <el-table-column prop="href" label="人脸图片">
-              <template slot-scope="scope">
-                <div v-if="scope.row.href">
-                  <el-popover placement="top-start" title trigger="click">
-                    <img :src="scope.row.href" style="max-width:800px;max-height:800px;" />
-                    <img slot="reference" :src="scope.row.href" style="max-width:180px;max-height:80px;" />
-                  </el-popover>
-                </div>
-                <div v-else>
-                  <span>--暂无图片--</span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" align="center">
-              <template slot-scope="scope">
-                <el-dropdown>
-                  <el-button type="primary">
-                    操作
-                    <i class="el-icon-arrow-down el-icon--right"></i>
-                  </el-button>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button size="mini" type="primary" @click="handleLogs(scope.$index, scope.row)">进出记录
-                      </el-button>
-                    </el-dropdown-item>
-
-                    <el-dropdown-item>
-                      <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </el-table>
-          <div class="block">
-            <el-pagination @current-change="familyCurrentChange" :current-page.sync="familyCurrent"
-              :page-sizes="[10, 20, 30, 40, 50]" :page-size="familySize" layout="sizes, prev, pager, next, jumper"
-              :total="familyTotal" @size-change="familySizeChange"></el-pagination>
-          </div>
-        </template>
+                  <el-dropdown-item>
+                    <el-button size="mini" type="danger" v-if="isShow" @click="handleDel(scope.$index, scope.row)">删除
+                    </el-button>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="block">
+          <el-pagination @current-change="residentCurrentChange" :current-page.sync="rensidentCurrent"
+            :page-sizes="[10, 20, 30, 40, 50]" :page-size="residentSize" layout="sizes, prev, pager, next, jumper"
+            :total="residentTotal" @size-change="residentSizeChange"></el-pagination>
+        </div>
       </div>
     </el-dialog>
     <!-- 访客 -->
@@ -655,18 +423,6 @@
         <el-form-item label="人脸组">
           <el-input v-model="listForm.group" :disabled="isDisabled"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="地址">
-          <el-radio-group v-model="changeFrom.sex">
-            <el-radio :label="1">男</el-radio>
-            <el-radio :label="2">女</el-radio>
-          </el-radio-group>
-        </el-form-item> -->
-        <!-- <el-form-item label="身份证">
-          <el-input v-model="changeFrom.card_number"></el-input>
-        </el-form-item> -->
-        <!-- <el-form-item label="手机号">
-          <el-input v-model="changeFrom.phone"></el-input>
-        </el-form-item> -->
         <div class="submit">
           <el-form-item>
             <el-button type="primary" @click="verifyID">提交</el-button>
@@ -760,26 +516,6 @@
             label: "家庭成员",
           },
         ],
-        houseOwnerList: [], // 户主列表
-        renterList: [], // 租客列表
-        managementList: [], // 物业列表
-        familyList: [],
-
-        houseOwnerCurrent: 1, // 户主列表分页
-        houseOwnerSize: 10,
-        houseOwnerTotal: 0,
-
-        renterCurrent: 1, // 租客列表分页
-        renterSize: 10,
-        renterTotal: 0,
-
-        managementCurrent: 1, //物业列表分页
-        managementSize: 10,
-        managementTotal: 0,
-
-        familyCurrent: 1, //物业列表分页
-        familySize: 10,
-        familyTotal: 0,
 
         dialogLogs: false, // 进出记录
         logsData: [],
@@ -836,7 +572,8 @@
         isAdd: false,
         dialogMember: false,
         memberData: [],
-        name: ''
+        name: '',
+        userType: ''
       };
     },
     mounted() {
@@ -1209,13 +946,14 @@
           room: row.door_number,
           uuid: row.uuid
         }]
-        console.log(self.buildForm.rooms);
+        // console.log(self.buildForm.rooms);
       },
 
       // 查看住户
       fucAllUser(cur, list) {
         var self = this;
         API.addressResidents(cur, list, self.address_id).then((res) => {
+          self.$message.success("获取数据成功");
           self.residentData = res.data;
           self.residentTotal = res.total;
         });
@@ -1223,30 +961,9 @@
       fucOwner(cur, list, type) {
         var self = this;
         API.addressResidents(cur, list, self.address_id, type).then((res) => {
-          self.houseOwnerList = res.data;
-          self.houseOwnerTotal = res.total;
-        });
-      },
-      fucRenter(cur, list, type) {
-        var self = this;
-        API.addressResidents(cur, list, self.address_id, type).then((res) => {
-          self.renterList = res.data;
-          self.renterTotal = res.total;
-        });
-      },
-      fucManage(cur, list, type) {
-        var self = this;
-        API.addressResidents(cur, list, self.address_id, type).then((res) => {
-          self.managementList = res.data;
-          self.managementTotal = res.total;
-        });
-
-      },
-      fucFamily(cur, list, type) {
-        var self = this;
-        API.addressResidents(cur, list, self.address_id, type).then((res) => {
-          self.familyList = res.data;
-          self.familyTotal = res.total;
+          self.$message.success("获取数据成功");
+          self.residentData = res.data;
+          self.residentTotal = res.total;
         });
       },
       handleResident(index, row) {
@@ -1261,45 +978,38 @@
       handleUser(value) {
         var self = this;
         self.name = '';
+        self.rensidentCurrent = 1;
+        self.residentSize = 10;
+        self.userType = value;
         switch (value) {
           case 0:
             self.$nextTick(() => {
-              self.rensidentCurrent = 1;
-              self.residentSize = 10;
               self.user = "全部";
               self.fucAllUser(self.rensidentCurrent, self.residentSize);
             });
             break;
           case 1:
             self.$nextTick(() => {
-              self.houseOwnerCurrent = 1;
-              self.houseOwnerSize = 10;
               self.user = "户主";
-              self.fucOwner(self.houseOwnerCurrent, self.houseOwnerSize, 1);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
             });
             break;
           case 2:
             self.$nextTick(() => {
-              self.renterCurrent = 1;
-              self.renterSize = 10;
               self.user = "租客";
-              self.fucRenter(self.renterCurrent, self.renterSize, 2);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
             });
             break;
           case 3:
             self.$nextTick(() => {
-              self.managementCurrent = 1;
-              self.managementSize = 10;
               self.user = "物业";
-              self.fucManage(self.managementCurrent, self.managementSize, 4);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
             });
             break;
           case 4:
             self.$nextTick(() => {
-              self.familyCurrent = 1;
-              self.familySize = 10;
               self.user = "家庭成员";
-              self.fucFamily(self.familyCurrent, self.familySize, 3);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
             });
             break;
         }
@@ -1308,61 +1018,31 @@
       residentCurrentChange(val) {
         var self = this;
         self.rensidentCurrent = val;
-        self.fucAllUser(val, self.residentSize);
+        if (self.name) {
+          API.addResSearch(val, self.residentSize, self.address_id, self.name).then(res => {
+            self.residentData = res.data;
+            self.residentTotal = res.total;
+          })
+        } else if (self.user != '全部') {
+          self.fucOwner(val, self.residentSize, self.userType);
+        } else {
+          self.fucAllUser(val, self.residentSize);
+        }
       },
       residentSizeChange(val) {
         var self = this;
         self.residentSize = val;
-        self.fucAllUser(1, val);
         self.rensidentCurrent = 1;
-      },
-      // 户主分页
-      houseOwnerCurrentChange(val) {
-        var self = this;
-        self.houseOwnerCurrent = val;
-        self.fucOwner(val, self.houseOwnerSize, 1);
-      },
-      houseOwnerSizeChange(val) {
-        var self = this;
-        self.houseOwnerSize = val;
-        self.fucOwner(1, val, 1);
-        self.houseOwnerCurrent = 1;
-      },
-      // 租客分页
-      renterCurrentChange(val) {
-        var self = this;
-        self.renterCurrent = val;
-        self.fucRenter(val, self.renterSize, 2);
-      },
-      renterSizeChange(val) {
-        var self = this;
-        self.renterSize = val;
-        self.fucRenter(1, val, 2);
-        self.renterCurrent = 1;
-      },
-      // 物业分页
-      managementCurrntChange(val) {
-        var self = this;
-        self.managementCurrent = val;
-        self.fucManage(val, self.managementSize, 4);
-      },
-      managementSizeChange(val) {
-        var self = this;
-        self.managementSize = val;
-        self.fucManage(1, val, 4);
-        self.managementCurrent = 1;
-      },
-      // 家庭成员分头
-      familyCurrentChange(val) {
-        var self = this;
-        self.familyCurrent = val;
-        self.fucFamily(val, self.familySize, 3);
-      },
-      familySizeChange(val) {
-        var self = this;
-        self.familySize = val;
-        self.fucFamily(1, val, 3);
-        self.familyCurrent = 1;
+        if (self.name) {
+          API.addResSearch(1, val, self.address_id, self.name).then(res => {
+            self.residentData = res.data;
+            self.residentTotal = res.total;
+          })
+        } else if (self.user != '全部') {
+          self.fucOwner(1, val, self.userType);
+        } else {
+          self.fucAllUser(1, val);
+        }
       },
 
       // 进出记录
@@ -1440,22 +1120,22 @@
             case "户主":
               self.$message.success("删除成功");
               self.dialogDel = false;
-              self.fucOwner(self.houseOwnerCurrent, self.houseOwnerSize, 1);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
               break;
             case "租客":
               self.$message.success("删除成功");
               self.dialogDel = false;
-              self.fucRenter(self.renterCurrent, self.renterSize, 2);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
               break;
             case "物业":
               self.$message.success("删除成功");
               self.dialogDel = false;
-              self.fucManage(self.managementCurrent, self.managementSize, 4);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
               break;
             case "家庭成员":
               self.$message.success("删除成功");
               self.dialogDel = false;
-              self.fucFamily(self.familyCurrent, self.familySize, 3);
+              self.fucOwner(self.rensidentCurrent, self.residentSize, self.userType);
               break;
           }
         });
@@ -1507,172 +1187,5 @@
 </script>
 
 <style scoped>
-  .ipt {
-    width: 220px;
-  }
-
-  #tooles {
-    height: 40px;
-    background: #5688cb;
-    position: relative;
-    z-index: 100;
-    color: white;
-    width: 900px;
-    margin-top: 10px;
-  }
-
-  #bside_left {
-    width: 260px;
-    height: 530px;
-    border: 1px solid #ccc;
-    float: left;
-    overflow: auto;
-    padding-left: 5px;
-  }
-
-  #cur_city,
-  #no_value {
-    height: 20px;
-    position: absolute;
-    top: 3px;
-    left: 10px;
-  }
-
-  #cur_city .change_city {
-    margin-left: 5px;
-    cursor: pointer;
-  }
-
-  #level {
-    margin-left: 20px;
-  }
-
-  .logo_img {
-    width: 172px;
-    height: 23px;
-  }
-
-  .poi {
-    width: 570px;
-    height: 41;
-    padding-top: 12px;
-    float: left;
-    position: relative;
-  }
-
-  .poi_note {
-    width: 63px;
-    line-height: 26px;
-    float: left;
-  }
-
-  .already {
-    width: 52px;
-    line-height: 26px;
-    padding-left: 5px;
-    float: left;
-    color: red;
-    display: none;
-  }
-
-  .info_list {
-    margin-bottom: 5px;
-    clear: both;
-    cursor: pointer;
-  }
-
-  #txt_pannel {
-    height: 500px;
-  }
-
-  #city {
-    width: 356px;
-    height: 433px;
-    padding: 10px;
-    border: 2px solid #d6d6d6;
-    position: absolute;
-    left: 44px;
-    top: 20px;
-    z-index: 999;
-    background: #fff;
-    overflow: auto;
-    color: black;
-  }
-
-  #city .city_class {
-    font-size: 12px;
-    background: #fff;
-    margin: 1px 0;
-  }
-
-  #city .city_container {
-    margin-top: 10px;
-    /*margin-bottom: 50px;*/
-    background: #fff;
-  }
-
-  #city .city_container_left {
-    width: 48px;
-    float: left;
-  }
-
-  #city .style_color {
-    color: #000;
-    font-weight: 600;
-  }
-
-  #city .city_container_right {
-    width: 289px;
-    float: left;
-  }
-
-  #city .close {
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    /* float: right; */
-    font-size: 20px;
-    font-weight: normal;
-    cursor: pointer;
-    position: absolute;
-    right: 10px;
-  }
-
-  #city .city_name {
-    line-height: 20px;
-    height: 20px;
-    margin-left: 5px;
-    color: #2f82c4;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 12px;
-  }
-
-  #curCity {
-    margin-right: 5px;
-  }
-
-  .hide {
-    display: none;
-  }
-
-  #bside_rgiht {
-    width: 631px;
-    height: 530px;
-    border: 1px solid #ccc;
-    float: left;
-    font-size: 12px;
-  }
-
-  #containers {
-    width: 621px;
-    height: 520px;
-    border: 5px solid #fff;
-  }
-
-  #no_value {
-    color: red;
-    position: relative;
-    width: 200px;
-  }
+  
 </style>
