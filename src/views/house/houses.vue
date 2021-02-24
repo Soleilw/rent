@@ -117,6 +117,12 @@
               <el-option v-for="item in userList" :key="item.value" :label="item.label" :value="item.value"></el-option>
             </el-select>
           </div>
+          <div class="btn">
+            <el-input v-model="name" placeholder="请输入姓名" class="input-with-select"
+              @keyup.enter.native="searchRes(name)">
+              <el-button slot="append" icon="el-icon-search" @click="searchRes(name)"></el-button>
+            </el-input>
+          </div>
         </div>
         <template v-if="user == '全部'">
           <el-table :data="residentData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
@@ -187,7 +193,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="room.door_number" label="门牌号"></el-table-column> -->
+            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸照片">
@@ -303,7 +309,7 @@
                 <span v-else-if="scope.row.type == 4">物业</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="room.door_number" label="门牌号"></el-table-column> -->
+            <el-table-column prop="room.door_number" label="门牌号"></el-table-column>
             <el-table-column prop="card_number" label="身份证号"></el-table-column>
             <el-table-column prop="phone" label="手机号"></el-table-column>
             <el-table-column prop="href" label="人脸图片">
@@ -443,7 +449,7 @@
     </el-dialog>
 
     <!-- 楼栋管理 -->
-    <el-dialog title="楼栋管理" :visible.sync="dialogBuild">
+    <el-dialog title="楼栋管理" :visible.sync="dialogBuild" width="60%">
       <div class="box">
         <div class="handle-box">
           <div class="btn">
@@ -452,6 +458,7 @@
         </div>
         <el-table :data="buildingList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
+          <!-- <el-table-column prop="door_number" label="人数"></el-table-column> -->
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑uuid</el-button>
@@ -828,7 +835,8 @@
         dialogLose: false,
         isAdd: false,
         dialogMember: false,
-        memberData: []
+        memberData: [],
+        name: ''
       };
     },
     mounted() {
@@ -902,6 +910,16 @@
         var self = this;
         self.current = 1;
         self.funSearch(self.current, self.size);
+      },
+      searchRes() {
+        var self = this;
+        self.user = '全部';
+        self.rensidentCurrent = 1;
+        API.addResSearch(self.rensidentCurrent, self.residentSize, self.address_id, self.name).then(res => {
+          self.$message.success("搜索成功！");
+          self.residentData = res.data;
+          self.residentTotal = res.total;
+        })
       },
       // 刷新
       refresh() {
@@ -1237,10 +1255,12 @@
         self.address_id = row.id;
         self.user = "全部";
         self.rensidentCurrent = 1;
+        self.name = '';
         self.fucAllUser(self.rensidentCurrent, self.residentSize);
       },
       handleUser(value) {
         var self = this;
+        self.name = '';
         switch (value) {
           case 0:
             self.$nextTick(() => {

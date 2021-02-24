@@ -98,6 +98,14 @@ API.addressResidents = function (page, limit, address_id, type) {
 		type: type
 	})
 }
+API.addResSearch = function (page, limit, address_id, name) {
+	return axios.get(url.AddressResidents, {
+		page: page,
+		limit: limit,
+		address_id: address_id,
+		name: name
+	})
+}
 // 获取进出记录
 API.faceLogs = function (page, limit, face_id) {
 	return axios.get(url.FaceLogs, {
