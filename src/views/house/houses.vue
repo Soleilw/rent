@@ -226,8 +226,8 @@
         </div>
         <el-table :data="buildingList" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
           <el-table-column prop="door_number" label="房屋编号"></el-table-column>
-          <!-- <el-table-column prop="door_number" label="人数"></el-table-column> -->
-          <el-table-column label="操作">
+          <el-table-column prop="count" label="人数"></el-table-column>
+          <el-table-column label="操作" width="500px">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleBuildEdit(scope.$index, scope.row)">编辑uuid</el-button>
               <el-button type="primary" size="mini" @click="handleVistor(scope.$index, scope.row)">访客</el-button>
