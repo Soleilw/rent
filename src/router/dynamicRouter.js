@@ -13,7 +13,7 @@ const dynamicRouter = [{
 		component: () => import('@/views/house/index.vue'),
 		meta: {
 			title: '房屋管理',
-			icon: 'el-icon-s-home'
+			icon: 'el-icon-office-building'
 		},
 		children: [{
 				path: '/houses',
@@ -105,23 +105,15 @@ const dynamicRouter = [{
             icon: 'el-icon-coin',
         }
 	},
-	// {
-	// 	path: '/total',
-	// 	name: 'total',
-	// 	component: () => import('@/views/total/index.vue'),
-	// 	meta: {
-	// 		title: '统计',
-	// 		icon: 'el-icon-pie-chart'
-	// 	},
-	// 	children: [{
-	// 		path: '/rentersTotal',
-	// 		name: 'rentersTotal',
-	// 		component: () => import('@/views/total/total.vue'),
-	// 		meta: {
-	// 			title: '出租屋人数总统计'
-	// 		}
-	// 	}, ]
-	// },
+	{
+		path: '/recruit',
+		name: 'recruit',
+		component: () => import('@/views/recruit/recruit.vue'),
+		meta: {
+			title: '人才招聘',
+			icon: 'el-icon-suitcase-1'
+		},
+	},
 
 	{
 		path: '/permission',
