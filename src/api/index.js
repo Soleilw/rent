@@ -540,4 +540,10 @@ API.roomMenber = function (address_id, room_id) {
 	})
 }
 
+// 查看房间成员
+API.postRelease = function (data) {
+	return axios.post(url.PostRelease, data)
+}
+
+
 export default API

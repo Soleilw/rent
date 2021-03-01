@@ -64,6 +64,15 @@ const dynamicRouter = [{
 				meta: {
 					title: '文档管理'
 				}
+			},
+			{
+				path: '/recruit',
+				name: 'recruit',
+				component: () => import('@/views/recruit/recruit.vue'),
+				meta: {
+					title: '人才招聘',
+					icon: 'el-icon-suitcase-1'
+				},
 			}
 		]
 	},
@@ -92,28 +101,28 @@ const dynamicRouter = [{
 		name: 'switch',
 		component: () => import('@/views/switch/index'),
 		meta: {
-            title: '人脸开关管理',
-            icon: 'el-icon-key',
-        }
+			title: '人脸开关管理',
+			icon: 'el-icon-key',
+		}
 	},
 	{
 		path: '/refund',
 		name: 'refund',
 		component: () => import('@/views/refund/refund'),
 		meta: {
-            title: '用户返现',
-            icon: 'el-icon-coin',
-        }
+			title: '用户返现',
+			icon: 'el-icon-coin',
+		}
 	},
-	{
-		path: '/recruit',
-		name: 'recruit',
-		component: () => import('@/views/recruit/recruit.vue'),
-		meta: {
-			title: '人才招聘',
-			icon: 'el-icon-suitcase-1'
-		},
-	},
+	// {
+	// 	path: '/recruit',
+	// 	name: 'recruit',
+	// 	component: () => import('@/views/recruit/recruit.vue'),
+	// 	meta: {
+	// 		title: '人才招聘',
+	// 		icon: 'el-icon-suitcase-1'
+	// 	},
+	// },
 
 	{
 		path: '/permission',

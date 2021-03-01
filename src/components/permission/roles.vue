@@ -71,6 +71,7 @@
                 <el-checkbox label="documentGet" @change="oneChange">获取文档</el-checkbox>
                 <el-checkbox label="documentDel" @change="oneChange">删除文档</el-checkbox>
                 <el-checkbox label="documentEdit" @change="oneChange">编辑文档</el-checkbox>
+                <el-checkbox label="recruit" @change="oneChange">人才招聘</el-checkbox>
               </el-checkbox-group>
             </div>
             <div class="permission">
@@ -118,18 +119,6 @@
                 <el-checkbox label="orderServe" @change="oneChange">服务订单</el-checkbox>
                 <el-checkbox label="checkBuy" @change="oneChange">查询服务</el-checkbox>
                 <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <div class="permission">
-              <el-checkbox-group v-model="form.permissions" class="permission-item">
-                <el-checkbox label="recruit" @change="oneChange" border>
-                  <span style="font-weight: bold">人才招聘</span>
-                </el-checkbox>
-                <!-- <el-checkbox label="buyAdd" @change="oneChange">添加购买服务</el-checkbox>
-                <el-checkbox label="compileBuy" @change="oneChange">编辑服务</el-checkbox>
-                <el-checkbox label="orderServe" @change="oneChange">服务订单</el-checkbox>
-                <el-checkbox label="checkBuy" @change="oneChange">查询服务</el-checkbox>
-                <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox> -->
               </el-checkbox-group>
             </div>
           </el-form-item>

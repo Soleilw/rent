@@ -85,6 +85,8 @@ const url = {
 	'DelCommission': BaseURL + '/commission', // 删除
 	'PayCommission': BaseURL + '/commission/withdraw', // 佣金返现
 
+	'PostRelease': BaseURL + '/post/release', // 佣金返现
+
 }
 
 module.exports = url;

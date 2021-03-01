@@ -7,26 +7,71 @@
         </div>
 
         <!-- 发布职位 -->
-        <el-dialog :visible.sync="dialogPosition" title="发布职位" width="85%">
+        <el-dialog :visible.sync="dialogPosition" title="发布职位" width="85%" @close="close">
             <el-form label-width="150px" :model="positionInfo">
-                <el-form-item label="公司名称">
-                    <el-input v-model="positionInfo.name"></el-input>
-                </el-form-item>
-                <el-form-item label="公司简介">
-                    <el-input v-model="positionInfo.intro"></el-input>
-                </el-form-item>
-                <el-form-item label="职位名称">
-                    <el-input v-model="positionInfo.share_title"></el-input>
+                <el-form-item label="是否上架">
+                    <el-radio-group v-model="positionInfo.on_shelf">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="2">否</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <div class="ipt-box">
-                    <el-form-item label="联系方式">
-                        <el-input v-model="positionInfo.price"></el-input>
+                    <el-form-item label="公司名称">
+                        <el-input v-model="positionInfo.company_name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="公司简介">
+                        <el-input v-model="positionInfo.company_intro" class="tex" type="textarea"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="ipt-box">
+                    <el-form-item label="职位名称">
+                        <el-input v-model="positionInfo.post_name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="职位描述">
+                        <el-input v-model="positionInfo.work_intro" class="tex" type="textarea"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="ipt-box">
+                    <el-form-item label="工作城市">
+                        <el-input v-model="positionInfo.work_city"></el-input>
+                    </el-form-item>
+                    <el-form-item label="工作地点">
+                        <el-input v-model="positionInfo.work_place" class="tex" type="textarea"></el-input>
+                    </el-form-item>
+                </div>
+                <el-form-item label="工作经验">
+                    <el-input v-model="positionInfo.work_experience" class="tex" type="textarea"></el-input>
+                </el-form-item>
+                <div class="ipt-box">
+                    <el-form-item label="学历">
+                        <!-- <el-input v-model="positionInfo.education"></el-input> -->
+                        <el-select v-model="positionInfo.education" placeholder="请选择">
+                            <el-option v-for="item in options" :key="item.label" :label="item.label"
+                                :value="item.label">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="薪资范围">
+                        <el-input v-model="positionInfo.salary" placeholder="格式(6-8k或者面议)"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="ipt-box">
+                    <el-form-item label="联系人">
+                        <el-input v-model="positionInfo.name"></el-input>
                     </el-form-item>
                     <el-form-item label="联系方式">
-                        <el-input v-model="positionInfo.vip_price"></el-input>
+                        <el-input v-model="positionInfo.phone"></el-input>
                     </el-form-item>
                     <el-form-item label="简历投递E-mail">
-                        <el-input v-model="positionInfo.freight"></el-input>
+                        <el-input v-model="positionInfo.email"></el-input>
+                    </el-form-item>
+                </div>
+                <div class="ipt-box">
+                    <el-form-item label="浏览量">
+                        <el-input v-model="positionInfo.browse"></el-input>
+                    </el-form-item>
+                    <el-form-item label="排序">
+                        <el-input v-model="positionInfo.sort"></el-input>
                     </el-form-item>
                 </div>
                 <el-form-item label="公司logo">
@@ -37,7 +82,7 @@
                         <i slot="default" class="el-icon-plus"></i>
                     </el-upload>
                 </el-form-item>
-                <el-form-item label="职位描述">
+                <!-- <el-form-item label="职位描述">
                     <quill-editor ref="myQuillEditor" v-model="positionInfo.detail" :options="editorOption"
                         style="height:430px;margin:0 0 60px 0;"></quill-editor>
                     <el-upload class="avatar-uploader quill-img" action="https://api.fengniaotuangou.cn/api/upload"
@@ -45,7 +90,7 @@
                         <el-button size="small" type="primary" id="imgInput" element-loading-text="插入中,请稍候">点击上传
                         </el-button>
                     </el-upload>
-                </el-form-item>
+                </el-form-item> -->
                 <div class="submit">
                     <el-form-item>
                         <el-button type="primary" @click="newPosition">提交</el-button>
@@ -112,7 +157,24 @@
                 size: 10,
                 total: 0,
 
-                positionInfo: {},
+                positionInfo: {
+                    href: '',
+                    company_name: '',
+                    company_intro: '',
+                    post_name: '',
+                    work_city: '',
+                    work_place: '',
+                    work_experience: '',
+                    education: '',
+                    salary: '',
+                    work_intro: '',
+                    name: '',
+                    phone: '',
+                    email: '',
+                    on_shelf: 1,
+                    browse: '',
+                    sort: ''
+                },
                 dialogPosition: false,
                 files: [],
                 editorOption: {
@@ -160,6 +222,17 @@
                         },
                     },
                 },
+
+                options: [{
+                    label: '本科',
+                    value: 1
+                },{
+                    label: '研究生',
+                    value: 2
+                },{
+                    label: '博士',
+                    value: 3
+                }]
             }
         },
 
@@ -167,42 +240,72 @@
             // 发布职位
             addPosition() {
                 var self = this;
-                // self.dialogPosition = true;
+                self.dialogPosition = true;
+
+            },
+
+            close() {
+                var self = this;
+                self.positionInfo = {
+                    href: '',
+                    company_name: '',
+                    company_intro: '',
+                    post_name: '',
+                    work_city: '',
+                    work_place: '',
+                    work_experience: '',
+                    education: '',
+                    salary: '',
+                    work_intro: '',
+                    name: '',
+                    phone: '',
+                    email: '',
+                    on_shelf: 1,
+                    browse: '',
+                    sort: ''
+                };
             },
 
             // 发布
-            newPosition() {},
+            newPosition() {
+                var self = this;
+                console.log(self.positionInfo);
+                // API.postRelease(self.positionInfo).then(res => {
+                //     self.$message.success("发布成功");
+                //     self.dialogPosition = false;
+                // })
+            },
 
 
             // 富文本选择图片时的事件
-            beforeUpload() {
-                // 显示加载动画
-                loading = this.$loading({
-                    lock: true,
-                    text: "图片上传中",
-                    spinner: "el-icon-loading",
-                    background: "rgba(0, 0, 0, 0.7)",
-                });
-            },
-            // 富文本插入图片时上传图片
-            quillImgSuccess(res, file) {
-                let quill = this.$refs.myQuillEditor.quill;
-                // 关闭动画
-                loading.close();
-                if (res.data) {
-                    let length = quill.getSelection().index;
-                    quill.insertEmbed(length, "image", res.data);
-                    quill.setSelection(length + 1);
-                } else {
-                    this.$message.error("图片插入失败");
-                }
-            },
+            // beforeUpload() {
+            //     // 显示加载动画
+            //     loading = this.$loading({
+            //         lock: true,
+            //         text: "图片上传中",
+            //         spinner: "el-icon-loading",
+            //         background: "rgba(0, 0, 0, 0.7)",
+            //     });
+            // },
+            // // 富文本插入图片时上传图片
+            // quillImgSuccess(res, file) {
+            //     let quill = this.$refs.myQuillEditor.quill;
+            //     // 关闭动画
+            //     loading.close();
+            //     if (res.data) {
+            //         let length = quill.getSelection().index;
+            //         quill.insertEmbed(length, "image", res.data);
+            //         quill.setSelection(length + 1);
+            //     } else {
+            //         this.$message.error("图片插入失败");
+            //     }
+            // },
             // 上传图片
             handleRemove(file, fileList) {
                 //移除图片
                 var self = this;
                 self.files = fileList
-                self.goodsInfo.img = ''
+                self.goodsInfo.href = ''
             },
             beforeAvatarUpload(file) {
                 const isLt2M = 300 * 1024;
@@ -214,7 +317,7 @@
             handleAvatarSuccess(res, file) {
                 //图片上传成功
                 var self = this;
-                self.positionInfo.img = file.response.data;
+                self.positionInfo.href = file.response.data;
             },
             handleExceed(files, fileList) {
                 //图片上传超过数量限制
@@ -233,5 +336,9 @@
 <style lang="scss" scoped>
     .ipt-box {
         display: flex;
+    }
+
+    .tex {
+        width: 500px;
     }
 </style>
