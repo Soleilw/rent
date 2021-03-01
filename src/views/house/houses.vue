@@ -63,6 +63,7 @@
       <el-table-column prop="address" label="房屋地址"></el-table-column>
       <el-table-column prop="room_count" label="单元总数"></el-table-column>
       <el-table-column prop="room_resident" label="租客总数"></el-table-column>
+      <el-table-column prop="pay_resident" label="缴费人数"></el-table-column>
       <el-table-column prop="state" label="是否收费">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.state" active-color="#2a9f93"

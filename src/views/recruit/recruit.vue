@@ -167,7 +167,7 @@
             // 发布职位
             addPosition() {
                 var self = this;
-                self.dialogPosition = true;
+                // self.dialogPosition = true;
             },
 
             // 发布
