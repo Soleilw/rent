@@ -540,9 +540,24 @@ API.roomMenber = function (address_id, room_id) {
 	})
 }
 
-// 查看房间成员
+// 发布职位
 API.postRelease = function (data) {
 	return axios.post(url.PostRelease, data)
+}
+// 列表
+API.postList = function (page, limit, company_name, post_name) {
+	return axios.get(url.PostList, {
+		page: page,
+		limit: limit,
+		company_name: company_name,
+		post_name: post_name
+	})
+}
+// 删除
+API.delPost = function (id) {
+	return axios.del(url.DelPost, {
+		id: id
+	})
 }
 
 
