@@ -290,7 +290,8 @@
               <el-option v-for="item in detailAddressList" :key="item.id" :label="item.address" :value="item.id">
               </el-option>
             </el-select>
-            <el-select v-model="room_id" placeholder="请选择门牌号" @change="roomIdChange" style="margin-right: 10px">
+            <el-select v-model="room_id" placeholder="请选择门牌号" @change="roomIdChange" style="margin-right: 10px"
+              v-if="userForm.type == 2">
               <el-option v-for="item in roomList" :key="item.id" :label="item.door_number" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
@@ -451,17 +452,17 @@
           type: "",
           address_id: "",
           address: "",
-          room_id: "",
-          self: 1,
+          room_id: '',
+          self: 1
         },
-        userForms: {
-          user_id: "",
-          areas_id: "",
-          type: "",
-          address_id: "",
-          address: "",
-          self: 1,
-        },
+        // userForms: {
+        //   user_id: "",
+        //   areas_id: "",
+        //   type: "",
+        //   address_id: "",
+        //   address: "",
+        //   self: 1,
+        // },
         rolesList: [{
             name: "户主",
             type: 1,
@@ -709,7 +710,7 @@
       userListChange(val) {
         var self = this;
         self.userForm.user_id = val;
-        self.userForms.user_id = val;
+        // self.userForms.user_id = val;
         let obj = {};
         obj = this.userList.find((item) => {
           return item;
@@ -728,7 +729,10 @@
       roleChange(value) {
         var self = this;
         self.userForm.type = value;
-        self.userForms.type = value;
+        if (self.userForm.type != 2) {
+          delete self.userForm.room_id
+        }
+        // self.userForms.type = value;
       },
       getPro() {
         var self = this;
@@ -792,7 +796,7 @@
       communityChange(val) {
         var self = this;
         self.userForm.areas_id = val;
-        self.userForms.areas_id = val;
+        // self.userForms.areas_id = val;
         self.funTitle(self.areaList, val);
         self.getDetailAddress(val);
         self.address = "";
@@ -800,7 +804,7 @@
       detailAddressChnage(val) {
         var self = this;
         self.userForm.address_id = val;
-        self.userForms.address_id = val;
+        // self.userForms.address_id = val;
         let obj = {};
         obj = this.detailAddressList.find((item) => {
           return item.id === val;
@@ -815,8 +819,10 @@
         obj = this.roomList.find((item) => {
           return item.id === val;
         });
-        self.detailAddress += obj.door_number;
-        self.userForm.room_id = val;
+        if (self.userForm.type == 2) {
+          self.detailAddress += obj.door_number;
+          self.userForm.room_id = val;
+        }
       },
       // 添加身份
       addUser(index, row) {
@@ -842,14 +848,14 @@
           room_id: "",
           self: 1,
         };
-        self.userForms = {
-          user_id: "",
-          areas_id: "",
-          type: "",
-          address_id: "",
-          address: "",
-          self: 1,
-        };
+        // self.userForms = {
+        //   user_id: "",
+        //   areas_id: "",
+        //   type: "",
+        //   address_id: "",
+        //   address: "",
+        //   self: 1,
+        // };
       },
       fucUser(form) {
         var self = this;
@@ -862,12 +868,15 @@
       newUser() {
         var self = this;
         self.userForm.address = self.detailAddress;
-        self.userForms.address = self.detailAddress;
-        if (self.userForm.room_id) {
-          self.fucUser(self.userForm);
-        } else {
-          self.fucUser(self.userForms);
-        }
+        self.fucUser(self.userForm);
+
+        // console.log('self.userForm', self.userForm);
+        // self.userForms.address = self.detailAddress;
+        // if (self.userForm.room_id) {
+        // self.fucUser(self.userForm);
+        // } else {
+        //   self.fucUser(self.userForms);
+        // }
       },
 
       // 操作
