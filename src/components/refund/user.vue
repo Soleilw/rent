@@ -77,8 +77,27 @@
       <div class="box">
         <el-form :model="listForm">
           <div v-for="(item, index) in listForm.service" :key="index">
-            <el-form-item v-if="isAdd">
-              <span>选择社区：</span>
+            <el-form-item v-if="isAdd" label="选择省份">
+              <!-- <span>选择省份: </span> -->
+              <el-select v-model="pro_id" placeholder="请选择省份" @change="proChange">
+                <el-option v-for="item in proList" :key="item.index" :label="item.title" :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="isAdd" label="选择市级">
+              <!-- <span>选择市级: </span> -->
+              <el-select v-model="city_id" placeholder="请选择市级" @change="cityChange">
+                <el-option v-for="item in cityList" :key="item.index" :label="item.title" :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="isAdd" label="选择区级">
+              <!-- <span>选择区级: </span> -->
+              <el-select v-model="community_id" placeholder="请选择区级" @change="areasChange">
+                <el-option v-for="item in communityList" :key="item.index" :label="item.title" :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="isAdd" label="选择社区">
+              <!-- <span>选择社区：</span> -->
               <el-select v-model="item.area_id" placeholder="请选择社区" @change="changeAreaType">
                 <el-option v-for="item in areaList" :key="item.index" :label="item.title" :value="item.id"></el-option>
               </el-select>
@@ -277,6 +296,12 @@
         isAdd: true,
         isDisabled: false,
         isBan: false,
+        proList: [], // 省级列表
+        pro_id: "",
+        cityList: [], // 市级列表
+        city_id: "",
+        communityList: [], // 区级列表
+        community_id: "",
       };
     },
     mounted() {
@@ -381,16 +406,63 @@
         self.addopenList();
         self.isAdd = true;
         self.isDisabled = false;
-        API.areas(1, 100, 3).then((res) => {
+        // API.areas(1, 100, 3).then((res) => {
+        //   self.areaList = res.data;
+        // });
+        this.getPro()
+      },
+      getPro() {
+        var self = this;
+        API.areas(1, 4000, 0).then((res) => {
+          self.proList = res.data;
+        });
+      },
+      getCity(val) {
+        var self = this;
+        API.areas(1, 4000, val).then((res) => {
+          self.cityList = res.data;
+        });
+      },
+      getCommunity(val) {
+        var self = this;
+        API.areas(1, 100, val).then((res) => {
+          self.communityList = res.data;
+        });
+      },
+      proChange(val) {
+        var self = this;
+        self.getCity(val);
+      },
+      getAreas(val) {
+        var self = this;
+        
+        API.areas(1, 4000, val).then((res) => {
           self.areaList = res.data;
         });
+      },
+      cityChange(val) {
+        var self = this;
+        self.getCommunity(val);
+      },
+      areasChange(val) {
+        var self = this;
+        self.getAreas(val);
       },
       // 选择社区
       changeAreaType(value) {
         var self = this;
         self.area_id = value;
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         API.addresses(1, 100, self.area_id).then((res) => {
           self.addressList = res.data;
+          loading.close()
+        }).catch(err => {
+          loading.close()
         });
       },
       // 选择地址
@@ -442,6 +514,11 @@
         self.isAdd = true;
         self.delopenList();
         self.listForm.service = [];
+        self.pro_id = "";
+        self.cityList = []; // 市级列表
+        self.city_id = "";
+        self.communityList = []; // 区级列表
+        self.community_id = "";
       },
 
       // 返现记录

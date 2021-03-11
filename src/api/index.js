@@ -560,5 +560,41 @@ API.delPost = function (id) {
 	})
 }
 
+// 发布出租屋信息
+API.issueRenting = function (data) {
+	return axios.post(url.IssueRenting, data)
+}
+// 列表
+API.issuesList = function (page, limit, type, name, address) {
+	return axios.get(url.IssuesList, {
+		page: page,
+		limit: limit,
+		type: type,
+		name: name,
+		address: address
+	})
+}
+// 删除
+API.delIssue = function (id) {
+	return axios.del(url.DelIssue, {
+		id: id
+	})
+}
+
+// 模板列表
+API.templates = function (page, limit, title) {
+	return axios.get(url.Templates, {
+		page: page,
+		limit: limit,
+		title: title,
+	})
+}
+// 删除
+API.delTemplates = function (id) {
+	return axios.del(url.DelTemplates, {
+		id: id
+	})
+}
+
 
 export default API

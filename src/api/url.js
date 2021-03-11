@@ -89,6 +89,13 @@ const url = {
 	'PostList': BaseURL + '/post/lists', // 获取列表
 	'DelPost': BaseURL + '/del/post', // 删除
 
+	'IssueRenting': BaseURL + '/creation/message/issue', // 发布出租屋信息
+	'DelIssue': BaseURL + '/del/message/issue', // 删除
+	'IssuesList': BaseURL + '/message/issues', // 列表
+
+	'Templates': BaseURL + '/templates', // 模板列表
+	'DelTemplates': BaseURL + '/del/template', // 删除
+
 }
 
 module.exports = url;

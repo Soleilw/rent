@@ -4,6 +4,18 @@
             <div class="btn">
                 <el-button type="primary" @click="addPosition">发布职位</el-button>
             </div>
+            <div class="btn">
+                <el-input v-model="keyword" placeholder="输入职位名称/公司名称" class="input-with-select"
+                    @keyup.enter.native="search(keyword)">
+                    <el-select v-model="type" placeholder="请选择搜索方式" @change="changeType" slot="prepend"
+                        style="width: 150px">
+                        <el-option v-for="item in typeList" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <el-button slot="append" icon="el-icon-search" @click="search(keyword)"></el-button>
+                    <el-button slot="append" icon="el-icon-refresh" @click="refresh"></el-button>
+                </el-input>
+            </div>
         </div>
 
         <!-- 发布职位 -->
@@ -160,17 +172,9 @@
 
 <script>
     import API from "@/api/index.js";
-    import md5 from "blueimp-md5";
-    import {
-        quillEditor
-    } from "vue-quill-editor";
-    import "quill/dist/quill.core.css";
-    import "quill/dist/quill.snow.css";
-    import "quill/dist/quill.bubble.css";
     export default {
-        components: {
-            quillEditor,
-        },
+        inject: ["reload"],
+
         data() {
             return {
                 loading: true,
@@ -199,51 +203,6 @@
                 },
                 dialogPosition: false,
                 files: [],
-                editorOption: {
-                    placeholder: "请输入文档内容",
-                    theme: "snow",
-                    modules: {
-                        toolbar: {
-                            container: [
-                                ["bold", "italic", "underline", "strike"],
-                                ["blockquote", "code-block"],
-                                [{
-                                    direction: "rtl",
-                                }, ],
-                                [{
-                                    size: ["small", false, "large", "huge"],
-                                }, ],
-                                [{
-                                    header: [1, 2, 3, 4, 5, 6, false],
-                                }, ],
-                                [{
-                                        color: [],
-                                    },
-                                    {
-                                        background: [],
-                                    },
-                                ],
-                                [{
-                                    font: [],
-                                }, ],
-                                [{
-                                    align: [],
-                                }, ],
-                                ["clean"],
-                                ["link", "image"],
-                            ],
-                            handlers: {
-                                image: function (value) {
-                                    if (value) {
-                                        document.querySelector(".quill-img input").click();
-                                    } else {
-                                        this.quill.format("image", false);
-                                    }
-                                },
-                            },
-                        },
-                    },
-                },
 
                 options: [{
                     label: '本科',
@@ -257,7 +216,19 @@
                 }],
                 on_shelf: false,
                 dialogDel: false,
-                id: ''
+                id: '',
+                keyword: '',
+                type: 2, // 选中的搜索方式
+                typeList: [{
+                        value: 1,
+                        label: "按公司名称搜索",
+                    },
+                    {
+                        value: 2,
+                        label: "按职位名称搜索",
+                    },
+                ],
+                typeDisabled: false,
             }
         },
 
@@ -284,14 +255,61 @@
                 var self = this;
                 self.current = val;
                 self.loading = true;
-                self.getList(val, self.size);
+                if (self.keyword) {
+                    switch (self.type) {
+                        case 1:
+                            var company_name = self.keyword;
+                            self.getList(val, self.size, company_name, post_name)
+                            break;
+                        case 2:
+                            var post_name = self.keyword;
+                            self.getList(val, self.size, company_name, post_name)
+                    }
+                } else {
+                    self.getList(val, self.size);
+                }
             },
             sizeChange(val) {
                 var self = this;
                 self.size = val;
                 self.loading = true;
                 self.current = 1;
-                self.getList(1, val);
+                if (self.keyword) {
+                    switch (self.type) {
+                        case 1:
+                            var company_name = self.keyword;
+                            self.getList(1, val, company_name, post_name);
+                            break;
+                        case 2:
+                            var post_name = self.keyword;
+                            self.getList(1, val, company_name, post_name);
+                    }
+                } else {
+                    self.getList(1, val);
+                }
+            },
+
+            // 搜索方式
+            changeType(val) {
+                var self = this;
+                self.typeDisabled = true;
+                self.keyword = "";
+                self.current = 1;
+                self.getList(self.current, self.size);
+            },
+
+            search() {
+                var self = this;
+                self.loading = true;
+                self.current = 1;
+                if (self.type == 1) {
+                    var company_name = self.keyword;
+                    self.getList(self.current, self.size, company_name, post_name)
+                }
+                if (self.type == 2) {
+                    var post_name = self.keyword;
+                    self.getList(self.current, self.size, company_name, post_name)
+                }
             },
 
             // 发布职位
@@ -327,12 +345,16 @@
             newPosition() {
                 var self = this;
                 // console.log(self.positionInfo);
-                API.postRelease(self.positionInfo).then(res => {
-                    self.$message.success("发布成功");
-                    self.dialogPosition = false;
-                    self.getList(self.current, self.size)
-                })
-            },
+                if (self.positionInfo.name && self.positionInfo.phone && self.positionInfo.email) {
+                    API.postRelease(self.positionInfo).then(res => {
+                        self.$message.success("发布成功");
+                        self.dialogPosition = false;
+                        self.getList(self.current, self.size)
+                    })
+                } else {
+                    self.$message.warning("请填写完整信息");
+                }
+            }, 
 
             handleEdit(index, row) {
                 var self = this;
@@ -432,31 +454,11 @@
                     self.getList(self.current, self.size);
                 })
             },
+            // 刷新
+            refresh() {
+                this.reload();
+            },
 
-
-            // 富文本选择图片时的事件
-            // beforeUpload() {
-            //     // 显示加载动画
-            //     loading = this.$loading({
-            //         lock: true,
-            //         text: "图片上传中",
-            //         spinner: "el-icon-loading",
-            //         background: "rgba(0, 0, 0, 0.7)",
-            //     });
-            // },
-            // // 富文本插入图片时上传图片
-            // quillImgSuccess(res, file) {
-            //     let quill = this.$refs.myQuillEditor.quill;
-            //     // 关闭动画
-            //     loading.close();
-            //     if (res.data) {
-            //         let length = quill.getSelection().index;
-            //         quill.insertEmbed(length, "image", res.data);
-            //         quill.setSelection(length + 1);
-            //     } else {
-            //         this.$message.error("图片插入失败");
-            //     }
-            // },
             // 上传图片
             handleRemove(file, fileList) {
                 //移除图片

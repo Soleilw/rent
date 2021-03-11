@@ -53,6 +53,8 @@
                   <span style="font-weight: bold">房屋管理页</span>
                 </el-checkbox>
                 <el-checkbox label="houses" @change="oneChange">房屋列表</el-checkbox>
+                <el-checkbox label="renting" @change="oneChange">租赁列表</el-checkbox>
+                <el-checkbox label="demoIndex" @change="oneChange">信息模板发布</el-checkbox>
                 <el-checkbox label="housesAdd" @change="oneChange">新增房屋</el-checkbox>
                 <el-checkbox label="housesGet" @change="oneChange">获取房屋</el-checkbox>
               </el-checkbox-group>
@@ -169,6 +171,7 @@
           "houses",
           "housesAdd", // 新增房屋
           "housesGet", // 房屋列表获取
+          "renting",
 
           "picture", // 图文管理
           "banner", // 轮播图
@@ -209,7 +212,8 @@
           "manageResetPwd", // 重置密码
           "switch",
           "refund",
-          "recruit"
+          "recruit",
+          "demoIndex"
         ],
         areaPerson: [
           "resident", // 住户管理
@@ -219,6 +223,7 @@
           "houses",
           "housesAdd", // 新增房屋
           "housesGet", // 房屋列表获取
+          "renting",
 
           "picture", // 图文管理
           "banner", // 轮播图

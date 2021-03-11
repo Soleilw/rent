@@ -23,14 +23,22 @@ const dynamicRouter = [{
 					title: '房屋列表',
 				}
 			},
-			// {
-			// 	path: '/map',
-			// 	name: 'map',
-			// 	component: () => import('@/views/house/map.vue'),
-			// 	meta: {
-			// 	    title: '腾讯地图demo',
-			// 	}
-			// }
+			{
+				path: '/renting',
+				name: 'renting',
+				component: () => import('@/views/house/renting.vue'),
+				meta: {
+				    title: '租赁列表',
+				}
+			},
+			{
+				path: '/demoIndex',
+				name: 'demoIndex',
+				component: () => import('@/views/house/demoIndex.vue'),
+				meta: {
+				    title: '信息模板发布',
+				}
+			},
 		]
 	},
 	{
