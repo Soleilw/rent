@@ -44,7 +44,7 @@
                         </el-option>
                     </el-select>
                 </el-form-item> -->
-                <el-form-item label="请选择详细地址">
+                <el-form-item label="请选择详细地址id">
                     <el-select v-model="pro_id" placeholder="请选择省份" @change="proChange" style="margin-right: 10px">
                         <el-option v-for="item in proList" :key="item.id" :label="item.title" :value="item.id">
                         </el-option>

@@ -96,6 +96,16 @@ const dynamicRouter = [{
 	},
 
 	{
+		path: '/order',
+		name: 'order',
+		component: () => import('@/views/order/order.vue'),
+		meta: {
+			title: '服务订单列表',
+			icon: 'el-icon-s-order'
+		}
+	},
+
+	{
 		path: '/suspected',
 		name: 'suspected',
 		component: () => import('@/views/suspected/suspected.vue'),

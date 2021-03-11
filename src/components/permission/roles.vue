@@ -123,6 +123,13 @@
                 <el-checkbox label="delBuy" @change="oneChange">删除</el-checkbox>
               </el-checkbox-group>
             </div>
+            <div class="permission">
+              <el-checkbox-group v-model="form.permissions" class="permission-item">
+                <el-checkbox label="order" @change="oneChange" border>
+                  <span style="font-weight: bold">服务订单列表</span>
+                </el-checkbox>
+              </el-checkbox-group>
+            </div>
           </el-form-item>
           <div class="submit">
             <el-form-item>
@@ -213,7 +220,8 @@
           "switch",
           "refund",
           "recruit",
-          "demoIndex"
+          "demoIndex",
+          "order"
         ],
         areaPerson: [
           "resident", // 住户管理
@@ -258,6 +266,7 @@
           "manageEdit",
           "manageDel",
           "manageResetPwd", // 重置密码
+          "order"
         ],
 
         dialogDel: false,
