@@ -68,6 +68,21 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="地址经纬度">
+                    <div class="ipt-box">
+                        <el-input v-model="rentingInfo.longitude" placeholder="经度显示" style="margin-right: 10px;">
+                        </el-input>
+                        <el-input v-model="rentingInfo.latitude" placeholder="纬度显示" style="margin-right: 10px;">
+                        </el-input>
+                    </div>
+                </el-form-item>
+                <el-form-item label="地图显示">
+                    <el-switch v-model="showMap" active-color="#2a9f93">
+                    </el-switch>
+                    <div v-if="showMap">
+                        <v-map @callback="getLoc"></v-map>
+                    </div>
+                </el-form-item>
                 <el-form-item label="出租房屋地址">
                     <el-input v-model="rentingInfo.address" class="tex" placeholder="请输入出租房屋地址"></el-input>
                 </el-form-item>
@@ -192,9 +207,12 @@
 
 <script>
     import API from "@/api/index.js";
+    import vMap from '@/components/map/map-iframe.vue'
     export default {
         inject: ["reload"],
-
+        components: {
+            vMap
+        },
         data() {
             return {
                 loading: true,
@@ -222,8 +240,9 @@
                     house_type: '',
                     house_type_text: '',
                     pay_type: '',
-                    orientation: ''
-
+                    orientation: '',
+                    latitude: '',
+                    longitude: ''
                 },
                 dialogPosition: false,
                 fileLists: [],
@@ -301,7 +320,8 @@
                 community_id: "",
                 areaList: [], //  社区列表
                 areas_id: "",
-                // detailAddressList: [], // 详细地址
+                // detailAddressList: [], // 详细地址,
+                showMap: false
             }
         },
 
@@ -417,7 +437,9 @@
                     house_type: '',
                     house_type_text: '',
                     pay_type: '',
-                    orientation: ''
+                    orientation: '',
+                    latitude: '',
+                    longitude: ''
                 };
                 self.fileLists = [];
                 // self.area_id = '';
@@ -491,6 +513,14 @@
                 self.getDetailAddress(val);
             },
 
+            getLoc(mapData) {
+                console.log(mapData);
+                this.rentingInfo.longitude = mapData.latlng.lng;
+                this.rentingInfo.latitude = mapData.latlng.lat;
+                this.rentingInfo.address = mapData.poiaddress + mapData.poiname;
+                this.showMap = false;
+            },
+
             // 选择社区
             // changeAreaType(value) {
             //     var self = this;
@@ -539,6 +569,8 @@
                     house_type_text: row.house_type_text,
                     pay_type: row.pay_type,
                     orientation: row.orientation,
+                    latitude: row.latitude,
+                    longitude: row.longitude,
                     id: row.id
                 };
 
@@ -547,6 +579,8 @@
                     obj.url = t;
                     return obj;
                 })
+                // self.pro_id = row.province.id
+                // self.getPro()
                 API.addresses(1, 4000, row.areas_id).then((res) => {
                     self.addressList = res.data;
                 }).catch(err => {});
@@ -595,6 +629,8 @@
                         house_type_text: row.house_type_text,
                         pay_type: row.pay_type,
                         orientation: row.orientation,
+                        latitude: row.latitude,
+                        longitude: row.longitude,
                         id: row.id
                     };
                 } else {
@@ -618,6 +654,8 @@
                         house_type_text: row.house_type_text,
                         pay_type: row.pay_type,
                         orientation: row.orientation,
+                        latitude: row.latitude,
+                        longitude: row.longitude,
                         id: row.id
                     };
                 }
