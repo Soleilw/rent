@@ -596,5 +596,29 @@ API.delTemplates = function (id) {
 	})
 }
 
+// 发布模板记录列表
+API.templatesMsg = function (page, limit, target_type, template_id) {
+	return axios.get(url.TemplatesMsg, {
+		page: page,
+		limit: limit,
+		target_type: target_type,
+		template_id: template_id
+	})
+}
+// 删除模板记录
+API.delTemplatesMsg = function (id) {
+	return axios.del(url.DelTemplatesMsg, {
+		id: id
+	})
+}
+// 详情
+API.msgDetails = function (page, limit, id) {
+	return axios.get(url.MsgDetails, {
+		page: page,
+		limit: limit,
+		id: id
+	})
+}
+
 
 export default API

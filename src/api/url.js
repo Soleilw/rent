@@ -1,5 +1,5 @@
-//  const BaseURL = "https://chu.fengniaotuangou.cn"
-const BaseURL = "http://192.168.0.110"
+ const BaseURL = "https://chu.fengniaotuangou.cn"
+// const BaseURL = "http://192.168.0.110"
 
 const url = {
 	// 登录
@@ -95,6 +95,10 @@ const url = {
 
 	'Templates': BaseURL + '/templates', // 模板列表
 	'DelTemplates': BaseURL + '/del/template', // 删除
+
+	'TemplatesMsg': BaseURL + '/template/messages', // 模板记录列表
+	'DelTemplatesMsg': BaseURL + '/del/template/message', // 删除模板记录
+	'MsgDetails': BaseURL + '/message/details', // 详情
 
 }
 
