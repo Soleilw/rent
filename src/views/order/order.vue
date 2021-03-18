@@ -8,6 +8,9 @@
                         <el-button slot="append" icon="el-icon-search" @click="search(keyword)"></el-button>
                     </el-input>
                 </div>
+                <div class="btn">
+                    <el-tag effect="dark" type="info">总金额: {{totalMoney}}</el-tag>
+                </div>
             </div>
             <el-table :data="orderData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
                 <el-table-column prop="no" label="订单ID"></el-table-column>
@@ -47,6 +50,7 @@
                 orderSize: 10,
                 orderTotal: 0,
                 orderCurrent: 1,
+                totalMoney: 0
             }
         },
 
@@ -61,6 +65,7 @@
                     self.$message.success("获取数据成功");
                     self.orderData = res.data;
                     self.orderTotal = res.total;
+                    self.totalMoney = res.money;
                     self.loading = false;
                 }).catch(err => {
                     self.loading = false;

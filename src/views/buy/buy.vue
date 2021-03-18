@@ -48,6 +48,9 @@
               <el-button slot="append" icon="el-icon-search" @click="search(keyword)"></el-button>
             </el-input>
           </div>
+          <div class="btn">
+            <el-tag effect="dark" type="info">总金额: {{totalMoney}}</el-tag>
+          </div>
         </div>
         <div>
           <el-table :data="orderData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
@@ -162,6 +165,7 @@
         id: "",
         keyword: "",
         isAdd: true,
+        totalMoney: 0
       };
     },
     mounted() {
@@ -284,6 +288,7 @@
           self.$message.success("获取数据成功");
           self.orderData = res.data;
           self.orderTotal = res.total;
+          self.totalMoney = res.money;
         });
       },
       handleOrder(index, row) {

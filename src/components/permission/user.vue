@@ -53,16 +53,18 @@
             </el-select>
           </el-form-item>
           <el-form-item label="选择社区">
-            <el-select v-model="pro_id" placeholder="请选择省份" @change="proChange" style="margin-right: 10px;">
+            <el-select v-model="pro_id" placeholder="请选择省份" clearable @change="proChange" style="margin-right: 10px;">
               <el-option v-for="item in proList" :key="item.id" :label="item.title" :value="item.id"></el-option>
             </el-select>
-            <el-select v-model="city_id" placeholder="请选择市级" @change="cityChange" style="margin-right: 10px;">
+            <el-select v-model="city_id" placeholder="请选择市级" clearable @change="cityChange" style="margin-right: 10px;">
               <el-option v-for="item in cityList" :key="item.id" :label="item.title" :value="item.id"></el-option>
             </el-select>
-            <el-select v-model="areas_id" placeholder="请选择区级" @change="areasChange" style="margin-right: 10px;">
+            <el-select v-model="areas_id" placeholder="请选择区级" clearable @change="areasChange"
+              style="margin-right: 10px;">
               <el-option v-for="item in communityList" :key="item.id" :label="item.title" :value="item.id"></el-option>
             </el-select>
-            <el-select v-model="community_id" placeholder="请选择社区" @change="communityChange" style="margin-right: 10px;">
+            <el-select v-model="community_id" placeholder="请选择社区" clearable style="margin-right: 10px;">
+              <!-- @change="communityChange" -->
               <el-option v-for="item in areaList" :key="item.id" :label="item.title" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
@@ -167,37 +169,41 @@
       // 获取社区列表（省市区选中）
       getPro() {
         var self = this;
-        API.areas(self.current, 100, 0).then((res) => {
+        API.areas(1, 100, 0).then((res) => {
           self.proList = res.data;
         });
       },
       proChange(val) {
+        // this.form.areas_id = val;
         this.getCity(val);
       },
       getCity(val) {
         var self = this;
-        API.areas(self.current, 100, val).then((res) => {
+        API.areas(1, 100, val).then((res) => {
           self.cityList = res.data;
         });
       },
       cityChange(val) {
+        // this.form.areas_id = val;
         this.getCommunity(val);
       },
       getCommunity(val) {
         var self = this;
-        API.areas(self.current, 100, val).then((res) => {
+        this.form.areas_id = val;
+        API.areas(1, 100, val).then((res) => {
           self.communityList = res.data;
         });
       },
       areasChange(val) {
+        // this.form.areas_id = val;
         this.getAreas(val);
       },
-      communityChange(val) {
-        this.form.areas_id = val;
-      },
+      // communityChange(val) {
+      //   this.form.areas_id = val;
+      // },
       getAreas(val) {
         var self = this;
-        API.areas(self.current, 100, val).then((res) => {
+        API.areas(1, 100, val).then((res) => {
           self.areaList = res.data;
         });
       },
@@ -258,7 +264,17 @@
       },
       newUser() {
         var self = this;
-        if (self.form.username && self.form.password && self.form.enable && self.form.role && self.form.areas_id) {
+        if (self.community_id != '' && self.areas_id != '' && self.city_id != '' && self.pro_id != '') {
+          self.form.areas_id = self.community_id;
+        } else if (self.community_id == '' && self.areas_id != '' && self.city_id != '' && self.pro_id != '') {
+          self.form.areas_id = self.areas_id;
+        } else if (self.community_id == '' && self.areas_id == '' && self.city_id != '' && self.pro_id != '') {
+          self.form.areas_id = self.city_id;
+        } else if (self.community_id == '' && self.areas_id == '' && self.city_id == '' && self.pro_id != '') {
+          self.form.areas_id = self.pro_id;
+        }
+        console.log('areas_id', self.form.areas_id);
+        if (self.form.username && self.form.password && self.form.enable && self.form.role && self.areas_id) {
           API.user(self.form).then((res) => {
             self.dialogUser = false;
             self.$message.success("提交成功");

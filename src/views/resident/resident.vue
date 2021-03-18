@@ -22,7 +22,7 @@
         </el-select>
         <el-button slot="append" icon="el-icon-search" @click="searchChange"></el-button>
       </div>
-      <div class="btn">
+      <div class="btn" v-if="username == 'admin'">
         <el-button type="primary" @click="addUser">添加身份</el-button>
       </div>
     </div>
@@ -554,8 +554,6 @@
     },
     mounted() {
       this.getAllRent(this.current, this.size);
-      this.getPro();
-      this.getUser();
     },
     methods: {
       // 表格数据
@@ -828,6 +826,8 @@
       addUser(index, row) {
         var self = this;
         self.dialogUser = true;
+        self.getUser();
+        self.getPro();
       },
       close() {
         var self = this;

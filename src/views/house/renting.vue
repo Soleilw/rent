@@ -27,10 +27,10 @@
                         <el-radio :label="2">否</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="标题">
-                    <el-input v-model="rentingInfo.title" class="tex" placeholder="请输入标题"></el-input>
+                <el-form-item label="房屋名称">
+                    <el-input v-model="rentingInfo.title" class="tex" placeholder="请输入房屋名称(如: xx房屋出租)"></el-input>
                 </el-form-item>
-                <el-form-item label="简介">
+                <el-form-item label="房屋简介">
                     <el-input v-model="rentingInfo.intro" class="tex" type="textarea"
                         :autosize="{ minRows: 2, maxRows: 100}" placeholder="请输入房屋简介"></el-input>
                 </el-form-item>
@@ -91,8 +91,14 @@
                         <el-input v-model="rentingInfo.price" placeholder="请输价格(如: 450)"></el-input>
                     </el-form-item>
                     <el-form-item label="支付类型">
-                        <el-input v-model="rentingInfo.pay_type" placeholder="请输入支付类型(如: 押一付一)" style="width: 250px">
-                        </el-input>
+                        <el-select v-model="rentingInfo.pay_type" placeholder="请选择支付类型" style="margin-right: 10px">
+                            <el-option v-for="item in payTypeList" :key="item.value" :label="item.label"
+                                :value="item.label">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="rentingInfo.pay_type" placeholder="请输入支付类型(如: 押一付一)"
+                                style="width: 250px">
+                            </el-input> -->
                     </el-form-item>
                 </div>
                 <div class="ipt-box">
@@ -103,7 +109,7 @@
                         <el-input v-model="rentingInfo.floor" placeholder="请输入楼层"></el-input>
                     </el-form-item>
                     <el-form-item label="楼层类型">
-                        <el-select v-model="rentingInfo.floor_type" filterable placeholder="选择楼层类型">
+                        <el-select v-model="rentingInfo.floor_type" placeholder="选择楼层类型">
                             <el-option v-for="item in floorList" :label="item.label" :value="item.value"
                                 :key="item.index">
                             </el-option>
@@ -114,15 +120,15 @@
                     <el-form-item label="户型">
                         <el-input v-model="rentingInfo.house_type_text" placeholder="请输入户型(如: 两室一厅)"></el-input>
                     </el-form-item>
-                    <el-form-item label="户型类型">
-                        <el-select v-model="rentingInfo.house_type" filterable placeholder="选择户型类型">
+                    <el-form-item label="房屋类型">
+                        <el-select v-model="rentingInfo.house_type" placeholder="选择房屋类型">
                             <el-option v-for="item in houseTypeList" :label="item.label" :value="item.value"
                                 :key="item.index">
                             </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="朝向">
-                        <el-select v-model="rentingInfo.orientation" filterable placeholder="选择户型类型">
+                        <el-select v-model="rentingInfo.orientation" placeholder="选择房屋朝向">
                             <el-option v-for="item in orientationList" :label="item.label" :value="item.value"
                                 :key="item.index">
                             </el-option>
@@ -287,17 +293,14 @@
                     value: 3
                 }],
                 houseTypeList: [{
-                    label: '一室',
+                    label: '自建房',
                     value: 1
                 }, {
-                    label: '两室',
+                    label: '小区房',
                     value: 2
                 }, {
-                    label: '三室',
+                    label: '别墅',
                     value: 3
-                }, {
-                    label: '四室及以上',
-                    value: 4
                 }],
                 orientationList: [{
                     label: '东',
@@ -321,7 +324,20 @@
                 areaList: [], //  社区列表
                 areas_id: "",
                 // detailAddressList: [], // 详细地址,
-                showMap: false
+                showMap: false,
+                payTypeList: [{
+                    label: '押一付一',
+                    value: 1
+                }, {
+                    label: '押二付一',
+                    value: 2
+                }, {
+                    label: '押一付三',
+                    value: 3
+                }, {
+                    label: '面议',
+                    value: 4
+                }]
             }
         },
 
