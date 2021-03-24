@@ -9,7 +9,7 @@
                     </el-input>
                 </div>
                 <div class="btn">
-                    <el-tag effect="dark" type="info">总金额: {{totalMoney}}</el-tag>
+                    <div class="tip">总金额: {{totalMoney}}</div>
                 </div>
             </div>
             <el-table :data="orderData" border :header-cell-style="{background:'#f0f0f0'}" max-height="620">
@@ -111,5 +111,10 @@
 </script>
 
 <style lang="scss" scoped>
-
+.tip {
+    height: 40px;
+    line-height: 40px;
+    color: red;
+    font-size: 28px;
+}
 </style>
