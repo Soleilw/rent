@@ -443,7 +443,7 @@
 
 <script>
   import API from "@/api/index.js";
-  import vMap from "./map.vue";
+  // import vMap from "./map.vue";
   // import axios from '@/plugins/axios'
   import axios from 'axios'
 
@@ -453,9 +453,9 @@
   } from "util";
 
   export default {
-    components: {
-      vMap,
-    },
+    // components: {
+    //   vMap,
+    // },
     inject: ["reload"],
 
     data() {
@@ -570,7 +570,7 @@
         isDisabled: false,
         is_visitor_code: false,
         dialogLose: false,
-        isAdd: false,
+        // isAdd: false,
         dialogMember: false,
         memberData: [],
         name: '',
@@ -1188,5 +1188,5 @@
 </script>
 
 <style scoped>
-  
+
 </style>
