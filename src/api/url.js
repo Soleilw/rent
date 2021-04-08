@@ -84,6 +84,7 @@ const url = {
 	'CommissionRecord': BaseURL + '/commission/records', // 获取佣金来源
 	'DelCommission': BaseURL + '/commission', // 删除
 	'PayCommission': BaseURL + '/commission/withdraw', // 佣金返现
+	'ManualCommission': BaseURL + '/manual/commission', // 统计佣金
 
 	'PostRelease': BaseURL + '/post/release', // 发布职位
 	'PostList': BaseURL + '/post/lists', // 获取列表

@@ -51,6 +51,11 @@
                                     佣金来源</el-button>
                             </el-dropdown-item>
                             <el-dropdown-item>
+                                <el-button size="mini" type="primary"
+                                    @click="handleStatistics(scope.$index, scope.row)">
+                                    统计佣金</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
                                 <el-button size="mini" type="primary" @click="handleEdit(scope.$index, scope.row)">编辑
                                 </el-button>
                             </el-dropdown-item>
@@ -251,6 +256,16 @@
             </span>
         </el-dialog>
 
+        <!-- 统计分佣 -->
+        <el-dialog :visible.sync="dialogStatistics" title="统计佣金" width="20%" align="center"
+            :close-on-click-modal="false">
+            <div style="font-size: 20px; margin-bottom: 30px">是否统计该户主佣金</div>
+            <span>
+                <el-button type="primary" @click="toConfirm">确定</el-button>
+                <el-button type="danger" @click="dialogStatistics = false">取消</el-button>
+            </span>
+        </el-dialog>
+
         <!-- 分页 -->
         <div class="block">
             <el-pagination @current-change="currentChange" :current-page.sync="current" :page-size="size"
@@ -333,6 +348,7 @@
                 city_id: "",
                 communityList: [], // 区级列表
                 community_id: "",
+                dialogStatistics: false
             };
         },
         mounted() {
@@ -467,7 +483,7 @@
             },
             getAreas(val) {
                 var self = this;
-                
+
                 API.areas(1, 4000, val).then((res) => {
                     self.areaList = res.data;
                 })
@@ -495,7 +511,7 @@
                     loading.close()
                 }).catch(err => {
                     loading.close()
-                });;
+                });
             },
             // 选择地址
             selectSize(value) {
@@ -611,6 +627,22 @@
                 self.recSize = val;
                 self.getCommissionRecord(1, val);
                 self.recCurrent = 1;
+            },
+
+            // 统计佣金
+            handleStatistics(index, row) {
+                var self = this;
+                self.address_id = row.address_id;
+                self.dialogStatistics = true;
+            },
+
+            toConfirm() {
+                var self = this;
+                API.manualCommission(self.address_id).then(res => {
+                    self.$message.success("操作成功！");
+                    self.dialogStatistics = false;
+                    self.getList(self.current, self.size);
+                })
             },
 
             // 编辑

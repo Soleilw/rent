@@ -526,6 +526,13 @@ API.payCommission = function (id) {
 	})
 }
 
+// 统计佣金
+API.manualCommission = function (address_id) {
+	return axios.post(url.ManualCommission, {
+		address_id: address_id
+	})
+}
+
 API.passLose = function (addresses_id) {
 	return axios.post(url.PassLose, {
 		addresses_id: addresses_id
