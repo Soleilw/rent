@@ -73,6 +73,10 @@
             :before-upload="beforeUpload" :on-success="quillImgSuccess" style="display: none">
             <el-button size="small" type="primary" id="imgInput" element-loading-text="插入中,请稍候">点击上传</el-button>
           </el-upload>
+          <el-upload class="avatar-uploader quill-video" action="https://api.fengniaotuangou.cn/api/upload"
+            :before-upload="beforeUploadVideo" :on-success="handleVideoSuccess" style="display: none">
+            <el-button size="small" type="primary" id="imgInput" element-loading-text="插入中,请稍候">点击上传</el-button>
+          </el-upload>
         </el-form-item>
         <div class="submit">
           <el-form-item>
@@ -168,7 +172,7 @@
                   align: [],
                 }, ],
                 ["clean"],
-                ["link", "image"],
+                ["link", "image", "video"],
               ],
               handlers: {
                 image: function (value) {
@@ -178,6 +182,14 @@
                     this.quill.format("image", false);
                   }
                 },
+                video: function (value) {
+                  console.log(value);
+                  if (value) {
+                    document.querySelector(".quill-video input").click();
+                  } else {
+                    this.quill.format("video", false);
+                  }
+                }
               },
             },
           },
@@ -341,6 +353,42 @@
         self.$refs.upload.clearFiles();
         self.imageUrl = "";
       },
+
+
+      //上传前回调
+      beforeUploadVideo(file) {
+        var self = this;
+        loading = this.$loading({
+          lock: true,
+          text: "视频上传中...",
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
+        });
+        var fileSize = file.size / 1024 / 1024 < 50;
+        if (['video/mp4', 'video/ogg', 'video/flv', 'video/avi', 'video/wmv', 'video/rmvb', 'video/mov'].indexOf(file
+            .type) == -1) {
+          self.$message.error("请上传正确的视频格式");
+          return false;
+        }
+        if (!fileSize) {
+          self.$message.error("视频大小不能超过50MB");
+          return false;
+        }
+        self.isShowUploadVideo = false;
+      },
+
+      //上传成功回调
+      handleVideoSuccess(res, file) {
+        loading.close();
+        let quill = this.$refs.myQuillEditor.quill;
+        if (res.data) {
+          let length = quill.getSelection().index;
+          quill.insertEmbed(length, "video", res.data);
+          quill.setSelection(length + 1);
+        } else {
+          this.$message.error("视频插入失败");
+        }
+      }
     },
   };
 </script>
